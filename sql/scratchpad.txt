@@ -32,7 +32,7 @@ If Chicago, mention Kyle used to live there.
 If North Carolina, mention Linhda used to live there. Go to 6
 
 answer = "I live in Los Angeles"
-if answer.find('Los Angeles') > 0:
+if answer.find('The city of Los Angeles') > 0:
   print("That is where the show is recorded")
 
 
