@@ -68,7 +68,8 @@ SELECT * from bot_survey_response_answers;
 
 
 
-#survey_branching_logic
+# survey_branching_logic 
+# more work to be done.
 CREATE TABLE survey_branching_logic (
 question_id int not null
 ,magic_text varchar(1024) not null
@@ -77,4 +78,4 @@ question_id int not null
 
 
 show tables;
-select * from bot_survey_response_answers;
+
