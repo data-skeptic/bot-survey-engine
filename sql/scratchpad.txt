@@ -23,7 +23,9 @@ if answer.find('yes') > 0:
   go_to_question(5)
 
 
-If Los Angeles, mention Data Skeptic records in Los Angeles.  If Chicago, mention Kyle used to live there.  If North Carolina, mention Linhda used to live there. Go to 6
+If Los Angeles, mention Data Skeptic records in Los Angeles.
+If Chicago, mention Kyle used to live there.
+If North Carolina, mention Linhda used to live there. Go to 6
 
 answer = "I live in Los Angeles"
 if answer.find('Los Angeles') > 0:
