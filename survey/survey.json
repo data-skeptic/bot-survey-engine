@@ -14,7 +14,7 @@
   }
   , {"question_text": "Do you consider yourself to be a data scientist?"
   ,"question_id": 3
-  , "branching": {'Yes': 5, 'No': 4}
+  , "branching": {"Yes": 5, "No": 4}
   , "validation": {}
   }
   , {"question_text": "What is your field of study?"
@@ -28,47 +28,47 @@
   , "validation": {}}
   , {"question_text": "Where do you live?"
   ,"question_id": 6
-  , "branching": {'Los Angeles': {'some_text', 6}, 'Chicago': {'some_text', 6}, 'North Carolina': {'some_text', 6}, 'others': {'some_text', 6}}
+  , "branching": {"Los Angeles": {"some_text": 6}, "Chicago": {"some_text": 6}, "North Carolina": {"some_text", 6}, "others": {"some_text", 6}}
   , "validation": {}
   }
   , {"question_text": "What is your age?"
   ,"question_id": 7
-  , "branching": {8}
+  , "branching": {"next_question_id": 8}
   , "validation": {}
   }
   , {"question_text": "What is your gender?"
   ,"question_id": 8
-  , "branching": {9}
+  , "branching": {"next_question_id": 9}
   , "validation": {}
   }
   , {"question_text": "When and where do you listen to Data Skeptic?"
   ,"question_id": 9
-  , "branching": {extracted_ans(response), {'commute': 10, 'others': 11}}
+  , "branching": {"extracted_ans(response)": {"commute": 10, "others": 11}}
   , "validation": {}
   }
   , {"question_text": "What other podcasts do you listen to on your commute?"
   ,"question_id": 10
-  , "branching": {11}
+  , "branching": {"next_question_id": 11}
   , "validation": {}
   }
   , {"question_text": "What do you like most about Data Skeptic?"
   ,"question_id": 11
-  , "branching": {12}
+  , "branching": {"next_question_id": 12}
   , "validation": {}
   }
   , {"question_text": "In what ways would you like to see the show improve?"
   ,"question_id": 12
-  , "branching": {13}
+  , "branching": {"next_question_id": 13}
   , "validation": {}
   }
   , {"question_text": "Does any episode in your recent memory stand out as being a favorite?  If so, which one?"
   ,"question_id": 13
-  , "branching": {14}
+  , "branching": {"next_question_id": 14}
   , "validation": {}
   }
   , {"question_text": "Thanks for your feedback!  If we have any further questions, we'd like to be able to follow up via email.  If that's ok, please provide your email.  If not, feel free to write n/a."
   ,"question_id": 14
-  , "branching": {extracted_ans(response), {'email': save_email}}
+  , "branching": {"extracted_ans(response)": {"email": "save_email"}}
   , "validation": {}}
   ]
 }
