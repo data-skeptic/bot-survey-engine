@@ -71,8 +71,4 @@
   , "branching": {"email": "save_email"}
   , "validation": {}}
   ]
- ,"user_response":[ 
-   {"user_id": 1, "question_id": 1,"time_response": "record_time", "response": "response_orig", "extracted_resp": "extract response"}
-  ,{"user_id": 1, "question_id": 2,"time_response": "record_time", "response": "response_orig", "extracted_resp": "extract response"}
- ]
 }
