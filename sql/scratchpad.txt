@@ -17,6 +17,10 @@ CREATE TABLE bot_survey_response_answers (
 )
 
 
+
+
+
+
 If yes, Go to 5, Else go to 4
 
 if answer.find('yes') > 0:
