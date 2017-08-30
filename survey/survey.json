@@ -4,12 +4,12 @@
     {
     	"question_text": "When did you start listening to Data Skeptic?"
     ,"question_id": 1
-    , "branching": 2
+    , "branching": {"next_question_id": 2}
     , "validation": {}
     }
   , {"question_text": "What is your academic background?"
   ,"question_id": 2
-  , "branching": 3
+  , "branching": {"next_question_id": 3}
   , "validation": {}
   }
   , {"question_text": "Do you consider yourself to be a data scientist?"
@@ -19,12 +19,12 @@
   }
   , {"question_text": "What is your field of study?"
   ,"question_id": 4
-  , "branching": 5
+  , "branching": {"next_question_id": 5}
   , "validation": {}
   }
   , {"question_text": "How long have you been in your current role?"
   ,"question_id": 5
-  , "branching": 6
+  , "branching": {"next_question_id": 6}
   , "validation": {}}
   , {"question_text": "Where do you live?"
   ,"question_id": 6
@@ -43,7 +43,7 @@
   }
   , {"question_text": "When and where do you listen to Data Skeptic?"
   ,"question_id": 9
-  , "branching": {"extracted_ans(response)": {"commute": 10, "others": 11}}
+  , "branching": {"commute": 10, "others": 11}
   , "validation": {}
   }
   , {"question_text": "What other podcasts do you listen to on your commute?"
@@ -68,7 +68,7 @@
   }
   , {"question_text": "Thanks for your feedback!  If we have any further questions, we'd like to be able to follow up via email.  If that's ok, please provide your email.  If not, feel free to write n/a."
   ,"question_id": 14
-  , "branching": {"extracted_ans(response)": {"email": "save_email"}}
+  , "branching": {"email": "save_email"}
   , "validation": {}}
   ]
 }
