@@ -11,7 +11,7 @@ CREATE TABLE bot_survey_questions (
 , question_text varchar(1024) not null
 , default_next_question_id int 
 , is_starting_question BIT 
-, is_ending_question BIT
+, can_be_ending_question BIT
 , primary key (question_id)
 );
 
