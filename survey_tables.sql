@@ -15,7 +15,7 @@ CREATE TABLE bot_survey_questions (
 , primary key (question_id)
 );
 
-
+-- Modify this when the columns are determined. Or the table should be created using python from JSON file.
 -- INSERT INTO bot_survey_questions
 -- (question_text)
 -- VALUES ('When did you start listening to Data Skeptic?'),
