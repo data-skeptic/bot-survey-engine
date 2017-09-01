@@ -39,17 +39,11 @@ CREATE TABLE bot_survey_questions (
 # This table should get one record every time a survey is started. It will capture metadata like the time it is started.
 DROP TABLE IF EXISTS bot_survey_responses;
 CREATE TABLE bot_survey_responses(
-response_id int not null auto_increment
-,user_id int 
+ response_id int not null auto_increment
 ,response_start_time TIMESTAMP not null
 ,primary key (response_id)
 );
 
-
-INSERT INTO bot_survey_responses(response_id, user_id, survey_start_time) 
-values(3, 1, NOW()),
-(4,13, NOW());
-SELECT * from bot_survey_responses;
 
 
 # bot_survey_response_answers
@@ -57,20 +51,13 @@ DROP TABLE IF EXISTS bot_survey_response_answers;
 CREATE TABLE bot_survey_response_answers(
   response_answer_id bigint auto_increment
 , response_id int not null
-, user_id int
 , question_id int not null
-, question_order int 
+, question_order int not null
 , answer_time TIMESTAMP not null
 , answer_text varchar(1024) not null
 , PRIMARY KEY (response_answer_id)
 , FOREIGN KEY (response_id) REFERENCES bot_survey_responses(response_id)
 );
-
-INSERT INTO bot_survey_response_answers(response_id, user_id, question_id, question_order, answer_time, answer_text) 
-values(1, 200, 1, 1, NOW(), "In 2015, I started listening to Data Skeptic"),
-(1,200,2,2,Now(), "My academic background is Math");
-SELECT * from bot_survey_response_answers;
-
 
 
 # survey_branching_logic 
