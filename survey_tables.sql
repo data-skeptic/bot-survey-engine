@@ -41,6 +41,7 @@ DROP TABLE IF EXISTS bot_survey_responses;
 CREATE TABLE bot_survey_responses(
  response_id int not null auto_increment
 ,response_start_time TIMESTAMP not null
+,response_end_time TIMESTAMP null
 ,primary key (response_id)
 );
 
