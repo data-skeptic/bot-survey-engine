@@ -184,7 +184,7 @@ results = record_answer_to_database(response_id, question_id, question_order, an
 def magic_table():
    query_create =""" 
    CREATE TABLE magic (
-     branch_logic_id int not null auto_increment
+     magic_id int not null auto_increment
    , question_id int not null
    , magic_text varchar(1024) DEFAULT NULL
    , magic_reply varchar(1024) DEFAULT NULL
