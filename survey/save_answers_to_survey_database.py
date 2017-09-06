@@ -62,8 +62,7 @@ def record_answer_to_database(response_id, question_id, question_order, answer_t
         # we insert a new row in table bot_survey_responses to update the response_start_time
         # response_id will be generated automatically when insert a new row.
         try: 
-            response_start_time = internal.execute("SELECT NOW()")
-            template = "INSERT INTO bot_survey_responses(response_start_time) VALUES('{response_start_time}')"
+            template = "INSERT INTO bot_survey_responses(response_start_time) VALUES(NOW())"
             query = template.format(response_start_time=response_start_time)
             
             internal.execute(query)
@@ -87,10 +86,9 @@ def record_answer_to_database(response_id, question_id, question_order, answer_t
 
     # update table bot_survey_response_answers   
     try: 
-        answer_time = internal.execute("SELECT NOW()")
         # response_answer_id will be automatically added by sql when we insert new rows.
-        template = "INSERT INTO bot_survey_response_answers (response_id, question_id, question_order, answer_time, answer_text) VALUES('{response_id}','{question_id}', '{question_order}', '{answer_time}', '{answer_text}')"
-        query = template.format(response_id = response_id, question_id=question_id,  question_order=question_order, answer_time=answer_time, answer_text=answer_text)
+        template = "INSERT INTO bot_survey_response_answers (response_id, question_id, question_order, answer_time, answer_text) VALUES('{response_id}','{question_id}', '{question_order}', NOW(), '{answer_text}')"
+        query = template.format(response_id = response_id, question_id=question_id,  question_order=question_order, answer_text=answer_text)
         internal.execute(query) 
         # retrivel the response_id if the insertation is sucessful.
         r = internal.execute("SELECT LAST_INSERT_ID()") 
