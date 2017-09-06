@@ -63,7 +63,7 @@ def record_answer_to_database(response_id, question_id, question_order, answer_t
         # response_id will be generated automatically when insert a new row.
         try: 
             template = "INSERT INTO bot_survey_responses(response_start_time) VALUES(NOW())"
-            query = template.format(response_start_time=response_start_time)
+            query = template.format()
             
             internal.execute(query)
             
