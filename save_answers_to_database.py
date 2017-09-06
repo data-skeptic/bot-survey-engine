@@ -65,7 +65,23 @@ is_starting_question = True
 can_be_ending_question = False
 
 insert_question_into_table(question_id,question_text,default_next_question_id,is_starting_question,can_be_ending_question)
-   
+
+# retrieve question text given quesiton_id
+def retrieve_question(question_id):
+    try:
+        template = "SELECT question_text FROM bot_survey_questions WHERE question_id = '{question_id}' "
+        r = internal.execute(template.format(question_id = question_id))
+        return  r.fetchone()[0]
+
+        
+    except:
+        print('error in retrieve question text.')
+        raise
+    
+# test
+retrieve_question(question_id)
+
+
     
 
 # create table bot_survey_responses
