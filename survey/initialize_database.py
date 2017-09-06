@@ -97,9 +97,30 @@ def create_magic_table():
        print( "failed")
    finally:
        internal.close()
+    
+def create_logic_branches_table():
+    query_create =""" 
+    CREATE TABLE logic_branches (
+     logic_branches_id int not null auto_increment
+    , question_id int not null
+    , test_text varchar(1024) DEFAULT NULL
+    , next_question_id int not null
+    , primary key (logic_branches_id)
+    );
+    """
+    try:
+    #internal.execute("""DROP TABLE IF EXISTS bot_survey_response_answers;""")
+       internal.execute(query_create)
+       internal.commit()
+       print( "done")
+    except:
+       print( "failed")
+    finally:
+       internal.close()
 
 create_questions_table()
 create_responses_table()
 create_response_answers_table()
 create_magic_table()
+create_logic_branches_table()
 
