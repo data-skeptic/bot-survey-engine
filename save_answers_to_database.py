@@ -20,6 +20,53 @@ internal = Internal()
 # Test it is sucessfully connected.
 internal.execute('SHOW databases;')
 
+# create question table
+def create_questions_table():
+    query_create = """
+      CREATE TABLE bot_survey_questions (
+      question_id int not null auto_increment
+    , question_text varchar(1024) not null
+    , default_next_question_id int 
+    , is_starting_question BIT 
+    , can_be_ending_question BIT
+    , primary key (question_id)
+    );
+    """
+
+    try:
+        #internal.execute("""DROP TABLE IF EXISTS bot_survey_responses;""")
+        internal.execute(query_create)
+        print( "done")
+    except:
+        print( "failed")
+    finally:
+        internal.close()
+        
+
+create_questions_table()
+
+def insert_question_into_table(question_id,question_text,default_next_question_id,is_starting_question,can_be_ending_question):
+    try:
+        template = "INSERT INTO bot_survey_questions(question_id,question_text,default_next_question_id,is_starting_question,can_be_ending_question) VALUES('{question_id}','{question_text}','{default_next_question_id}','{is_starting_question}','{can_be_ending_question}')"
+        query = template.format(question_id = question_id,question_text=question_text,default_next_question_id=default_next_question_id,is_starting_question=is_starting_question,can_be_ending_question=can_be_ending_question)
+        internal.execute(query)
+        print('Insert into quesiton table is successful.')
+    except:
+        print("Error in insert operation")
+        pass
+    
+
+
+#test 
+question_id = 1
+question_text = 'When did you start listening to Data Skeptic?'
+default_next_question_id = 2
+is_starting_question = True
+can_be_ending_question = False
+
+insert_question_into_table(question_id,question_text,default_next_question_id,is_starting_question,can_be_ending_question)
+   
+    
 
 # create table bot_survey_responses
 
