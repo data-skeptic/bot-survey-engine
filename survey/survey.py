@@ -45,8 +45,7 @@ class survey():
         return result_dfs
     def get_next_question_id(self, question_id, answer):
         question_df = self._dfs['logic_branches_df']
-        question_df.columns = ['logic_branch_id','question_id', 'test_text','next_question_id'] # not robust, to be updated. or use r.keys() above
-        #print(question_df) for test
+        
         
         #filter according to question_id and the answer
         sub_df = question_df.loc[question_df['question_id'] == question_id & ((question_df['test_text'].isnull()) | (question_df['test_text'].apply(lambda x: str(x).lower() in answer.lower())))]
