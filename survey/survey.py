@@ -20,7 +20,7 @@ class survey():
         self.internal = Internal()
         #test
         try:
-            internal.execute("SHOW DATABASES;")
+            self.internal.execute("SHOW DATABASES;")
             print('The connection is successful.')
         except:
             print('The connection fails.')
