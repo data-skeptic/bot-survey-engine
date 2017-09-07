@@ -70,6 +70,8 @@ class survey():
                 r = self.internal.execute("SELECT last_insert_id()")
                 response_id = r.fetchone()[0]
                 #print(response_id)
+                print('Successful in inserting into bot_survey_responses table.')
+                print('Successful in getting the response_id.')                                                              
             except: 
                 print("Error in inserting into bot_survey_responses.")
                 raise
