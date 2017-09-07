@@ -71,7 +71,7 @@ class survey():
                 response_id = r.fetchone()[0]
                 #print(response_id)
             except: 
-                print("Error")
+                print("Error in inserting into bot_survey_responses.")
                 raise
         # response_id is known for the moment.
         # check whether the survey is over. If yes, then update the end_time and reset response_id = None
