@@ -116,35 +116,37 @@ class survey():
         return ""
 # the end of the definition of the class
 
-# test
-username = 'xiaofei'
-address = "iupdated.com:3306"
-databasename = 'survey'
+def test():
+    username = 'xiaofei'
+    address = "iupdated.com:3306"
+    databasename = 'survey'
 
-# check initialization
-s= survey(username, password, address, databasename)
-s._dfs['logic_branches_df']
-#check get_next_question_id
-s.get_next_question_id(1, "Since last year.")
+    # check initialization
+    s= survey(username, password, address, databasename)
+    s._dfs['logic_branches_df']
+    #check get_next_question_id
+    s.get_next_question_id(1, "Since last year.")
 
-response_id = None
-question_id =1
-question_order =1
-answer_text = "Some Text"
-(r_id, a_id) = s.save_answer(response_id, question_id, question_order, answer_text)
-print("Response_id and answer_id are ", (r_id, a_id))
-                                                                              
-#When insert an answer which has response_id into the answer table, 
-# the response_id must be in the response_id column of the response table due to the foreign key restriction.                                                                               
-respns = s.internal.execute('select response_id from bot_survey_responses;')
-response_ids = respns.fetchall() 
-response_ids = [id[0] for id in response_ids]
-                                                                              
-response_id = random.choice(response_ids)
-question_id =2
-question_order =2
-answer_text = "Some Text"
-s.save_answer(response_id, question_id, question_order, answer_text)
+    response_id = None
+    question_id =1
+    question_order =1
+    answer_text = "Some Text"
+    (r_id, a_id) = s.save_answer(response_id, question_id, question_order, answer_text)
+    print("Response_id and answer_id are ", (r_id, a_id))
 
-respns = s.internal.execute('select * from bot_survey_responses;')
-respns.fetchall()
+    #When insert an answer which has response_id into the answer table, 
+    # the response_id must be in the response_id column of the response table due to the foreign key restriction.                                                                               
+    respns = s.internal.execute('select response_id from bot_survey_responses;')
+    response_ids = respns.fetchall() 
+    response_ids = [id[0] for id in response_ids]
+
+    response_id = random.choice(response_ids)
+    question_id =2
+    question_order =2
+    answer_text = "Some Text"
+    s.save_answer(response_id, question_id, question_order, answer_text)
+
+    respns = s.internal.execute('select * from bot_survey_responses;')
+    respns.fetchall()
+if __name__ == "__main__":
+   main()                                                                              
