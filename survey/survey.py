@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 import datetime
 import time
 from pandas import DataFrame
+import random
 
 with open ("mysql_password.txt", "r") as myfile:
     password=myfile.readlines()[0].strip()    
@@ -130,9 +131,16 @@ response_id = None
 question_id =1
 question_order =1
 answer_text = "Some Text"
-s.save_answer(response_id, question_id, question_order, answer_text)
-
-response_id = 1
+(r_id, a_id) = s.save_answer(response_id, question_id, question_order, answer_text)
+print("Response_id and answer_id are ", (r_id, a_id))
+                                                                              
+#When insert an answer which has response_id into the answer table, 
+# the response_id must be in the response_id column of the response table due to the foreign key restriction.                                                                               
+respns = s.internal.execute('select response_id from bot_survey_responses;')
+response_ids = respns.fetchall() 
+response_ids = [id[0] for id in response_ids]
+                                                                              
+response_id = random.choice(response_ids)
 question_id =2
 question_order =2
 answer_text = "Some Text"
