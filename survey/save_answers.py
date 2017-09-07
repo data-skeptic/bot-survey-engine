@@ -114,13 +114,6 @@ class survey():
             if text_reply['magic_text'] in answer_text:
                 return text_reply['magic_reply']
         return ""
-        
-
-
-
-    
-
-
 
 # test
 username = 'xiaofei'
@@ -132,7 +125,6 @@ s= survey(username, password, address, databasename)
 s._dfs['logic_branches_df']
 #check get_next_question_id
 s.get_next_question_id(1, "Since last year.")
-
 
 response_id = None
 question_id =1
