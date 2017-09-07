@@ -37,7 +37,7 @@ class survey():
                 print('Refresh '+ table_name +' is successful.')
                 data = r.fetchall()
                 df = DataFrame(data)
-                #df.columns = r.keys() # to check the rightness
+                df.columns = r.keys()
                 result_dfs[table_name+"_df"] = df
             except:
                 print("Error in refresh " + table_name)
