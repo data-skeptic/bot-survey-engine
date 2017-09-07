@@ -16,8 +16,7 @@ class survey():
         #engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % ("xiaofei", password, "iupdated.com:3306","survey"),pool_size=3, pool_recycle=3600)
         engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, password, address,databasename),pool_size=3, pool_recycle=3600)
         Internal = sessionmaker(bind=engine_internal)
-        internal = Internal()
-        self.internal = internal 
+        self.internal = Internal()
         #test
         try:
             internal.execute("SHOW DATABASES;")
@@ -46,11 +45,11 @@ class survey():
         return result_dfs
     def get_next_question_id(self, question_id, answer):
         question_df = self._dfs['logic_branches_df']
-        question_df.columns = ['logic_branch_id','question_id', 'test_text','next_question_id'] # not robust to be updated
+        question_df.columns = ['logic_branch_id','question_id', 'test_text','next_question_id'] # not robust, to be updated. or use r.keys() above
         #print(question_df) for test
         
         #filter according to question_id and the answer
-        sub_df = question_df.loc[question_df['question_id'] == question_id]# & ((question_df['test_text'].isnull()) | (question_df['test_text'].apply(lambda x: str(x).lower() in answer.lower())))]
+        sub_df = question_df.loc[question_df['question_id'] == question_id & ((question_df['test_text'].isnull()) | (question_df['test_text'].apply(lambda x: str(x).lower() in answer.lower())))]
         return sub_df['next_question_id'].values[0]  if sub_df['next_question_id'].shape[0] == 1 else print('error in the design of the logic_branch table.')
         # When we design the table logic_branches, we should take the case that there is no next question into consideration. 
         # In this case, the next_question_id is -1.
@@ -101,7 +100,6 @@ class survey():
             print('Error in inserting into the answers table.')
             print('Error in getting response_anwser_id.')
             raise
-
         return response_id, response_answer_id
     def get_magic_reply(self, answer_text, question_id):
         template = "SELECT * FROM magic WHERE question_id = '{question_id}' "
@@ -114,6 +112,7 @@ class survey():
             if text_reply['magic_text'] in answer_text:
                 return text_reply['magic_reply']
         return ""
+# the end of the definition of the class
 
 # test
 username = 'xiaofei'
