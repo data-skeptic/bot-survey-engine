@@ -48,7 +48,7 @@ class survey():
         
         
         #filter according to question_id and the answer
-        sub_df = question_df.loc[question_df['question_id'] == question_id & ((question_df['test_text'].isnull()) | (question_df['test_text'].apply(lambda x: str(x).lower() in answer.lower())))]
+        sub_df = question_df.loc[question_df['question_id'] == question_id & ((question_df['test_text'].apply(lambda x: str(x) == "None") | (question_df['test_text'].apply(lambda x: str(x).lower() in answer.lower())))]
         return sub_df['next_question_id'].values[0]  if sub_df['next_question_id'].shape[0] == 1 else print('error in the design of the logic_branch table.')
         # When we design the table logic_branches, we should take the case that there is no next question into consideration. 
         # In this case, the next_question_id is -1.
