@@ -46,29 +46,33 @@ class GetQuestion(Resource):
         return resp
 
 class SaveAnswer(Resource):
+    #def post(self, response_id = None, question_id, question_order):
     def post(self):
         r = request.get_data()
-        print(r)
         req = json.loads(r.decode('utf-8'))
-        # todo list:
-        # get user's answer to question_id
-        # save to database: save_answer(self, response_id, question_id, question_order, answer_text) 
-        # return magic text: get_magic_reply(self, answer_text, question_id) 
-        # return next_question_id: get_next_question_id(self, question_id, answer):
-        resp = { "magic_text": "Great job", "next_question_id": 2, "your_msg": req}
+
+        answer_text = req['answer_text']
+        question_id = req['question_id']
+        question_order = req['question_order']
+        if 'response_id' in req:
+            response_id = req['response_id']
+        else:
+            response_id = None
+        
+        magic_text = survey_instance.get_magic_reply(answer_text, question_id)
+        next_question_id = survey_instance.get_next_question_id(question_id, answer_text)
+        response_id, response_answer_id = survey_instance.save_answer(response_id, question_id, question_order, answer_text)
+    
+        resp = { "magic_text": magic_text, "next_question_id": int(next_question_id)}
         return resp
-
-# GET /survey/question?question_id=2
-# {"question_id": 2, "question_text": "blah}
-
-# POST /survey/response/answer/save
 
 if __name__ == '__main__':
     logger.info("Init")
     app = Flask(__name__)
     api = Api(app)
     parser = reqparse.RequestParser()
-    api.add_resource(GetQuestion,          '/survey/question/<int:question_id>')
-    api.add_resource(SaveAnswer,           '/survey/response/answer/save')
+    api.add_resource(GetQuestion,  '/survey/question/<int:question_id>')
+    api.add_resource(SaveAnswer,   '/survey/response/answer/save')
     app.run(host='0.0.0.0', debug=False, port=3500)
     logger.info("Ready")
+    print("***")

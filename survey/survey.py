@@ -7,17 +7,20 @@ import time
 from pandas import DataFrame
 import random
 
-# with open ("mysql_password.txt", "r") as myfile:
-#     password=myfile.readlines()[0].strip()    
-password = "LGEDQYpADZVwAJdFUJ5wrJ2K8bsrgAYP"
+
 class Survey():   
-    def __init__(self, username, password, address, databasename):
-        
+    def __init__(self, username, address, databasename):
+         
+        with open ("mysql_password.txt", "r") as myfile:
+            self.password = myfile.readlines()[0].strip()    
+        #password = "LGEDQYpADZVwAJdFUJ5wrJ2K8bsrgAYP"
+
         #connect to sqlworkbench/J
         #engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % ("xiaofei", password, "iupdated.com:3306","survey"),pool_size=3, pool_recycle=3600)
-        engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, password, address,databasename),pool_size=3, pool_recycle=3600)
-        Internal = sessionmaker(bind=engine_internal)
-        self.internal = Internal()
+        engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, self.password, address,databasename),pool_size=3, pool_recycle=3600)
+        #Internal = sessionmaker(bind=engine_internal)
+        #self.internal = Internal()
+        self.internal = engine_internal
         #test
         try:
             self.internal.execute("SHOW DATABASES;")
@@ -65,7 +68,7 @@ class Survey():
         write a function to update responses and answers tables.
         '''
         # update table bot_survey_responses if response_id is None
-        if response_id is None:  # a new survey starts when response_id is None.
+        if response_id is  None:  # a new survey starts when response_id is None.
             # we insert a new row in table bot_survey_responses to update the response_start_time
             # response_id will be generated automatically when insert a new row.
             try: 
@@ -93,6 +96,14 @@ class Survey():
 
         # update table bot_survey_response_answers   
         try: 
+            #check whether response_id is in the response_table
+            respns = self.internal.execute('select response_id from bot_survey_responses;')
+            response_ids = respns.fetchall() 
+            response_ids = [id[0] for id in response_ids]
+
+            if response_id not in response_ids:
+                print('Foreign key error will happen. Because response_id is not in the response table.')
+                return 
             # response_answer_id will be automatically added by sql when we insert new rows.
             template = "INSERT INTO bot_survey_response_answers (response_id, question_id, question_order, answer_time, answer_text) VALUES('{response_id}','{question_id}', '{question_order}', NOW(), '{answer_text}')"
             query = template.format(response_id = response_id, question_id=question_id,  question_order=question_order, answer_text=answer_text)
@@ -126,7 +137,7 @@ def create_survey():
     address = "iupdated.com:3306"
     databasename = 'survey'
     # check initialization
-    survey_instance = Survey(username, password, address, databasename)
+    survey_instance = Survey(username, address, databasename)
     return survey_instance
 
 def test():
@@ -135,7 +146,7 @@ def test():
     databasename = 'survey'
 
     # check initialization
-    s= Survey(username, password, address, databasename)
+    s= Survey(username,  address, databasename)
     s._dfs['logic_branches_df']
     #check get_next_question_id
     s.get_next_question_id(1, "Since last year.")
@@ -166,4 +177,5 @@ def test():
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
    main()
+   print("***")
    
