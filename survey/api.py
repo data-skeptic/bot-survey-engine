@@ -46,13 +46,16 @@ class GetQuestion(Resource):
         return resp
 
 class SaveAnswer(Resource):
-    def post(self, question_id):
+    def post(self):
+        r = request.get_data()
+        print(r)
+        req = json.loads(r.decode('utf-8'))
         # todo list:
         # get user's answer to question_id
         # save to database: save_answer(self, response_id, question_id, question_order, answer_text) 
         # return magic text: get_magic_reply(self, answer_text, question_id) 
         # return next_question_id: get_next_question_id(self, question_id, answer):
-        resp = { "magic_text": "Great job", "next_question_id": 2}
+        resp = { "magic_text": "Great job", "next_question_id": 2, "your_msg": req}
         return resp
 
 # GET /survey/question?question_id=2
