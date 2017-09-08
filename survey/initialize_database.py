@@ -40,8 +40,8 @@ def create_responses_table():
     query_create = """
     CREATE TABLE bot_survey_responses(
      response_id INT NOT NULL AUTO_INCREMENT,
-     response_start_time TIMESTAMP NOT NULL,
-     response_end_time TIMESTAMP default NULL,
+     response_start_time DATETIME NOT NULL,
+     response_end_time DATETIME default null,
      primary key(response_id)
     );
     """
