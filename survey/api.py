@@ -38,20 +38,16 @@ survey_instance = survey.create_survey()
 
 class GetQuestion(Resource):
     def get(self, question_id):
-        #print('enter get.')
         question_text = survey_instance.get_question_text(question_id)
-        #print(question_text)
-        #print(question_id)
         resp = {
             "question_id": question_id,
             "question_text": question_text
         }
-        #print(resp)
-        #print('get over.')
         return resp
 
 class SaveAnswer(Resource):
     def post(self, question_id):
+        # todo list:
         # get user's answer to question_id
         # save to database: save_answer(self, response_id, question_id, question_order, answer_text) 
         # return magic text: get_magic_reply(self, answer_text, question_id) 
