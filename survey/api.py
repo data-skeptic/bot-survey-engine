@@ -56,14 +56,16 @@ class SaveAnswer(Resource):
         question_order = req['question_order']
         if 'response_id' in req:
             response_id = req['response_id']
+            print('response_id is ', response_id)
         else:
             response_id = None
+            print('response_id is none.')
         
         magic_text = survey_instance.get_magic_reply(answer_text, question_id)
         next_question_id = survey_instance.get_next_question_id(question_id, answer_text)
         response_id, response_answer_id = survey_instance.save_answer(response_id, question_id, question_order, answer_text)
-    
-        resp = { "magic_text": magic_text, "next_question_id": int(next_question_id)}
+        
+        resp = { "magic_text": magic_text, "response_id": response_id, "next_question_id": int(next_question_id)}
         return resp
 
 if __name__ == '__main__':
@@ -75,4 +77,4 @@ if __name__ == '__main__':
     api.add_resource(SaveAnswer,   '/survey/response/answer/save')
     app.run(host='0.0.0.0', debug=False, port=3500)
     logger.info("Ready")
-    
+    print("****")

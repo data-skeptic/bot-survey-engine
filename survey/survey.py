@@ -67,25 +67,29 @@ class Survey():
         write a function to update responses and answers tables.
         '''
         # update table bot_survey_responses if response_id is None
-        if response_id is  None:  # a new survey starts when response_id is None.
+        if response_id is None:  # a new survey starts when response_id is None.
             # we insert a new row in table bot_survey_responses to update the response_start_time
             # response_id will be generated automatically when insert a new row.
             try: 
                 template = "INSERT INTO bot_survey_responses(response_start_time) VALUES(NOW())"
                 query = template.format()
-                self.internal.execute(query)
-                # retrivel the response_id if the insertation is sucessful.
-                r = self.internal.execute("SELECT last_insert_id()")
-                response_id = r.fetchone()[0]
-                #print(response_id)
+                conn = self.internal.connect()
+                conn.execute(query)
+                r = conn.execute("SELECT last_insert_id()")
+
+                conn.close()
+                #self.internal.execute(query)
                 print('Successful in inserting into bot_survey_responses table.')
+                # retrivel the response_id if the insertation is sucessful.
+                response_id = r.fetchone()[0]
+                print('get a new response_id', response_id)
                 print('Successful in getting the response_id.')                                                              
             except: 
                 print("Error in inserting into bot_survey_responses.")
                 raise
         # response_id is known for the moment.
         # check whether the survey is over. If yes, then update the end_time and reset response_id = None
-        last_question_list = [4,5]  # just for test todo: query from question_table to get a list of ending question_ids.
+        last_question_list = [6]  # just for test todo: query from question_table to get a list of ending question_ids.
         if question_id in last_question_list:
             # Then the survey is over
             template = "UPDATE bot_survey_responses SET response_end_time = Now() WHERE response_id = '{response_id}';"
@@ -105,6 +109,7 @@ class Survey():
                 return 
             # response_answer_id will be automatically added by sql when we insert new rows.
             template = "INSERT INTO bot_survey_response_answers (response_id, question_id, question_order, answer_time, answer_text) VALUES('{response_id}','{question_id}', '{question_order}', NOW(), '{answer_text}')"
+            print('in the survey.py, print the response_id which is to be inserted into the table ', response_id)
             query = template.format(response_id = response_id, question_id=question_id,  question_order=question_order, answer_text=answer_text)
             self.internal.execute(query) 
             # retrivel the response_id if the insertation is sucessful.
@@ -176,5 +181,5 @@ def test():
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
    main()
-   
+   print('****')
    
