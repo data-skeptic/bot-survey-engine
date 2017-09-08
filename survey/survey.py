@@ -13,7 +13,6 @@ class Survey():
          
         with open ("mysql_password.txt", "r") as myfile:
             self.password = myfile.readlines()[0].strip()    
-        #password = "LGEDQYpADZVwAJdFUJ5wrJ2K8bsrgAYP"
 
         #connect to sqlworkbench/J
         #engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % ("xiaofei", password, "iupdated.com:3306","survey"),pool_size=3, pool_recycle=3600)
