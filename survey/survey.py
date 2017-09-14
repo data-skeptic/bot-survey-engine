@@ -6,6 +6,9 @@ import datetime
 import time
 from pandas import DataFrame
 import random
+import pandas as pd
+import json
+import boto3
 
 
 class Survey():   
@@ -134,6 +137,65 @@ class Survey():
             if text_reply['magic_text'] in answer_text:
                 return text_reply['magic_reply']
         return ""
+
+    def survey_retrieval(self, next_question_id, response_id):
+        result_dfs = {}
+        if next_question_id == -1:
+            print('The survey is complete. Information retrieval time!') # for testing
+            # how to get all information needed for an email from database?
+            table_names = ['bot_survey_response_answers', 'bot_survey_responses']
+            for table_name in table_names:
+                try:
+                    r = self.internal.execute("SELECT * FROM "+ table_name + " where response_id = " + str(response_id))
+                    print('Refresh '+ table_name +' is successful.')
+                    data = r.fetchall()
+                    df = DataFrame(data)
+                    df.columns = r.keys()
+                    result_dfs[table_name+"_df"] = df
+                except:
+                    print("Error in refreshing " + table_name)
+                    raise        
+        # if the survey is completed, return {'bot_survey_responses_df': a df, 'bot_survey_response_answers_df': a df }
+        # else return {}
+        return result_dfs
+
+    #def send_email(self, result_dfs, source_email, destination_email, reply_to_email):
+    def send_email(self,result_dfs):
+        with open ("awskeys.txt", "r") as myfile:
+            user, pw = [s.strip() for s in myfile.readlines()]
+
+        client = boto3.client('ses',
+                    region_name = 'us-east-1', 
+                    aws_access_key_id = user, 
+                    aws_secret_access_key = pw)
+        source_email = "xfzhengnankai@gmail.com"
+        destination_email = "fayezheng1010@gmail.com"
+        reply_to_email = source_email
+        if len(result_dfs) == 2:
+            bodyhtml = [df.to_html() for df in result_dfs.values()]
+            response = client.send_email(
+                Source= source_email,
+                Destination={'ToAddresses': [destination_email]},
+                Message={
+                    'Subject': {
+                        'Data': 'A survey is complete.'
+                    },
+                    'Body': {
+                        'Html': {
+                            'Data': bodyhtml[0]
+                        },
+                        'Html': {
+                            'Data': bodyhtml[1]
+                        }
+
+                    }
+                },
+                ReplyToAddresses=[reply_to_email]
+            )
+            return response if 'ErrorResponse' in response else 'successful. Check email box.'  # if successful, return ""
+        else:
+            print("The survey is not complete yet. Email will be sent once it is complete.") 
+            return "not complete yet."
 # the end of the definition of the class
 
 def create_survey():
