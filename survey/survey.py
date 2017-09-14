@@ -1,3 +1,4 @@
+#(9_14_17)
 import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
@@ -92,6 +93,7 @@ class Survey():
                 raise
         # response_id is known for the moment.
         # check whether the survey is over. If yes, then update the end_time and reset response_id = None
+        
         last_question_list = [6]  # just for test todo: query from question_table to get a list of ending question_ids.
         if question_id in last_question_list:
             # Then the survey is over
