@@ -1,3 +1,4 @@
+#9_14_17
 from flask import Flask
 from flask import Response
 from flask_restful import reqparse, Resource, Api, request
@@ -66,6 +67,13 @@ class SaveAnswer(Resource):
         response_id, response_answer_id = survey_instance.save_answer(response_id, question_id, question_order, answer_text)
         
         resp = { "magic_text": magic_text, "response_id": response_id, "next_question_id": int(next_question_id)}
+        if next_question_id == -1:
+            content = survey_instance.survey_retrieval(next_question_id, response_id)
+            print(content)
+            if content.empty:
+                print("No data for the current survey.")
+            else:
+                survey_instance.send_email(content)
         return resp
 
 if __name__ == '__main__':
