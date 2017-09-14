@@ -139,25 +139,35 @@ class Survey():
         return ""
 
     def survey_retrieval(self, next_question_id, response_id):
-        result_dfs = {}
+        
         if next_question_id == -1:
             print('The survey is complete. Information retrieval time!') # for testing
             # how to get all information needed for an email from database?
-            table_names = ['bot_survey_response_answers', 'bot_survey_responses']
-            for table_name in table_names:
-                try:
-                    r = self.internal.execute("SELECT * FROM "+ table_name + " where response_id = " + str(response_id))
-                    print('Refresh '+ table_name +' is successful.')
-                    data = r.fetchall()
-                    df = DataFrame(data)
-                    df.columns = r.keys()
-                    result_dfs[table_name+"_df"] = df
-                except:
-                    print("Error in refreshing " + table_name)
-                    raise        
+            table_name = 'bot_survey_response_answers'
+            try:
+                r = self.internal.execute("SELECT * FROM "+ table_name + " where response_id = " + str(response_id))
+                print('Refresh '+ table_name +' is successful.')
+                data = r.fetchall()
+                df = DataFrame(data)
+                df.columns = r.keys()
+    
+            except:
+                print("Error in refreshing " + table_name)
+                raise 
+            #print("question_table is : ")
+            question_table = self._dfs['bot_survey_questions_df'][['question_id', 'question_text']]
+            #print(question_table) 
+            question_dict = dict(zip(question_table.question_id, question_table.question_text))
+            #print(question_dict)
+            df = df.replace({"question_id": question_dict})
+            df = df[['question_id', 'answer_time', 'answer_text']]  
+            df.rename(columns={'question_id': 'question_text'}, inplace=True)
+            df = df[df['question_text'] != -1 ]
         # if the survey is completed, return {'bot_survey_responses_df': a df, 'bot_survey_response_answers_df': a df }
         # else return {}
-        return result_dfs
+            return df
+        else:
+            return pd.DataFrame()
 
     #def send_email(self, result_dfs, source_email, destination_email, reply_to_email):
     def send_email(self,result_dfs):
@@ -171,8 +181,8 @@ class Survey():
         source_email = "xfzhengnankai@gmail.com"
         destination_email = "fayezheng1010@gmail.com"
         reply_to_email = source_email
-        if len(result_dfs) == 2:
-            bodyhtml = [df.to_html() for df in result_dfs.values()]
+        if not result_dfs.empty:
+            bodyhtml = result_dfs.to_html() 
             response = client.send_email(
                 Source= source_email,
                 Destination={'ToAddresses': [destination_email]},
@@ -182,12 +192,8 @@ class Survey():
                     },
                     'Body': {
                         'Html': {
-                            'Data': bodyhtml[0]
-                        },
-                        'Html': {
-                            'Data': bodyhtml[1]
+                            'Data': bodyhtml
                         }
-
                     }
                 },
                 ReplyToAddresses=[reply_to_email]
