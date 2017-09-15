@@ -60,16 +60,20 @@ class Survey():
     def get_next_question_id(self, question_id, answer):
         question_df = self._dfs['logic_branches_df']
         #filter according to question_id and the answer
-        sub_df = question_df.loc[(question_df['question_id'] == question_id) & ((question_df['test_text'].apply(lambda x: str(x) == "None")) | (question_df['test_text'].apply(lambda x: str(x).lower() in answer.lower())))]
-        return sub_df['next_question_id'].values[0]  if sub_df['next_question_id'].shape[0] == 1 else print('error in the design of the logic_branch table.')
-        # When we design the table logic_branches, we should take the case that there is no next question into consideration. 
-        # In this case, the next_question_id is -1.
+        sub_df = question_df.loc[(question_df['question_id'] == question_id) & (question_df['test_text'].apply(lambda x: str(x).lower() in answer.lower()) )]
+        if sub_df['next_question_id'].shape[0] == 1:
+            return sub_df['next_question_id'].values[0]
+        else:
+            sub_df = question_df.loc[(question_df['question_id'] == question_id) & ((question_df['test_text'].apply(lambda x: str(x) == "None")) )]
+            return sub_df['next_question_id'].values[0]
     
     # update table bot_survey_response_answers and bot_survey_responses with users' answers.
     def save_answer(self, response_id, question_id, question_order, answer_text):
         '''
         write a function to update responses and answers tables.
         '''
+        answer_text = answer_text.replace("'", "\\'")
+        print("answer_text is ", answer_text)
         # update table bot_survey_responses if response_id is None
         if response_id is None:  # a new survey starts when response_id is None.
             # we insert a new row in table bot_survey_responses to update the response_start_time
