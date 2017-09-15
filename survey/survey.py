@@ -180,14 +180,14 @@ class Survey():
                     region_name = 'us-east-1', 
                     aws_access_key_id = user, 
                     aws_secret_access_key = pw)
-        source_email = "xfzhengnankai@gmail.com"
-        destination_email = "fayezheng1010@gmail.com"
+        source_email = "kylepolich@gmail.com"
+        destination_email = ["kyle@dataskeptic.com,fayezheng1010@gmail.com"]
         reply_to_email = source_email
         if not result_dfs.empty:
             bodyhtml = result_dfs.to_html() 
             response = client.send_email(
                 Source= source_email,
-                Destination={'ToAddresses': [destination_email]},
+                Destination={'ToAddresses': destination_email},
                 Message={
                     'Subject': {
                         'Data': 'A survey is complete.'
