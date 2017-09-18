@@ -75,7 +75,8 @@ class Survey():
         answer_text = answer_text.replace("'", "\\'")
         answer_text = answer_text.replace(";", "\\;")
         answer_text = answer_text.replace("&", "\\&")
-        
+        #answer_text = answer_text.replace("%", " percent")
+
         print("answer_text is ", answer_text)
         # update table bot_survey_responses if response_id is None
         if response_id is None:  # a new survey starts when response_id is None.
@@ -101,7 +102,8 @@ class Survey():
         # response_id is known for the moment.
         # check whether the survey is over. If yes, then update the end_time and reset response_id = None
         
-        last_question_list = [6]  # just for test todo: query from question_table to get a list of ending question_ids.
+          # just for test todo: query from question_table to get a list of ending question_ids.
+        last_question_list = [20]
         if question_id in last_question_list:
             # Then the survey is over
             template = "UPDATE bot_survey_responses SET response_end_time = Now() WHERE response_id = '{response_id}';"
