@@ -1,0 +1,176 @@
+{
+  "survey_name": "Data Skeptic Listener Survey"
+, "questions": [
+  {
+    "question_text": "When did you start listening to Data Skeptic?"
+  ,"question_id": 1
+  }
+  , {"question_text": "What is your job?"
+  ,"question_id": 2
+  }
+  , {"question_text": "What is your academic background?"
+  ,"question_id": 3
+  }
+  , {"question_text": "Do you consider yourself to be a data scientist?  (Yes or No)"
+  ,"question_id": 4
+  }
+  , {"question_text": "What is your field of study?"
+  ,"question_id": 5
+  }
+  , {"question_text": "How long have you been in your current role?"
+  ,"question_id": 6
+  }
+  , {"question_text": "Where do you live?"
+  ,"question_id": 7
+  }
+  , {"question_text": "What is your age?"
+  ,"question_id": 8
+  }
+  , {"question_text": "What is your gender?"
+  ,"question_id": 9
+  }
+  , {"question_text": "When and where do you listen to Data Skeptic?"
+  ,"question_id": 10
+  }
+  , {"question_text": "What other podcasts do you listen to on your commute?"
+  ,"question_id": 11
+  }
+  , {"question_text": "What do you like most about Data Skeptic?"
+  ,"question_id": 12
+  }
+  , {"question_text": "In what ways would you like to see the show improve?"
+  ,"question_id": 13
+  }
+  , {"question_text": "Does any episode in your recent memory stand out as being a favorite?  (Yes or No) "
+  ,"question_id": 14
+  }
+  , {"question_text": "Which one? What did you like the most?  Be specific."
+  ,"question_id": 15
+  }
+  , {"question_text": "Do you listen to every episode?  (Yes or No)"
+  ,"question_id": 16
+  }
+  , {"question_text": "Data Skeptic is released every week; how do you choose which shows to listen to?"
+  ,"question_id": 17
+  }
+  , {"question_text": "What percentage of Data Skeptic do you listen to?"
+  ,"question_id": 18
+  }
+   , {"question_text": "Is there anything else that we should know? Be specific."
+  ,"question_id": 19
+  }
+  , {"question_text": "Thanks for your feedback!  If we have any further questions, we\\'d like to be able to follow up via email.  If that\\'s ok, please provide your email.  If not, feel free to write n/a."
+  ,"question_id": 20
+  }
+  ],
+"logic_branches": [
+  { "question_id": 1,
+    "test_text": "None",
+    "next_question_id":2
+  }
+  ,{ "question_id": 2,
+    "test_text": "None",
+    "next_question_id":3
+  }
+  ,{ "question_id": 3,
+    "test_text": "None",
+    "next_question_id":4
+  }
+  ,{ "question_id": 4,
+    "test_text": "Yes",
+    "next_question_id":6
+  }
+  ,{ "question_id": 4,
+    "test_text": "No",
+    "next_question_id":5
+  }
+  ,{ "question_id": 4,
+    "test_text": "None",
+    "next_question_id":5
+  }
+  ,{ "question_id": 5,
+    "test_text": "None",
+    "next_question_id":6
+  }
+  ,{ "question_id": 6,
+    "test_text": "None",
+    "next_question_id":7
+  }
+  ,{ "question_id": 7,
+    "test_text": "None",
+    "next_question_id":8
+  }
+  ,{ "question_id": 8,
+    "test_text": "None",
+    "next_question_id":9
+  }
+  ,{ "question_id": 9,
+    "test_text": "None",
+    "next_question_id":10
+  }
+  ,{ "question_id": 10,
+    "test_text": "commute",
+    "next_question_id":11
+  }
+  ,{ "question_id": 10,
+    "test_text": "None",
+    "next_question_id":12
+  }
+  ,{ "question_id": 11,
+    "test_text": "None",
+    "next_question_id":12
+  }
+  ,{ "question_id": 12,
+    "test_text": "None",
+    "next_question_id":13
+  }
+  ,{ "question_id": 13,
+    "test_text": "None",
+    "next_question_id":14
+  }
+  ,{ "question_id": 14,
+    "test_text": "Yes",
+    "next_question_id":15
+  }
+  ,{ "question_id": 14,
+    "test_text": "No",
+    "next_question_id":16
+  }
+   ,{ "question_id": 14,
+    "test_text": "None",
+    "next_question_id":16
+  }
+   ,{ "question_id": 15,
+    "test_text": "None",
+    "next_question_id":16
+  }
+   ,{ "question_id": 16,
+    "test_text": "Yes",
+    "next_question_id":19
+  }
+   ,{ "question_id": 16,
+    "test_text": "None",
+    "next_question_id":19
+  }
+  ,{ "question_id": 16,
+    "test_text": "No",
+    "next_question_id":17
+  }
+    ,{ "question_id": 17,
+    "test_text": "None",
+    "next_question_id":18
+  }
+    ,{ "question_id": 18,
+    "test_text": "None",
+    "next_question_id":19
+  }
+    ,{ "question_id": 19,
+    "test_text": "None",
+    "next_question_id":20
+  }
+    ,{ "question_id": 20,
+    "test_text": "None",
+    "next_question_id":-1
+  }
+]
+}
