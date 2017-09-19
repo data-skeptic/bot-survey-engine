@@ -75,9 +75,9 @@ class Survey():
         answer_text = answer_text.replace("'", "\\'")
         answer_text = answer_text.replace(";", "\\;")
         answer_text = answer_text.replace("&", "\\&")
-        #answer_text = answer_text.replace("%", " percent")
+        answer_text = answer_text.replace("%", "\\%")
 
-        print("answer_text is ", answer_text)
+        print("answer_text is", answer_text)
         # update table bot_survey_responses if response_id is None
         if response_id is None:  # a new survey starts when response_id is None.
             # we insert a new row in table bot_survey_responses to update the response_start_time
