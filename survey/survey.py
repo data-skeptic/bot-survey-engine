@@ -75,7 +75,7 @@ class Survey():
         answer_text = answer_text.replace("'", "\\'")
         answer_text = answer_text.replace(";", "\\;")
         answer_text = answer_text.replace("&", "\\&")
-        answer_text = answer_text.replace("%", "\\%")
+        answer_text = answer_text.replace("%", "%%")
 
         print("answer_text is", answer_text)
         # update table bot_survey_responses if response_id is None
