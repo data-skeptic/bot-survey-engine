@@ -192,7 +192,7 @@ class Survey():
                     aws_access_key_id = user, 
                     aws_secret_access_key = pw)
         source_email = "kyle@dataskeptic.com"
-        destination_email = ["fayezheng1010@gmail.com"] #add "kyle@dataskeptic.com" later when everything is fixed.
+        destination_email = ["kyle@dataskeptic.com", "fayezheng1010@gmail.com"] #add "kyle@dataskeptic.com" later when everything is fixed.
         reply_to_email = source_email
         if not result_dfs.empty:
             bodyhtml = result_dfs.to_html() 
