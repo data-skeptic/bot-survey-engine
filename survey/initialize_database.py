@@ -20,10 +20,7 @@ def create_questions_table():
     query_create = """
       CREATE TABLE bot_survey_questions (
       question_id int not null auto_increment
-    , question_text varchar(1024) not null
-    , default_next_question_id int 
-    , is_starting_question BIT 
-    , can_be_ending_question BIT
+    , question_text varchar(244) not null
     , primary key (question_id)
     );
     """
