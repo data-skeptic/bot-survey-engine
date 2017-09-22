@@ -20,7 +20,7 @@ print(r.fetchall())
 
 
 def insert_into_questions_table(question_id, question_text):
-	template = "INSERT INTO bot_survey_questions_test (question_id, question_text) VALUES('{question_id}','{question_text}')"
+	template = "INSERT INTO bot_survey_questions (question_id, question_text) VALUES('{question_id}','{question_text}')"
 	query = template.format(question_id = question_id, question_text = question_text)
 	try:
 	    internal.execute(query)
@@ -30,7 +30,7 @@ def insert_into_questions_table(question_id, question_text):
 	# finally:
 	#     internal.close() 
 def insert_into_logic_branches(question_id, test_text, next_question_id):
-	template = "INSERT INTO logic_branches_test (question_id, test_text, next_question_id) VALUES('{question_id}','{test_text}','{next_question_id}')"
+	template = "INSERT INTO logic_branches (question_id, test_text, next_question_id) VALUES('{question_id}','{test_text}','{next_question_id}')"
 	query = template.format(question_id = question_id, test_text = test_text, next_question_id = next_question_id)
 	try:
 	    internal.execute(query)
@@ -40,7 +40,7 @@ def insert_into_logic_branches(question_id, test_text, next_question_id):
 	# finally:
 	#     internal.close() 
 def update_logic_branches(question_id, test_text, next_question_id):
-	template = "UPDATE logic_branches_test SET next_question_id = '{next_question_id}', test_text = '{test_text}' WHERE question_id = '{question_id}';"
+	template = "UPDATE logic_branches SET next_question_id = '{next_question_id}', test_text = '{test_text}' WHERE question_id = '{question_id}';"
 	query = template.format(question_id = question_id, test_text = test_text, next_question_id = next_question_id)
 	try:
 	    internal.execute(query)
@@ -50,7 +50,7 @@ def update_logic_branches(question_id, test_text, next_question_id):
 	# finally:
 	#     internal.close() 
 
-with open('survey_test.json') as f:
+with open('survey.json') as f:
 	data = json.load(f)
 	questions = data['questions'] # questions is a list of dictionaries
 	logic_branches = data['logic_branches'] # logic_branches is a list of dictionary
