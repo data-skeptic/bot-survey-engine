@@ -52,10 +52,12 @@ class Survey():
                 raise        
         return result_dfs
     def get_question_text(self, question_id):
-        print("debugging for get_question_text.")
+        print("I am getting the question text now.")
         df = self._dfs['bot_survey_questions_df']
-        
-        return df[df['question_id'] == question_id]['question_text'].values[0]
+        if question_id != -1:
+            return df[df['question_id'] == question_id]['question_text'].values[0]
+        else:
+            return "The survey is over. Thank you."
         #return 'default question.'
     def get_next_question_id(self, question_id, answer):
         question_df = self._dfs['logic_branches_df']
@@ -190,7 +192,7 @@ class Survey():
                     aws_access_key_id = user, 
                     aws_secret_access_key = pw)
         source_email = "kyle@dataskeptic.com"
-        destination_email = ["kyle@dataskeptic.com","fayezheng1010@gmail.com"]
+        destination_email = ["fayezheng1010@gmail.com"] #add "kyle@dataskeptic.com" later when everything is fixed.
         reply_to_email = source_email
         if not result_dfs.empty:
             bodyhtml = result_dfs.to_html() 
