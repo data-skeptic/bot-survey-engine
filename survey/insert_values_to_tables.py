@@ -54,7 +54,7 @@ with open('survey.json') as f:
 	data = json.load(f)
 	questions = data['questions'] # questions is a list of dictionaries
 	logic_branches = data['logic_branches'] # logic_branches is a list of dictionary
-
+	magic = data['magic']
 
 for item in questions:
 	question_text = item['question_text']
@@ -67,6 +67,12 @@ for item in logic_branches:
 	next_question_id = item['next_question_id']
 	test_text = item['test_text']
 	insert_into_logic_branches(question_id, test_text, next_question_id)
+	
+for item in magic:
+	question_id = item['question_id']
+	magic_text = item['magic_text']
+	magic_reply = item['magic_reply']
+	insert_into_magic_table(question_id, magic_text, magic_reply)
 
 
 
