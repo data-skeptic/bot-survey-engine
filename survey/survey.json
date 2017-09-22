@@ -172,5 +172,19 @@
     "test_text": "None",
     "next_question_id":-1
   }
+],
+"magic": [
+    {"question_id": 7, 
+    "magic_text": "Los Angeles", 
+    "magic_reply": "Data Skeptic records in Los Angeles."
+  }
+    ,{"question_id": 7, 
+    "magic_text": "Chicago", 
+    "magic_reply": "Kyle used to live there."
+  }
+    ,{ "question_id": 7, 
+    "magic_text": "North Carolina", 
+    "magic_reply": "Linhda used to live there."
+  }
 ]
 }
