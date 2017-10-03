@@ -12,9 +12,9 @@ After downloading it, save the csv file in the folder word_vec.
 
     Note : vocab_dict_question_answer_200_6_2 in the folder vocab_dic is also generated from **gensim_models_question_answer       python 3.ipynb**. Since its size is small, it has already been uploaded at github. 
 
-3. To get the lastest episodes, run **episodes_all.ipynb** to get vector representations of all episodes. They will be saved in the folder **episode_vec**. Make sure that there are 179 episodes before 10/3/2017.
+3. If it is fine to only get the related podcasts before 10/3/2017, then skip this step. To get the lastest episodes, run **episodes_all.ipynb** to get vector representations of all episodes. They will be saved in the folder **episode_vec**. Make sure that there are 179 episodes before 10/3/2017.
 
-    The files in the folders episode_vec and text are generated from **episodes_all.ipynb**.
+    The files in the folders **episode_vec** and **text** are generated from **episodes_all.ipynb**.
 
 4. Then in terminal run **api_episode.py** 
 
