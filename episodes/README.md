@@ -23,5 +23,5 @@ It is expected to return a random episode.
 
 6. At rest console, type in the request url “http://0.0.0.0:3500/episode/recommendation”. The method is post. 
 RAW_body is {“request”: “string of user’s request”}.  
-For example, {“request”: “ I would like to listen to an episode on random forest and decision tree. ”}  
-It will return a related episode.
+For example, {“request”: “ I would like to listen to an episode on random forest and decision tree. ”} Make sure that the quote signs are in the right form.  
+It will return a related episode. 
