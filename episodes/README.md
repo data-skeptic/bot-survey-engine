@@ -8,6 +8,7 @@ titles of all posts from stack exchange statistics session. The result will be s
 2. The size of the file **word2vector_model_question_answer_200_6_2.csv** is large, so I didn’t upload it to GitHub. 
 In case one doesn’t want to run **gensim_models_question_answer python 3.ipynb**, **word2vector_model_question_answer_200_6_2.csv**  
 is accessible at my google driver: https://drive.google.com/file/d/0Bz-4FukuZM1Kbm81UkF3RnRjY2c/view?usp=sharing
+After downloading it, save the csv file in the folder word_vec.
 
 3. Second run episodes_all.ipynb to get vector representations of all episodes. They will be saved in the folder 
 **episode_vec**. Make sure that there are 179 episodes before 10/3/2017.
