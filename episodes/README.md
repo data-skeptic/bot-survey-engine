@@ -10,6 +10,8 @@ In case one doesn’t want to run **gensim_models_question_answer python 3.ipynb
 is accessible at my google driver: https://drive.google.com/file/d/0Bz-4FukuZM1Kbm81UkF3RnRjY2c/view?usp=sharing
 After downloading it, save the csv file in the folder word_vec.
 
+Note : vocab_dict_question_answer_200_6_2 in the folder vocab_dic is also generated from **gensim_models_question_answer python 3.ipynb**. Since its size is small, it has already been uploaded at github. 
+
 3. Second run episodes_all.ipynb to get vector representations of all episodes. They will be saved in the folder 
 **episode_vec**. Make sure that there are 179 episodes before 10/3/2017.
 
