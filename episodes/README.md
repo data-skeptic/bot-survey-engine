@@ -5,7 +5,7 @@ titles of all posts from stack exchange statistics session. The result will be s
 **word2vector_model_question_answer_200_6_2.csv**. 200 is the size of the hidden layer, i.e. the dimension of the word vectors. 
 6 is the window size and 2 is the min_count in the word2vec models.  
 
-2.The size of the file **word2vector_model_question_answer_200_6_2.csv** is large, so I didn’t upload it to GitHub. 
+2. The size of the file **word2vector_model_question_answer_200_6_2.csv** is large, so I didn’t upload it to GitHub. 
 In case one doesn’t want to run **gensim_models_question_answer python 3.ipynb**, **word2vector_model_question_answer_200_6_2.csv**  
 is accessible at my google driver: https://drive.google.com/file/d/0Bz-4FukuZM1Kbm81UkF3RnRjY2c/view?usp=sharing
 
