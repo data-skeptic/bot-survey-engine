@@ -11,7 +11,7 @@ import pandas as pd
 import json
 import boto3
 
-
+pd.set_option('display.max_colwidth', -1)
 class Survey():   
     def __init__(self, username, address, databasename):
          
@@ -178,6 +178,7 @@ class Survey():
             df = df[df['question_text'] != -1 ]
         # if the survey is completed, return {'bot_survey_responses_df': a df, 'bot_survey_response_answers_df': a df }
         # else return {}
+            print(df)
             return df
         else:
             return pd.DataFrame()
@@ -192,26 +193,27 @@ class Survey():
                     aws_access_key_id = user, 
                     aws_secret_access_key = pw)
         source_email = "kyle@dataskeptic.com"
-        destination_email = ["kyle@dataskeptic.com", "fayezheng1010@gmail.com"] #add "kyle@dataskeptic.com" later when everything is fixed.
+        destination_email = ["fayezheng1010@gmail.com"] #add "kyle@dataskeptic.com" later when everything is fixed.
         reply_to_email = source_email
         if not result_dfs.empty:
-            bodyhtml = result_dfs.to_html() 
-            response = client.send_email(
-                Source= source_email,
-                Destination={'ToAddresses': destination_email},
-                Message={
-                    'Subject': {
-                        'Data': 'A survey is complete.'
-                    },
-                    'Body': {
-                        'Html': {
-                            'Data': bodyhtml
+            with pd.option_context('display.max_colwidth', 1000):
+                bodyhtml = result_dfs.to_html() 
+                response = client.send_email(
+                    Source= source_email,
+                    Destination={'ToAddresses': destination_email},
+                    Message={
+                        'Subject': {
+                            'Data': 'A survey is complete.'
+                        },
+                        'Body': {
+                            'Html': {
+                                'Data': bodyhtml
+                            }
                         }
-                    }
-                },
-                ReplyToAddresses=[reply_to_email]
-            )
-            return response if 'ErrorResponse' in response else 'successful. Check email box.'  # if successful, return ""
+                    },
+                    ReplyToAddresses=[reply_to_email]
+                )
+                return response if 'ErrorResponse' in response else 'successful. Check email box.'  # if successful, return ""
         else:
             print("The survey is not complete yet. Email will be sent once it is complete.") 
             return "not complete yet."
