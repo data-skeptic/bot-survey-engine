@@ -12,7 +12,7 @@ is accessible at my google driver: https://drive.google.com/file/d/0Bz-4FukuZM1K
 3. Second run episodes_all.ipynb to get vector representations of all episodes. They will be saved in the folder 
 **episode_vec**. Make sure that there are 179 episodes before 10/3/2017.
 
-4. Then in terminal run **api_episode.py**. 
+4. Then in terminal run **api_episode.py** 
 
 5. At rest console, type in the request url “http://0.0.0.0:3500/episode/random_recommendation”. The method is get. 
 It is expected to return a random episode. 
