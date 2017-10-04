@@ -30,8 +30,16 @@ class episode_prepare():
         corpus = self.get_episode_corpus()
         self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = vocab_dic)
         self.X = self.vectorizer.fit_transform(corpus)
+
+        with open ("../config/config.json", "r") as myfile:
+            data = json.load(myfile)
+            size = data['model_paras']['size']
+            min_count = data['model_paras']['min_count']
+            window = data['model_paras']['window']
+            self.name = str(size) + "_" + str(window) + "_"+ str(min_count) 
+            
     def get_word_vec(self):
-        fname = './word_vec/word2vector_model_question_answer_200_6_2.csv'
+        fname = './word_vec/word2vector_model_question_answer_' + self.name + '.csv'
         word_vecs_df = pd.read_csv(fname,index_col=0)
         vocab = word_vecs_df.index
         print("the size of the vocab is ",len(vocab))
@@ -39,7 +47,8 @@ class episode_prepare():
         self.word_vecs_df = word_vecs_df
 
     def vocab_dic(self):
-        fname = './vocab_dict/vocab_dict_question_answer_200_6_2.csv'
+
+        fname = './vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
         with open(fname, 'r') as csv_file:
             reader = csv.reader(csv_file)
             vocab_dic = dict(reader)
