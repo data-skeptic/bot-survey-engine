@@ -18,13 +18,16 @@ import smart_open
 from sklearn.metrics.pairwise import cosine_similarity
 import json
 from sklearn.feature_extraction.text import TfidfVectorizer
+import episodes_preparation as ep
 import warnings
+
 warnings.filterwarnings('ignore')
 
 ########################## load files ######################
 class episode():
 
-    def __init__(self): 
+    def __init__(self, update_episode):
+        ep.run(update_episode)
         self.episodes_json_fname = './text/episodes_json.txt'  # store all information
         self.episodes_desc = './text/episode_descs_titles.txt' # store all descriptions
         self.episodes_corpus = './text/episode_corpus.txt' # store corpus: a list of sentences (words in sentences are tokenlized, lowercased and so on)
