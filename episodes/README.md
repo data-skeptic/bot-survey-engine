@@ -1,22 +1,25 @@
 # How to use it?
 
-1. First run **gensim_models_question_answer python 3.ipynb** to generate vector representations for all words in the bodies and 
-titles of all posts from stack exchange statistics session. The result will be saved in the folder word_vec with name 
-**word2vector_model_question_answer_200_6_2.csv**. 200 is the size of the hidden layer, i.e. the dimension of the word vectors. 
-6 is the window size and 2 is the min_count in the word2vec models.  
+1. First download **word2vector_model_question_answer_200_6_2.csv** from  my google driver: https://drive.google.com/file/d/0Bz-4FukuZM1Kbm81UkF3RnRjY2c/view?usp=sharing
+After downloading it, save the csv file in the folder bot-survey-engine/episodes/word_vec/.
 
-2. The size of the file **word2vector_model_question_answer_200_6_2.csv** is large, so I didn’t upload it to GitHub. 
-In case one doesn’t want to run **gensim_models_question_answer python 3.ipynb**, **word2vector_model_question_answer_200_6_2.csv**  
-is accessible at my google driver: https://drive.google.com/file/d/0Bz-4FukuZM1Kbm81UkF3RnRjY2c/view?usp=sharing
-After downloading it, save the csv file in the folder word_vec.
+What is  **word2vector_model_question_answer_200_6_2.csv**?  It stores vector representations for all words in the bodies and 
+titles of all posts from stack exchange statistics session. One can also run **gensim_models_question_answer python 3.ipynb** to generate it. 
 
-    Note : vocab_dict_question_answer_200_6_2 in the folder vocab_dic is also generated from **gensim_models_question_answer       python 3.ipynb**. Since its size is small, it has already been uploaded at github. 
+200 is the size of the hidden layer, i.e. the dimension of the word vectors.  6 is the window size and 2 is the min_count in the word2vec models.  
 
-3. If it is fine to only get the related podcasts before 10/3/2017, then skip this step. To get the lastest episodes, run **episodes_all.ipynb** to get vector representations of all episodes. They will be saved in the folder **episode_vec**. Make sure that there are 179 episodes before 10/3/2017.
+2. vocab_dict_question_answer_200_6_2 in the folder vocab_dic is also generated from **gensim_models_question_answer       python 3.ipynb**. Since its size is small, it has already been uploaded at github. 
 
-    The files in the folders **episode_vec** and **text** are generated from **episodes_all.ipynb**.
+3. Add config/config.json in the bot-survey-engine folder.
 
-4. Then in terminal run **api_episode.py** 
+4. Run api_episode.py directly in one of the following cases:
+  - This is the first time you run it. 
+  - This is not the first time you run it but you want to get the latest episodes from Data Skeptic.
+  Otherwise, you have to do the following thing:
+  - Open api_episodes.py
+  - update_episode = True   change it to update_episode = False
+  
+  When `python api_episode.py` is executed, two folders `text` and `episode_vec` will be generated and corresponding files     will be saved inside.
 
 5. At rest console, type in the request url “http://0.0.0.0:3500/episode/random_recommendation”. The method is get. 
 It is expected to return a random episode. 
