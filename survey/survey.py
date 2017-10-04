@@ -13,11 +13,11 @@ import boto3
 
 pd.set_option('display.max_colwidth', -1)
 class Survey():   
-    def __init__(self, username, address, databasename):
-         
-        with open ("mysql_password.txt", "r") as myfile:
-            self.password = myfile.readlines()[0].strip()    
-
+    def __init__(self, username, address, databasename):   
+        with open ("../config/config.json", "r") as myfile:
+            data = json.load(myfile)
+            self.password = data['mysql']['password']
+            
         #connect to sqlworkbench/J
         #engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % ("xiaofei", password, "iupdated.com:3306","survey"),pool_size=3, pool_recycle=3600)
         engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, self.password, address,databasename),pool_size=3, pool_recycle=3600)
@@ -220,17 +220,22 @@ class Survey():
 # the end of the definition of the class
 
 def create_survey():
-    username = 'xiaofei'
-    address = "iupdated.com:3306"
-    databasename = 'survey'
+    with open ("../config/config.json", "r") as myfile:
+        data = json.load(myfile)
+        username = data['mysql']['username']
+        address = data['mysql']['address']
+        databasename = data['mysql']['databasename']
+            
     # check initialization
     survey_instance = Survey(username, address, databasename)
     return survey_instance
 
 def test():
-    username = 'xiaofei'
-    address = "iupdated.com:3306"
-    databasename = 'survey'
+    with open ("../config/config.json", "r") as myfile:
+        data = json.load(myfile)
+        username = data['mysql']['username']
+        address = data['mysql']['address']
+        databasename = data['mysql']['databasename']
 
     # check initialization
     s= Survey(username,  address, databasename)
