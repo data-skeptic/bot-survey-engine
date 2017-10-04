@@ -4,9 +4,9 @@
 
    After downloading it, save the csv file in the folder bot-survey-engine/episodes/word_vec/.
 
-   What is  **word2vector_model_question_answer_200_6_2.csv**?  It stores vector representations for all words in the bodies and titles of all posts from stack exchange statistics session. One can also run **gensim_models_question_answer python 3.ipynb** to generate it. 200 is the size of the hidden layer, i.e. the dimension of the word vectors.  6 is the window size and 2 is the min_count in the word2vec models.  
+   What is  **word2vector_model_question_answer_200_6_2.csv**?  It stores vector representations for all words in the bodies and titles of all posts from stack exchange statistics session. One can also run **gensim_model/gensim_models_question_answer python 3.ipynb** to generate it. 200 is the size of the hidden layer, i.e. the dimension of the word vectors.  6 is the window size and 2 is the min_count in the word2vec models.  
 
-2. **vocab_dict_question_answer_200_6_2** in the folder **vocab_dic** is also generated from **gensim_models_question_answer       python 3.ipynb**. Since its size is small, it has already been uploaded at github. 
+2. **vocab_dict_question_answer_200_6_2** in the folder **vocab_dic** is also generated from **gensim_model/gensim_models_question_answer       python 3.ipynb**. Since its size is small, it has already been uploaded at github. 
 
 3. Add **config/config.json** in the **bot-survey-engine** folder.
 
