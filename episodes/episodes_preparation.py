@@ -23,6 +23,14 @@ warnings.filterwarnings('ignore')
 
 class episode_prepare():
     def __init__(self):
+        with open ("../config/config.json", "r") as myfile:
+            data = json.load(myfile)
+            size = data['model_paras']['size']
+            min_count = data['model_paras']['min_count']
+            window = data['model_paras']['window']
+            self.name = str(size) + "_" + str(window) + "_"+ str(min_count) 
+            
+            
         self.crawl_episode_info()
         self.get_word_vec()
         print("crawling episodes is done.")
@@ -31,13 +39,7 @@ class episode_prepare():
         self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = vocab_dic)
         self.X = self.vectorizer.fit_transform(corpus)
 
-        with open ("../config/config.json", "r") as myfile:
-            data = json.load(myfile)
-            size = data['model_paras']['size']
-            min_count = data['model_paras']['min_count']
-            window = data['model_paras']['window']
-            self.name = str(size) + "_" + str(window) + "_"+ str(min_count) 
-            
+        
     def get_word_vec(self):
         fname = './word_vec/word2vector_model_question_answer_' + self.name + '.csv'
         word_vecs_df = pd.read_csv(fname,index_col=0)
