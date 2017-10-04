@@ -2,7 +2,7 @@
 
 1. First download **word2vector_model_question_answer_200_6_2.csv** from  my google driver: https://drive.google.com/file/d/0Bz-4FukuZM1Kbm81UkF3RnRjY2c/view?usp=sharing
 
-After downloading it, save the csv file in the folder bot-survey-engine/episodes/word_vec/.
+   After downloading it, save the csv file in the folder bot-survey-engine/episodes/word_vec/.
 
 What is  **word2vector_model_question_answer_200_6_2.csv**?  It stores vector representations for all words in the bodies and titles of all posts from stack exchange statistics session. One can also run **gensim_models_question_answer python 3.ipynb** to generate it. 200 is the size of the hidden layer, i.e. the dimension of the word vectors.  6 is the window size and 2 is the min_count in the word2vec models.  
 
