@@ -35,8 +35,8 @@ logger.addHandler(stdout)
 
 version = "0.0.1"
 
-
-episode_instance = episode()
+update_episode = True
+episode_instance = episode(update_episode)
 
 
 class random_recommendation(Resource):
