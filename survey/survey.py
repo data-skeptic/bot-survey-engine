@@ -185,8 +185,10 @@ class Survey():
 
     #def send_email(self, result_dfs, source_email, destination_email, reply_to_email):
     def send_email(self,result_dfs):
-        with open ("awskeys.txt", "r") as myfile:
-            user, pw = [s.strip() for s in myfile.readlines()]
+        with open ("../config/config.json", "r") as myfile:
+            data = json.load(myfile)
+            user = data['aws']['accessKeyId']
+            pw= data['aws']['secretAccessKey']
 
         client = boto3.client('ses',
                     region_name = 'us-east-1', 
