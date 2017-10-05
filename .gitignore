@@ -1,4 +1,6 @@
 *.pyc
 *.htm
 .DS_Store
-
+episodes/episode_vec
+episodes/text
+episodes/feed.xml
