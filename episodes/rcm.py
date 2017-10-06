@@ -92,13 +92,13 @@ class episode():
         #tf_idf = self.vectorizer.fit_transform([" ".join(doc_corpus)]+self.corpus)
         df = self.word_vecs_df 
         related_rows = df.loc[sorted(list(set(doc_corpus).intersection(set(self.vocab)))), :] 
-        print(related_rows.shape)
-        print(tf_idf)
-        print(tf_idf[0,:])
+        # print(related_rows.shape)
+        # print(tf_idf)
+        # print(tf_idf[0,:])
         if weighted:
             weights = []
             ind = sorted(tf_idf[0,:].nonzero()[1])
-            print(ind)
+            print("index of related episodes are ", ind)
             if sum([self.vectorizer.vocabulary_[related_rows.index[j]] != ind[j] for j in range(len(ind))]) != 0:
                 print("words position don't match")
                 return 
@@ -108,13 +108,13 @@ class episode():
         else:
             weights = [1/related_rows.shape[0]] * related_rows.shape[0]
         
-        if related_rows.shape[0] != len(weights):
-            print(i)
-            print(related_rows.shape[0])
-            print(len(weights))
+        # if related_rows.shape[0] != len(weights):
+        #     print(i)
+        #     print(related_rows.shape[0])
+        #     print(len(weights))
         
         result = related_rows.T * weights
-        print('weighted vector is ', result.sum(axis = 1))
+        #print('weighted vector is ', result.sum(axis = 1))
         return result.sum(axis = 1)
 
     
@@ -125,14 +125,16 @@ class episode():
         all_episode = self.episode_vec_weighted_df.values
         print("*****************************************************" + "\n")
         user_request_corpus = gensim.utils.simple_preprocess(user_request)
-        print(user_request_corpus)
+        #print(user_request_corpus)
         #X_user = self.vectorizer.fit_transform([" ".join(user_request_corpus)])
         #print(str(X_user.shape) + "\n")
-        user_weighted_vec = self.get_doc_weighted_vec(user_request_corpus)
+        user_weighted_vec = self.get_doc_weighted_vec(user_request_corpus).reshape(1, -1)
+        #print('user_weighted_vec shape is ', user_weighted_vec.shape)
+        #print('all_episode shape is ', all_episode.shape)
         cos_similarities = cosine_similarity(X=user_weighted_vec, Y=all_episode)
 
         cos_similarities = cos_similarities[0]
-        print(cos_similarities.shape)
+        #print(cos_similarities.shape)
 
         most_similar = cos_similarities.argsort()[-4:][::-1]
         #print(str(most_similar) + "\n")
