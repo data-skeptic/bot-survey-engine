@@ -1,8 +1,8 @@
 from pandas import DataFrame
 import pandas as pd
 import boto3
-
-class listener_reminder():
+import json
+class Listener_Reminder():
     def __init__(self):
         self.message = "It is time to listen to Data Skeptic's podcasts!"
         with open ("../config/config.json", "r") as myfile:
@@ -16,7 +16,7 @@ class listener_reminder():
                         aws_access_key_id = self.user, 
                         aws_secret_access_key = self.pw
                         )
-            source_email = "kyle@dataskeptic.com"
+            source_email = "xfzhengnankai@gmail.com"
             destination_email = ["fayezheng1010@gmail.com", user_email] #add "kyle@dataskeptic.com" later when everything is fixed.
             reply_to_email = source_email
             response = client.send_email(
@@ -27,7 +27,7 @@ class listener_reminder():
                                 'Data': 'A reminder from Data Skeptic!'
                             },
                             'Body': {
-                                'Data': self.message # 
+                                'Text': {'Data': self.message}
                             }
                         },
                         ReplyToAddresses=[reply_to_email]
@@ -46,13 +46,13 @@ class listener_reminder():
             PhoneNumber = user_phone,  # Note the formate of the phone number. It's got to be in something called E.164 format.
             Message = self.message
         )
-def run_reminder(contact_type, contact_account):
-    reminder_ins = listener_reminder()
-    if contact_type == 'email':
-        reminder_ins.send_email(contact_account)
-    if contact_type == "sms":
-        reminder_ins.send_sms(contact_account)
-    print("message has been sent. Please check.")
+# def run_reminder(contact_type, contact_account):
+#     reminder_ins = listener_reminder()
+#     if contact_type == 'email':
+#         reminder_ins.send_email(contact_account)
+#     if contact_type == "sms":
+#         reminder_ins.send_sms(contact_account)
+#     print("message has been sent. Please check.")
 
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
