@@ -10,9 +10,9 @@ import sys
 import datetime
 import time
 import logging
-import rcm
 import random
-from 
+import listener_reminder
+from listener_reminder import Listener_Reminder
 
 logname = sys.argv[0]
 logger = logging.getLogger(logname)
@@ -33,16 +33,19 @@ logger.addHandler(stdout)
 
 version = "0.0.1"
 
+reminder_ins = Listener_Reminder()
+
 class send_message(Resource):
     def post(self):
         r = request.get_data()
-        req = json.loads(r.decode('utf-8'))
-        user_request = req['request']
-        result = episode_instance.recommend_episode(user_request)
-        if len(result) > 0:
-            return result
-        else:
-            return None
+        user_info = json.loads(r.decode('utf-8'))
+        contact_type = user_info['contact_type']
+        contact_account = user_info['contact_account']
+        if contact_type == 'email':
+            reminder_ins.send_email(contact_account)
+        if contact_type == "sns":
+            reminder_ins.send_sms(contact_account)
+        return "message has been sent. Please check."
 
 if __name__ == '__main__':
     logger.info("Init")
@@ -50,8 +53,7 @@ if __name__ == '__main__':
     api = Api(app)
     parser = reqparse.RequestParser()
 
-    api.add_resource(random_recommendation,  '/episode/random_recommendation')
-    api.add_resource(give_recommendation,   '/episode/recommendation')
+    api.add_resource(send_message,  '/listener_reminder/send_message')
     app.run(host='0.0.0.0', debug=False, port=3500)
     logger.info("Ready")
     
