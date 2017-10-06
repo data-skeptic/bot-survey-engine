@@ -15,7 +15,6 @@ import rcm
 import random
 from rcm import episode
 
-
 logname = sys.argv[0]
 logger = logging.getLogger(logname)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -38,7 +37,6 @@ version = "0.0.1"
 update_episode = True
 episode_instance = episode(update_episode)
 
-
 class random_recommendation(Resource):
     def get(self):
         descriptions = episode_instance.descriptions
@@ -50,8 +48,6 @@ class random_recommendation(Resource):
         desc = descriptions[rand_ind]
         return {'desc':desc, 'num':descToNum[desc], 'link':descToLink[desc],'title':descToTitle[desc]}
 
-
-
 class give_recommendation(Resource):
     def post(self):
         r = request.get_data()
@@ -62,12 +58,6 @@ class give_recommendation(Resource):
             return result
         else:
             return None
-       
-
-
-
-
-
 
 if __name__ == '__main__':
     logger.info("Init")
