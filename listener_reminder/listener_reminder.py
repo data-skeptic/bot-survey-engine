@@ -1,16 +1,66 @@
+import sqlalchemy
+import pymysql
+pymysql.install_as_MySQLdb()
+from sqlalchemy.orm import sessionmaker
+import datetime
+import time
 from pandas import DataFrame
+import random
 import pandas as pd
-import boto3
 import json
+import boto3
+
 class Listener_Reminder():
     def __init__(self):
-        self.message = "It is time to listen to Data Skeptic's podcasts!"
+        self.message = "" #"It is time to listen to Data Skeptic's podcasts! "
         with open ("../config/config.json", "r") as myfile:
-                data = json.load(myfile)
-                self.user = data['aws']['accessKeyId']
-                self.pw= data['aws']['secretAccessKey']
+            data = json.load(myfile)
+            # aws
+            self.user = data['aws']['accessKeyId']
+            self.pw= data['aws']['secretAccessKey']
+            # mysql
+            self.username = data['mysql']['username']
+            self.password = data['mysql']['password']
+            self.address = data['mysql']['address']
+            self.databasename = data['mysql']['databasename']
+            #connect to sqlworkbench/J
+            #engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % ("xiaofei", password, "iupdated.com:3306","survey"),pool_size=3, pool_recycle=3600)
+            engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (self.username, self.password, self.address, self.databasename),pool_size=3, pool_recycle=3600)
+            self.internal = engine_internal
+            #test
+            try:
+                self.internal.execute("SHOW DATABASES;")
+                print('The connection is successful.')
+            except:
+                print('The connection fails.')
+                raise
+           
+    def save_reminder_task (self, contact_type, contact_account, time_zone, reminder_time, reminder_time_server, episode_title, episode_link = None):
+        # What special characters may have in episode titles and links?
+        if episode_link and episode_title:
+            episode_link = episode_link.replace("'", "\\'")
+            episode_link = episode_link.replace(";", "\\;")
+            episode_link = episode_link.replace("&", "\\&")
+            episode_link = episode_link.replace("%", "%%")
+            episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
+            print("episode_link is ", episode_link )
+        try:
+            template = """
+                        INSERT INTO reminder_schedule (contact_type, contact_account, time_zone, reminder_time, 
+                        reminder_time_server, episode_title, episode_link) 
+                        Values ('{contact_type}', '{contact_account}', '{time_zone}', '{reminder_time}', 
+                        '{reminder_time_server}', '{episode_title}', '{episode_link}')
+                       """
+            query = template.format(contact_type = contact_type, contact_account = contact_account, time_zone = time_zone, reminder_time= reminder_time, 
+                        reminder_time_server = reminder_time_server, episode_title=episode_title, episode_link=episode_link)
+            conn = self.internal.connect()
+            conn.execute(query)
+            conn.close()
+        except: 
+            print("Error in saving task into reminder_schedule table.")
+            raise
 
-    def send_email(self, user_email):
+    def send_email(self, user_email, episode_title = None, episode_link = None):
             client = boto3.client('ses',
                         region_name = 'us-east-1', 
                         aws_access_key_id = self.user, 
@@ -19,6 +69,11 @@ class Listener_Reminder():
             source_email = "xfzhengnankai@gmail.com"
             destination_email = ["fayezheng1010@gmail.com", user_email] #add "kyle@dataskeptic.com" later when everything is fixed.
             reply_to_email = source_email
+            if episode_title is None:
+                episode_title = ""
+            if episode_link is None:
+                episode_link = ""
+
             response = client.send_email(
                         Source= source_email,
                         Destination={'ToAddresses': destination_email},
@@ -27,14 +82,14 @@ class Listener_Reminder():
                                 'Data': 'A reminder from Data Skeptic!'
                             },
                             'Body': {
-                                'Text': {'Data': self.message}
+                                'Text': {'Data': self.message + episode_title + " " + episode_link}
                             }
                         },
                         ReplyToAddresses=[reply_to_email]
                     )
             return response if 'ErrorResponse' in response else 'successful. Check email box.'  
             
-    def send_sms(self, user_phone):
+    def send_sms(self, user_phone, episode_title = None, episode_link = None):
         client = boto3.client(
             "sns",
             aws_access_key_id=self.user,
@@ -44,7 +99,7 @@ class Listener_Reminder():
         client.publish(
             # phone number has to be in this form: "+12223334444"
             PhoneNumber = user_phone,  # Note the formate of the phone number. It's got to be in something called E.164 format.
-            Message = self.message
+            Message = self.message  + episode_title + " " + episode_link
         )
 # def run_reminder(contact_type, contact_account):
 #     reminder_ins = listener_reminder()
