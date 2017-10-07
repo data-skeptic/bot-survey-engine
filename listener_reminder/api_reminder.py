@@ -35,7 +35,6 @@ logger.addHandler(stdout)
 version = "0.0.1"
 
 reminder_ins = Listener_Reminder()
-
 class reminder(Resource):
     def post(self):
         r = request.get_data()
