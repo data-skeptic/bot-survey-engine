@@ -20,27 +20,21 @@ import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 import episodes_preparation as ep
 import warnings
-
 warnings.filterwarnings('ignore')
 
 ########################## load files ######################
 class episode():
 
-    def __init__(self, update_episode):
-        ep.run(update_episode)
-        with open ("../config/config.json", "r") as myfile:
-            data = json.load(myfile)
-            size = data['model_paras']['size']
-            min_count = data['model_paras']['min_count']
-            window = data['model_paras']['window']
-            name = str(size) + "_" + str(window) + "_"+ str(min_count) 
-            
-        self.episodes_json_fname = './text/episodes_json.txt'  # store all information
-        self.episodes_desc = './text/episode_descs_titles.txt' # store all descriptions
-        self.episodes_corpus = './text/episode_corpus.txt' # store corpus: a list of sentences (words in sentences are tokenlized, lowercased and so on)
-        self.word_vec_file = './word_vec/word2vector_model_question_answer_' + name + '.csv'
-        self.voc_dic_file = './vocab_dict/vocab_dict_question_answer_' + name +'.csv' # store vocab_dictionary
-        self.weighted_vecs_file = './episode_vec/episode_vec_weighted.csv' # store weighted vectors
+    def __init__(self, update_episode, size, min_count, window, name):
+        ep.run(update_episode, size, min_count, window, name)
+        mdir = os.path.dirname(os.path.abspath(__file__))
+        print("In rcm.py mdir is ", mdir)
+        self.episodes_json_fname = mdir+'/text/episodes_json.txt'  # store all information
+        self.episodes_desc = mdir+'/text/episode_descs_titles.txt' # store all descriptions
+        self.episodes_corpus = mdir+'/text/episode_corpus.txt' # store corpus: a list of sentences (words in sentences are tokenlized, lowercased and so on)
+        self.word_vec_file = mdir+'/word_vec/word2vector_model_question_answer_' + name + '.csv'
+        self.voc_dic_file = mdir+'/vocab_dict/vocab_dict_question_answer_' + name +'.csv' # store vocab_dictionary
+        self.weighted_vecs_file = mdir+'/episode_vec/episode_vec_weighted.csv' # store weighted vectors
 
         # load episode informaiton and save it to variables.
         file_name = self.episodes_json_fname
