@@ -11,29 +11,20 @@ import json
 import boto3
 
 class Listener_Reminder():
-    def __init__(self):
+    def __init__(self, user, pw, username, password, address, databasename):
         self.message = "" #"It is time to listen to Data Skeptic's podcasts! "
-        with open ("../config/config.json", "r") as myfile:
-            data = json.load(myfile)
-            # aws
-            self.user = data['aws']['accessKeyId']
-            self.pw= data['aws']['secretAccessKey']
-            # mysql
-            self.username = data['mysql']['username']
-            self.password = data['mysql']['password']
-            self.address = data['mysql']['address']
-            self.databasename = data['mysql']['databasename']
-            #connect to sqlworkbench/J
-            #engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % ("xiaofei", password, "iupdated.com:3306","survey"),pool_size=3, pool_recycle=3600)
-            engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (self.username, self.password, self.address, self.databasename),pool_size=3, pool_recycle=3600)
-            self.internal = engine_internal
-            #test
-            try:
-                self.internal.execute("SHOW DATABASES;")
-                print('The connection is successful.')
-            except:
-                print('The connection fails.')
-                raise
+        engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, password, address, databasename),pool_size=3, pool_recycle=3600)
+        self.internal = engine_internal
+        #test
+        try:
+            self.internal.execute("SHOW DATABASES;")
+            print('The connection is successful.')
+        except:
+            print('The connection fails.')
+            raise
+        self.user= user
+        self.pw = pw
+        
            
     def save_reminder_task (self, contact_type, contact_account, time_zone, reminder_time, reminder_time_server, episode_title, episode_link = None):
         # What special characters may have in episode titles and links?
@@ -101,13 +92,6 @@ class Listener_Reminder():
             PhoneNumber = user_phone,  # Note the formate of the phone number. It's got to be in something called E.164 format.
             Message = self.message  + episode_title + " " + episode_link
         )
-# def run_reminder(contact_type, contact_account):
-#     reminder_ins = listener_reminder()
-#     if contact_type == 'email':
-#         reminder_ins.send_email(contact_account)
-#     if contact_type == "sms":
-#         reminder_ins.send_sms(contact_account)
-#     print("message has been sent. Please check.")
 
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
