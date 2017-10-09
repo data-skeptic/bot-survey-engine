@@ -12,7 +12,7 @@ import boto3
 
 class Listener_Reminder():
     def __init__(self, user, pw, username, password, address, databasename):
-        self.message = "" #"It is time to listen to Data Skeptic's podcasts! "
+        self.message = "It is time to listen to Data Skeptic's podcasts! "
         engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, password, address, databasename),pool_size=3, pool_recycle=3600)
         self.internal = engine_internal
         #test
@@ -51,7 +51,7 @@ class Listener_Reminder():
             print("Error in saving task into reminder_schedule table.")
             raise
 
-    def send_email(self, user_email, episode_title = None, episode_link = None):
+    def send_email(self, user_email, send_time,episode_title = None, episode_link = None):
             client = boto3.client('ses',
                         region_name = 'us-east-1', 
                         aws_access_key_id = self.user, 
@@ -80,7 +80,7 @@ class Listener_Reminder():
                     )
             return response if 'ErrorResponse' in response else 'successful. Check email box.'  
             
-    def send_sms(self, user_phone, episode_title = None, episode_link = None):
+    def send_sms(self, user_phone,send_time, episode_title = None, episode_link = None):
         client = boto3.client(
             "sns",
             aws_access_key_id=self.user,
