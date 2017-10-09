@@ -26,7 +26,7 @@ class Listener_Reminder():
         self.pw = pw
         
            
-    def save_reminder_task (self, contact_type, contact_account, time_zone, reminder_time, reminder_time_server, episode_title, episode_link = None):
+    def save_reminder_task (self, contact_type, contact_account, reminder_time, episode_title, episode_link = None):
         # What special characters may have in episode titles and links?
         if episode_link and episode_title:
             episode_link = episode_link.replace("'", "\\'")
@@ -37,13 +37,12 @@ class Listener_Reminder():
             print("episode_link is ", episode_link )
         try:
             template = """
-                        INSERT INTO reminder_schedule (contact_type, contact_account, time_zone, reminder_time, 
-                        reminder_time_server, episode_title, episode_link) 
-                        Values ('{contact_type}', '{contact_account}', '{time_zone}', '{reminder_time}', 
-                        '{reminder_time_server}', '{episode_title}', '{episode_link}')
+                        INSERT INTO reminder_schedule (contact_type, contact_account, reminder_time, 
+                        episode_title, episode_link) 
+                        Values ('{contact_type}', '{contact_account}', '{reminder_time}', 
+                        '{episode_title}', '{episode_link}')
                        """
-            query = template.format(contact_type = contact_type, contact_account = contact_account, time_zone = time_zone, reminder_time= reminder_time, 
-                        reminder_time_server = reminder_time_server, episode_title=episode_title, episode_link=episode_link)
+            query = template.format(contact_type = contact_type, contact_account = contact_account, reminder_time= reminder_time, episode_title=episode_title, episode_link=episode_link)
             conn = self.internal.connect()
             conn.execute(query)
             conn.close()
@@ -73,7 +72,7 @@ class Listener_Reminder():
                                 'Data': 'A reminder from Data Skeptic!'
                             },
                             'Body': {
-                                'Text': {'Data': self.message + episode_title + " " + episode_link}
+                                'Text': {'Data': self.message + "\n" + episode_title + "\n" + episode_link}
                             }
                         },
                         ReplyToAddresses=[reply_to_email]
@@ -90,7 +89,7 @@ class Listener_Reminder():
         client.publish(
             # phone number has to be in this form: "+12223334444"
             PhoneNumber = user_phone,  # Note the formate of the phone number. It's got to be in something called E.164 format.
-            Message = self.message  + episode_title + " " + episode_link
+            Message = self.message  + "\n" +episode_title + "\n" + episode_link
         )
 
 if __name__ == "__main__":
