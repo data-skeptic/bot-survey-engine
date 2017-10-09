@@ -10,19 +10,13 @@ import random
 import pandas as pd
 import json
 import boto3
+import os
 
 pd.set_option('display.max_colwidth', -1)
+
 class Survey():   
-    def __init__(self, username, address, databasename):   
-        with open ("../config/config.json", "r") as myfile:
-            data = json.load(myfile)
-            self.password = data['mysql']['password']
-            
-        #connect to sqlworkbench/J
-        #engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % ("xiaofei", password, "iupdated.com:3306","survey"),pool_size=3, pool_recycle=3600)
-        engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, self.password, address,databasename),pool_size=3, pool_recycle=3600)
-        #Internal = sessionmaker(bind=engine_internal)
-        #self.internal = Internal()
+    def __init__(self, username, password, address, databasename):   
+        engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, password, address,databasename),pool_size=3, pool_recycle=3600)
         self.internal = engine_internal
         #test
         try:
@@ -184,18 +178,13 @@ class Survey():
             return pd.DataFrame()
 
     #def send_email(self, result_dfs, source_email, destination_email, reply_to_email):
-    def send_email(self,result_dfs):
-        with open ("../config/config.json", "r") as myfile:
-            data = json.load(myfile)
-            user = data['aws']['accessKeyId']
-            pw= data['aws']['secretAccessKey']
-
+    def send_email(self,result_dfs, user, pw):
         client = boto3.client('ses',
                     region_name = 'us-east-1', 
                     aws_access_key_id = user, 
                     aws_secret_access_key = pw)
-        source_email = "kyle@dataskeptic.com"
-        destination_email = ["kyle@dataskeptic.com", "fayezheng1010@gmail.com"] #add "kyle@dataskeptic.com" later when everything is fixed.
+        source_email = 'kyle@dataskeptic.com'
+        destination_email = [ "fayezheng1010@gmail.com", "kyle@dataskeptic.com"] #add "kyle@dataskeptic.com" later when everything is fixed.
         reply_to_email = source_email
         if not result_dfs.empty:
             with pd.option_context('display.max_colwidth', 1000):
@@ -221,51 +210,41 @@ class Survey():
             return "not complete yet."
 # the end of the definition of the class
 
-def create_survey():
-    with open ("../config/config.json", "r") as myfile:
-        data = json.load(myfile)
-        username = data['mysql']['username']
-        address = data['mysql']['address']
-        databasename = data['mysql']['databasename']
-            
-    # check initialization
-    survey_instance = Survey(username, address, databasename)
-    return survey_instance
 
-def test():
-    with open ("../config/config.json", "r") as myfile:
-        data = json.load(myfile)
-        username = data['mysql']['username']
-        address = data['mysql']['address']
-        databasename = data['mysql']['databasename']
+# def test():
+#     with open ("../config/config.json", "r") as myfile:
+#         data = json.load(myfile)
+#         username = data['mysql']['username']
+#         address = data['mysql']['address']
+#         databasename = data['mysql']['databasename']
 
-    # check initialization
-    s= Survey(username,  address, databasename)
-    s._dfs['logic_branches_df']
-    #check get_next_question_id
-    s.get_next_question_id(1, "Since last year.")
+#     # check initialization
+#     s= Survey(username,  address, databasename)
+#     s._dfs['logic_branches_df']
+#     #check get_next_question_id
+#     s.get_next_question_id(1, "Since last year.")
 
-    response_id = None
-    question_id =1
-    question_order =1
-    answer_text = "Some Text"
-    (r_id, a_id) = s.save_answer(response_id, question_id, question_order, answer_text)
-    print("Response_id and answer_id are ", (r_id, a_id))
+#     response_id = None
+#     question_id =1
+#     question_order =1
+#     answer_text = "Some Text"
+#     (r_id, a_id) = s.save_answer(response_id, question_id, question_order, answer_text)
+#     print("Response_id and answer_id are ", (r_id, a_id))
                                                                                   
-    #When insert an answer which has response_id into the answer table, 
-    # the response_id must be in the response_id column of the response table due to the foreign key restriction.                                                                               
-    respns = s.internal.execute('select response_id from bot_survey_responses;')
-    response_ids = respns.fetchall() 
-    response_ids = [id[0] for id in response_ids]
+#     #When insert an answer which has response_id into the answer table, 
+#     # the response_id must be in the response_id column of the response table due to the foreign key restriction.                                                                               
+#     respns = s.internal.execute('select response_id from bot_survey_responses;')
+#     response_ids = respns.fetchall() 
+#     response_ids = [id[0] for id in response_ids]
                                                                                   
-    response_id = random.choice(response_ids)
-    question_id =2
-    question_order =2
-    answer_text = "Some Text"
-    s.save_answer(response_id, question_id, question_order, answer_text)
+#     response_id = random.choice(response_ids)
+#     question_id =2
+#     question_order =2
+#     answer_text = "Some Text"
+#     s.save_answer(response_id, question_id, question_order, answer_text)
 
-    respns = s.internal.execute('select * from bot_survey_responses;')
-    respns.fetchall()
+#     respns = s.internal.execute('select * from bot_survey_responses;')
+#     respns.fetchall()
 
 
 if __name__ == "__main__":
