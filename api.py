@@ -140,20 +140,17 @@ class reminder(Resource):
         print('user_info is ', user_info)
         contact_type = user_info.get('contact_type')
         contact_account = user_info.get('contact_account')
-        time_zone = user_info.get('time_zone')
         reminder_time = user_info.get('reminder_time') 
-        reminder_time_server = user_info.get('reminder_time_server')
         episode_title = user_info.get('episode_title')
         episode_link = user_info.get('episode_link')
         # save reminder task into the table.
-        reminder_ins.save_reminder_task(contact_type, contact_account, time_zone, 
-                                            reminder_time, reminder_time_server, 
+        reminder_ins.save_reminder_task(contact_type, contact_account,reminder_time, 
                                                 episode_title, episode_link)
         # send email or short message
         if contact_type.lower() == 'email':
-            reminder_ins.send_email(contact_account,reminder_time_server, episode_title, episode_link)
-        if contact_type.lower() == "sns":
-            reminder_ins.send_sms(contact_account, reminder_time_server, episode_title, episode_link)
+            reminder_ins.send_email(contact_account,reminder_time, episode_title, episode_link)
+        if contact_type.lower() == "sms":
+            reminder_ins.send_sms(contact_account, reminder_time, episode_title, episode_link)
         return "Reminder will be sent."
 
 
