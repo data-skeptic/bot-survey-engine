@@ -22,15 +22,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 class episode_prepare():
-    def __init__(self):
-        with open ("../config/config.json", "r") as myfile:
-            data = json.load(myfile)
-            size = data['model_paras']['size']
-            min_count = data['model_paras']['min_count']
-            window = data['model_paras']['window']
-            self.name = str(size) + "_" + str(window) + "_"+ str(min_count) 
-            
-            
+    def __init__(self,size, min_count, window, name):
+        self.name = name    
         self.crawl_episode_info()
         self.get_word_vec()
         print("crawling episodes is done.")
@@ -38,11 +31,12 @@ class episode_prepare():
         corpus = self.get_episode_corpus()
         self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = vocab_dic)
         self.X = self.vectorizer.fit_transform(corpus)
+    
 
-        
     def get_word_vec(self):
-        fname = './word_vec/word2vector_model_question_answer_' + self.name + '.csv'
-        word_vecs_df = pd.read_csv(fname,index_col=0)
+        fname = '/word_vec/word2vector_model_question_answer_' + self.name + '.csv'
+        mdir = os.path.dirname(os.path.abspath(__file__))
+        word_vecs_df = pd.read_csv(mdir+fname,index_col=0)
         vocab = word_vecs_df.index
         print("the size of the vocab is ",len(vocab))
         self.vocab = vocab
@@ -50,8 +44,9 @@ class episode_prepare():
 
     def vocab_dic(self):
 
-        fname = './vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
-        with open(fname, 'r') as csv_file:
+        fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
+        mdir = os.path.dirname(os.path.abspath(__file__))
+        with open(mdir+fname, 'r') as csv_file:
             reader = csv.reader(csv_file)
             vocab_dic = dict(reader)
         for k, value in vocab_dic.items():
@@ -168,9 +163,9 @@ class episode_prepare():
     # def run(self):
     #     ins = episodes_preparation.episode_prepare()
 
-def run(updata):
-    if updata:
-        ins = episode_prepare()
+def run(update,size, min_count, window, name):
+    if update:
+        ins = episode_prepare(size, min_count, window, name)
         ins.get_episode_weighted_vec() 
     
 if __name__ == "__main__":
