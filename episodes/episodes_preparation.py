@@ -54,7 +54,8 @@ class episode_prepare():
         return vocab_dic
 
     def crawl_episode_info(self):
-        fname = 'feed.xml'
+        mdir =os.path.dirname(os.path.abspath(__file__))
+        fname = mdir+'/feed.xml'
         url = 'http://dataskeptic.com/feed.rss'
         if not(os.path.isfile(fname)):
             print('fetching')
@@ -89,11 +90,13 @@ class episode_prepare():
             info["title"] = descToTitle[desc]
             info["num"] = descToNum[desc]
             result[desc] = info
-        if not os.path.exists('./text/'):
-            os.makedirs('./text/')
-        with open('./text/episodes_json.txt', 'w') as outfile:  
+        mdir = os.path.dirname(os.path.abspath(__file__))
+
+        if not os.path.exists(mdir+'/text/'):
+            os.makedirs(mdir+'/text/')
+        with open(mdir+'/text/episodes_json.txt', 'w') as outfile:  
             json.dump(result, outfile)
-        with open('./text/episode_descs_titles.txt', 'w') as thefile:  
+        with open(mdir+'/text/episode_descs_titles.txt', 'w') as thefile:  
             for i in range(len(descriptions)):
                 desc = descriptions[i]
                 title = descToTitle[desc]
@@ -115,13 +118,14 @@ class episode_prepare():
                     yield gensim.models.doc2vec.TaggedDocument(gensim.utils.simple_preprocess(line), [i])
 
     def get_episode_corpus(self):
-        fname = './text/episode_descs_titles.txt'
+        mdir = os.path.dirname(os.path.abspath(__file__))
+        fname = mdir+'/text/episode_descs_titles.txt'
         self.episode_desc_title_corpus = list(self.read_corpus(fname, tokens_only= True))
         corpus = []
         for desc in self.episode_desc_title_corpus:
             corpus.append(" ".join(desc))
 
-        fname = './text/episode_corpus.txt'
+        fname = mdir+'/text/episode_corpus.txt'
         with open(fname, 'w') as f:
             for c in corpus:
                 f.write("%s\n" % c)
@@ -154,12 +158,12 @@ class episode_prepare():
         for i in range(total):
             doc_corpus = self.episode_desc_title_corpus[i]
             episode_vec_weighted.append(self.get_doc_weighted_vec(i,doc_corpus, self.X))
-
-        if not os.path.exists('./episode_vec/'):
-            os.makedirs('./episode_vec/')
+        mdir = os.path.dirname(os.path.abspath(__file__))
+        if not os.path.exists(mdir+'/episode_vec/'):
+            os.makedirs(mdir+'/episode_vec/')
 
         episode_vec_weighted_df = pd.DataFrame(episode_vec_weighted)
-        episode_vec_weighted_df.to_csv("./episode_vec/episode_vec_weighted.csv")
+        episode_vec_weighted_df.to_csv(mdir+"/episode_vec/episode_vec_weighted.csv")
     # def run(self):
     #     ins = episodes_preparation.episode_prepare()
 
