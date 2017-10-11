@@ -13,6 +13,23 @@ import datetime
 import time
 import logging
 
+import time
+import boto3
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
+# from apscheduler.triggers.date import DateTrigger
+# from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.triggers.interval import IntervalTrigger
+
+from datetime import datetime, timedelta
+
+import sqlalchemy
+import pymysql
+pymysql.install_as_MySQLdb()
+
+
+
 sys.path.insert(0, './survey')
 import survey
 from survey import Survey
@@ -61,7 +78,7 @@ with open ("./config/config.json", "r") as myfile:
         # aws
         user = data['aws']['accessKeyId']
         pw = data['aws']['secretAccessKey']
-
+        url = "mysql://%s:%s@%s/%s" % (username, password, address,databasename)
 survey_instance = Survey(username, password, address, databasename)
 
 class GetQuestion(Resource):
@@ -133,6 +150,14 @@ class give_recommendation(Resource):
 #listener_reminder
 
 reminder_ins = Listener_Reminder(user, pw, username, password, address, databasename)
+## a test.
+contact_type = 'sms'
+contact_account = '+18144414200'
+episode_title = "MCMC"
+episode_link = "https://dataskeptic.com/blog/episodes/2017/data-science-tools-and-other-announcements-from-ignite"
+episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
+reminder_ins.send_message(contact_type, contact_account,episode_title , episode_link)
+
 class reminder(Resource):
     def post(self):
         r = request.get_data() # request is RAW body in REST Console.
@@ -140,18 +165,14 @@ class reminder(Resource):
         print('user_info is ', user_info)
         contact_type = user_info.get('contact_type')
         contact_account = user_info.get('contact_account')
-        reminder_time = user_info.get('reminder_time') 
+        #reminder_time = user_info.get('reminder_time') 
+        reminder_time = user_info.get('reminder_time')
         episode_title = user_info.get('episode_title')
         episode_link = user_info.get('episode_link')
         # save reminder task into the table.
         reminder_ins.save_reminder_task(contact_type, contact_account,reminder_time, 
                                                 episode_title, episode_link)
-        # send email or short message
-        if contact_type.lower() == 'email':
-            reminder_ins.send_email(contact_account,reminder_time, episode_title, episode_link)
-        if contact_type.lower() == "sms":
-            reminder_ins.send_sms(contact_account, reminder_time, episode_title, episode_link)
-        return "Reminder will be sent."
+        return " Reminder will be sent."# + str(alarm_time)
 
 
 if __name__ == '__main__':
@@ -167,7 +188,22 @@ if __name__ == '__main__':
     api.add_resource(give_recommendation,   '/episode/recommendation')
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')
+    
+    @app.before_first_request 
+    def add_tasks():
+        #scheduler = BlockingScheduler()
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(reminder_ins.checkForReminders, 'interval', seconds=30)
+        print('Press Ctrl+{0} to exit scheduler'.format('Break' if os.name == 'nt' else 'C'))
+        try:
+            scheduler.start()
+
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        scheduler.print_jobs()
+        atexit.register(lambda: scheduler.shutdown())
 
     app.run(host='0.0.0.0', debug=False, port=3500)
+
     logger.info("Ready")
     
