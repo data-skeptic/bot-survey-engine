@@ -124,7 +124,7 @@ def create_reminder_table():
       task_id int not null auto_increment
     , contact_type varchar(122) not null
     , contact_account varchar(244) not null
-    , reminder_time varchar(244) not null
+    , reminder_time DATETIME not null
     , episode_title varchar(1024) 
     , episode_link varchar(1024)
     , scheduled int default 0
