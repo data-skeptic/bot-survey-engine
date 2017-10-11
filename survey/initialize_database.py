@@ -127,6 +127,7 @@ def create_reminder_table():
     , reminder_time varchar(244) not null
     , episode_title varchar(1024) 
     , episode_link varchar(1024)
+    , scheduled int default 0
     , primary key (task_id)
     );
     """
