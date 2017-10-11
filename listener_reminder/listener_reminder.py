@@ -9,6 +9,12 @@ import random
 import pandas as pd
 import json
 import boto3
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.date import DateTrigger
+from datetime import date
+import re
 
 class Listener_Reminder():
     def __init__(self, user, pw, username, password, address, databasename):
@@ -50,20 +56,24 @@ class Listener_Reminder():
             print("Error in saving task into reminder_schedule table.")
             raise
 
-    def send_email(self, user_email, send_time,episode_title = None, episode_link = None):
+    def send_message(self, contact_type, contact_account,episode_title = None, episode_link = None):
+        message = 'It is time to listen to episodes. '
+        html_message = '<p>' + message + '</p>' 
+        if episode_title is None:
+                episode_title = ""
+        if episode_link is None:
+            episode_link = ""
+
+        if contact_type == 'email':
             client = boto3.client('ses',
                         region_name = 'us-east-1', 
                         aws_access_key_id = self.user, 
                         aws_secret_access_key = self.pw
                         )
             source_email = "xfzhengnankai@gmail.com"
-            destination_email = ["fayezheng1010@gmail.com", user_email] #add "kyle@dataskeptic.com" later when everything is fixed.
+            destination_email = [contact_account] #add "kyle@dataskeptic.com" later when everything is fixed.
             reply_to_email = source_email
-            if episode_title is None:
-                episode_title = ""
-            if episode_link is None:
-                episode_link = ""
-
+            
             response = client.send_email(
                         Source= source_email,
                         Destination={'ToAddresses': destination_email},
@@ -72,25 +82,41 @@ class Listener_Reminder():
                                 'Data': 'A reminder from Data Skeptic!'
                             },
                             'Body': {
-                                'Text': {'Data': self.message + "\n" + episode_title + "\n" + episode_link}
+                                'Html': {
+                                    'Data': html_message +  episode_link
+                                }
                             }
                         },
                         ReplyToAddresses=[reply_to_email]
                     )
-            return response if 'ErrorResponse' in response else 'successful. Check email box.'  
-            
-    def send_sms(self, user_phone,send_time, episode_title = None, episode_link = None):
-        client = boto3.client(
-            "sns",
-            aws_access_key_id=self.user,
-            aws_secret_access_key=self.pw,
-            region_name="us-east-1"
-        )
-        client.publish(
-            # phone number has to be in this form: "+12223334444"
-            PhoneNumber = user_phone,  # Note the formate of the phone number. It's got to be in something called E.164 format.
-            Message = self.message  + "\n" +episode_title + "\n" + episode_link
-        )
+            #return response if 'ErrorResponse' in response else 'successful. Check email box.'  
+        if contact_type == 'sms':
+            client = boto3.client(
+                "sns",
+                aws_access_key_id = self.user,
+                aws_secret_access_key = self.pw,
+                region_name="us-east-1"
+            )
+            client.publish(PhoneNumber = contact_account,  Message = message  + "\n" + episode_title + "\n" + re.findall(r'"([^"]*)"', episode_link)[0])
+
+    def checkForReminders(self):
+        query = "SELECT * FROM reminder_schedule WHERE scheduled = 0 and reminder_time > NOW() and reminder_time < DATE_ADD(NOW(), INTERVAL 5 MINUTE) "
+        r = self.internal.execute(query)
+        n= r.rowcount
+        print("The number of new task is ", n)
+        for i in range(n):
+            reminder_task = r.fetchone()
+            reminder_id = reminder_task['task_id']
+            reminder_time = reminder_task['reminder_time']
+            contact_type = reminder_task['contact_type']
+            contact_account = reminder_task['contact_account']
+            episode_title = reminder_task['episode_title']
+            episode_link = reminder_task['episode_link']
+            print("reminder task is ", reminder_time, contact_type, contact_account, episode_title, episode_link)
+            self.send_message(contact_type, contact_account,episode_title, episode_link)
+            template = "UPDATE reminder_schedule SET scheduled=1 WHERE task_id = '{reminder_id}' "
+            query =  template.format(reminder_id = reminder_id)
+            self.internal.execute(query)
 
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
