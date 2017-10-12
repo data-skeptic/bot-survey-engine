@@ -32,15 +32,23 @@ class Listener_Reminder():
         self.pw = pw
         
            
-    def save_reminder_task (self, contact_type, contact_account, reminder_time, episode_title, episode_link = None):
+    def save_reminder_task (self, contact_type, contact_account, reminder_time, episode_title = None, episode_link = None):
         # What special characters may have in episode titles and links?
         if episode_link and episode_title:
+            episode_title = episode_title.replace("'", "\\'")
+            episode_title = episode_title.replace(";", "\\;")
+            episode_title = episode_title.replace("&", "\\&")
+            episode_title = episode_title.replace("%", "%%")
+            print("episode_title is ", episode_title )
+            
             episode_link = episode_link.replace("'", "\\'")
             episode_link = episode_link.replace(";", "\\;")
             episode_link = episode_link.replace("&", "\\&")
             episode_link = episode_link.replace("%", "%%")
             episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
             print("episode_link is ", episode_link )
+            
+            
         try:
             template = """
                         INSERT INTO reminder_schedule (contact_type, contact_account, reminder_time, 
@@ -62,7 +70,7 @@ class Listener_Reminder():
         if episode_title is None:
                 episode_title = ""
         if episode_link is None:
-            episode_link = ""
+            episode_link = "<p></p>"
 
         if contact_type == 'email':
             client = boto3.client('ses',
@@ -70,7 +78,7 @@ class Listener_Reminder():
                         aws_access_key_id = self.user, 
                         aws_secret_access_key = self.pw
                         )
-            source_email = "xfzhengnankai@gmail.com"
+            source_email = "kyle@dataskeptic.com"
             destination_email = [contact_account] #add "kyle@dataskeptic.com" later when everything is fixed.
             reply_to_email = source_email
             
@@ -97,7 +105,7 @@ class Listener_Reminder():
                 aws_secret_access_key = self.pw,
                 region_name="us-east-1"
             )
-            client.publish(PhoneNumber = contact_account,  Message = message  + "\n" + episode_title + "\n" + re.findall(r'"([^"]*)"', episode_link)[0])
+            client.publish(PhoneNumber = contact_account,  Message = message  + "\n" + episode_title + "\n" + episode_link)
 
     def checkForReminders(self):
         query = "SELECT * FROM reminder_schedule WHERE scheduled = 0 and reminder_time > NOW() and reminder_time < DATE_ADD(NOW(), INTERVAL 5 MINUTE) "
