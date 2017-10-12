@@ -65,12 +65,10 @@ class Listener_Reminder():
             raise
 
     def send_message(self, contact_type, contact_account,episode_title = None, episode_link = None):
-        message = 'It is time to listen to episodes. '
-        html_message = '<p>' + message + '</p>' 
-        if episode_title is None:
-                episode_title = ""
-        if episode_link is None:
-            episode_link = "<p></p>"
+        message = 'It is time to listen to episodes.'
+        html_message = '<p>' + message + '</p>'
+        if len(episode_link) > 5:
+            html_message = html_message + episode_link
 
         if contact_type == 'email':
             client = boto3.client('ses',
@@ -91,7 +89,7 @@ class Listener_Reminder():
                             },
                             'Body': {
                                 'Html': {
-                                    'Data': html_message +  episode_link
+                                    'Data': html_message
                                 }
                             }
                         },
@@ -105,7 +103,10 @@ class Listener_Reminder():
                 aws_secret_access_key = self.pw,
                 region_name="us-east-1"
             )
-            client.publish(PhoneNumber = contact_account,  Message = message  + "\n" + episode_title + "\n" + episode_link)
+            client.publish(
+                PhoneNumber = contact_account,  
+                Message = html_message)
+        
 
     def checkForReminders(self):
         query = "SELECT * FROM reminder_schedule WHERE scheduled = 0 and reminder_time > NOW() and reminder_time < DATE_ADD(NOW(), INTERVAL 5 MINUTE) "
