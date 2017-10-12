@@ -151,12 +151,12 @@ class give_recommendation(Resource):
 
 reminder_ins = Listener_Reminder(user, pw, username, password, address, databasename)
 ## a test.
-contact_type = 'sms'
-contact_account = '+18144414200'
-episode_title = "MCMC"
-episode_link = "https://dataskeptic.com/blog/episodes/2017/data-science-tools-and-other-announcements-from-ignite"
-episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
-reminder_ins.send_message(contact_type, contact_account,episode_title , episode_link)
+# contact_type = 'sms'
+# contact_account = '+18144414200'
+# episode_title = "MCMC"
+# episode_link = "https://dataskeptic.com/blog/episodes/2017/data-science-tools-and-other-announcements-from-ignite"
+# episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
+# reminder_ins.send_message(contact_type, contact_account,episode_title , episode_link)
 
 class reminder(Resource):
     def post(self):
