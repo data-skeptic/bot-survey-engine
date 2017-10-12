@@ -65,7 +65,7 @@ class Listener_Reminder():
             raise
 
     def send_message(self, contact_type, contact_account,episode_title = None, episode_link = None):
-        message = 'It is time to listen to episodes.'
+        message = 'It is time to listen to podcasts.'
         html_message = '<p>' + message + '</p>'
         if len(episode_link) > 5:
             html_message = html_message + episode_link
@@ -97,16 +97,24 @@ class Listener_Reminder():
                     )
             #return response if 'ErrorResponse' in response else 'successful. Check email box.'  
         if contact_type == 'sms':
+            if len(episode_link) > 5:
+                episode_link = re.findall(r'"([^"]*)"', episode_link)[0]
+                sms_message = message + "\n" + episode_title + "\n" + episode_link
+            else:
+                sms_message = message
+
             client = boto3.client(
                 "sns",
                 aws_access_key_id = self.user,
                 aws_secret_access_key = self.pw,
                 region_name="us-east-1"
             )
-            client.publish(
+            response = client.publish(
                 PhoneNumber = contact_account,  
-                Message = html_message)
-        
+                Message = sms_message)
+          
+
+
 
     def checkForReminders(self):
         query = "SELECT * FROM reminder_schedule WHERE scheduled = 0 and reminder_time > NOW() and reminder_time < DATE_ADD(NOW(), INTERVAL 5 MINUTE) "
