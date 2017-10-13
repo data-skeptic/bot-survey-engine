@@ -32,41 +32,60 @@ class Listener_Reminder():
         self.pw = pw
         
            
-    def save_reminder_task (self, contact_type, contact_account, reminder_time, episode_title = None, episode_link = None):
+    def save_reminder_task (self, contact_type, contact_account, reminder_time, episode_titles = None, episode_links = None):
         # What special characters may have in episode titles and links?
-        if episode_link and episode_title:
-            episode_title = episode_title.replace("'", "\\'")
-            episode_title = episode_title.replace(";", "\\;")
-            episode_title = episode_title.replace("&", "\\&")
-            episode_title = episode_title.replace("%", "%%")
-            print("episode_title is ", episode_title )
+        
+        if episode_links and episode_titles:
+            for i in range(len(episode_links)):
+                episode_title = episode_titles[i]
+                episode_title = episode_title.replace("'", "\\'")
+                episode_title = episode_title.replace(";", "\\;")
+                episode_title = episode_title.replace("&", "\\&")
+                episode_title = episode_title.replace("%", "%%")
+                print("episode_title is ", episode_title )
+                episode_link = episode_links[i]
+                episode_link = episode_link.replace("'", "\\'")
+                episode_link = episode_link.replace(";", "\\;")
+                episode_link = episode_link.replace("&", "\\&")
+                episode_link = episode_link.replace("%", "%%")
+                episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
+                print("episode_link is ", episode_link )
             
-            episode_link = episode_link.replace("'", "\\'")
-            episode_link = episode_link.replace(";", "\\;")
-            episode_link = episode_link.replace("&", "\\&")
-            episode_link = episode_link.replace("%", "%%")
-            episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
-            print("episode_link is ", episode_link )
             
-            
-        try:
-            template = """
-                        INSERT INTO reminder_schedule (contact_type, contact_account, reminder_time, 
-                        episode_title, episode_link) 
-                        Values ('{contact_type}', '{contact_account}', '{reminder_time}', 
-                        '{episode_title}', '{episode_link}')
-                       """
-            query = template.format(contact_type = contact_type, contact_account = contact_account, reminder_time= reminder_time, episode_title=episode_title, episode_link=episode_link)
-            conn = self.internal.connect()
-            conn.execute(query)
-            conn.close()
-        except: 
-            print("Error in saving task into reminder_schedule table.")
-            raise
+                try:
+                    template = """
+                                INSERT INTO reminder_schedule (contact_type, contact_account, reminder_time, 
+                                episode_title, episode_link) 
+                                Values ('{contact_type}', '{contact_account}', '{reminder_time}', 
+                                '{episode_title}', '{episode_link}')
+                               """
+                    query = template.format(contact_type = contact_type, contact_account = contact_account, reminder_time= reminder_time, episode_title=episode_title, episode_link=episode_link)
+                    conn = self.internal.connect()
+                    conn.execute(query)
+                    conn.close()
+                except: 
+                    print("Error in saving task into reminder_schedule table.")
+                    raise
+        else:
+            try:
+                template = """
+                            INSERT INTO reminder_schedule (contact_type, contact_account, reminder_time, 
+                            episode_title, episode_link) 
+                            Values ('{contact_type}', '{contact_account}', '{reminder_time}', 
+                            '{episode_title}', '{episode_link}')
+                           """
+                query = template.format(contact_type = contact_type, contact_account = contact_account, reminder_time= reminder_time, episode_title=episode_title, episode_link=episode_link)
+                conn = self.internal.connect()
+                conn.execute(query)
+                conn.close()
+            except: 
+                print("Error in saving task into reminder_schedule table.")
+                raise
 
     def send_message(self, contact_type, contact_account,episode_title = None, episode_link = None):
         message = 'It is time to listen to podcasts.'
         html_message = '<p>' + message + '</p>'
+
         if len(episode_link) > 5:
             html_message = html_message + episode_link
 
