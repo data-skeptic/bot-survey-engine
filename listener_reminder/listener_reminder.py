@@ -79,22 +79,24 @@ class Listener_Reminder():
             source_email = "kyle@dataskeptic.com"
             destination_email = [contact_account] #add "kyle@dataskeptic.com" later when everything is fixed.
             reply_to_email = source_email
-            
-            response = client.send_email(
-                        Source= source_email,
-                        Destination={'ToAddresses': destination_email},
-                        Message={
-                            'Subject': {
-                                'Data': 'A reminder from Data Skeptic!'
-                            },
-                            'Body': {
-                                'Html': {
-                                    'Data': html_message
+            try:
+                response = client.send_email(
+                            Source= source_email,
+                            Destination={'ToAddresses': destination_email},
+                            Message={
+                                'Subject': {
+                                    'Data': 'A reminder from Data Skeptic!'
+                                },
+                                'Body': {
+                                    'Html': {
+                                        'Data': html_message
+                                    }
                                 }
-                            }
-                        },
-                        ReplyToAddresses=[reply_to_email]
-                    )
+                            },
+                            ReplyToAddresses=[reply_to_email]
+                        )
+            except:
+                print('error in sending email. Check the email address.')
             #return response if 'ErrorResponse' in response else 'successful. Check email box.'  
         if contact_type == 'sms':
             if len(episode_link) > 5:
@@ -102,16 +104,19 @@ class Listener_Reminder():
                 sms_message = message + "\n" + episode_title + "\n" + episode_link
             else:
                 sms_message = message
-
+            
             client = boto3.client(
                 "sns",
                 aws_access_key_id = self.user,
                 aws_secret_access_key = self.pw,
                 region_name="us-east-1"
             )
-            response = client.publish(
-                PhoneNumber = contact_account,  
-                Message = sms_message)
+            try:
+                response = client.publish(
+                    PhoneNumber = contact_account,  
+                    Message = sms_message)
+            except:
+                print('error in sending message. Check the phone number.')
           
 
 
