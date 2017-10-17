@@ -57,7 +57,6 @@ class episode():
         print('Retrival of episodes information is done.')
         
         ## get vocab_dic from SO
-        
         with open(self.voc_dic_file, 'r') as csv_file:
             reader = csv.reader(csv_file)
             self.vocab_dic = dict(reader)
@@ -66,14 +65,13 @@ class episode():
             self.vocab_dic[k] = int(value)
         print("Getting word vectors trained from SO and getting vocab_dictionary are done.")
         self.vocab = list(self.vocab_dic.keys())
-
         # get corpus of episodes
         self.corpus = []
         fname = self.episodes_corpus
         with open(fname, 'r') as f:
             for line in f:
                 self.corpus.append(line)
-  
+
         self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = self.vocab_dic)
         self.episode_vec_weighted_df = pd.read_csv(self.weighted_vecs_file, index_col=0)
         self.word_vecs_df = pd.read_csv(self.word_vec_file, index_col = 0)
@@ -81,58 +79,21 @@ class episode():
 
 
     def get_doc_weighted_vec(self, doc_corpus, weighted = True): #  doc_corpus a list of words
-        self.tf_idf = self.vectorizer.fit_transform(self.corpus)
-        tf_idf = self.vectorizer.fit_transform([" ".join(doc_corpus)])
-        #tf_idf = self.vectorizer.fit_transform([" ".join(doc_corpus)]+self.corpus)
+        all_tf_idf = self.vectorizer.fit_transform(self.corpus + [" ".join(doc_corpus)])
+        tf_idf = all_tf_idf[-1,:]
         df = self.word_vecs_df 
-        related_rows = df.loc[sorted(list(set(doc_corpus).intersection(set(self.vocab)))), :] 
-        # print(related_rows.shape)
-        # print(tf_idf)
-        # print(tf_idf[0,:])
-        if weighted:
-            weights = []
-            ind = sorted(tf_idf[0,:].nonzero()[1])
-            print("index of related episodes are ", ind)
-            if sum([self.vectorizer.vocabulary_[related_rows.index[j]] != ind[j] for j in range(len(ind))]) != 0:
-                print("words position don't match")
-                return 
-            for j in ind:
-                weights.append(tf_idf[0,j])
-            weights = np.array(weights)/sum(weights)
-        else:
-            weights = [1/related_rows.shape[0]] * related_rows.shape[0]
-        
-        # if related_rows.shape[0] != len(weights):
-        #     print(i)
-        #     print(related_rows.shape[0])
-        #     print(len(weights))
-        
-        result = related_rows.T * weights
-        #print('weighted vector is ', result.sum(axis = 1))
-        return result.sum(axis = 1)
-
-    
-
+        return tf_idf.dot(df)[0]
      ######################## make recommendation ######################
     def recommend_episode(self,user_request): # add parameter user_request 
-        print("Hello.", user_request)
         all_episode = self.episode_vec_weighted_df.values
         print("*****************************************************" + "\n")
         user_request_corpus = gensim.utils.simple_preprocess(user_request)
-        #print(user_request_corpus)
-        #X_user = self.vectorizer.fit_transform([" ".join(user_request_corpus)])
-        #print(str(X_user.shape) + "\n")
         user_weighted_vec = self.get_doc_weighted_vec(user_request_corpus).reshape(1, -1)
-        #print('user_weighted_vec shape is ', user_weighted_vec.shape)
-        #print('all_episode shape is ', all_episode.shape)
         cos_similarities = cosine_similarity(X=user_weighted_vec, Y=all_episode)
-
         cos_similarities = cos_similarities[0]
-        #print(cos_similarities.shape)
-
+        
         most_similar = cos_similarities.argsort()[-4:][::-1]
-        #print(str(most_similar) + "\n")
-        threshold = 0.60
+        threshold = 0.65
         print("User's request is: " + user_request + "\n" )
         result = {}
         rank  = 1
@@ -147,12 +108,8 @@ class episode():
                 print(str(self.descToLink[desc]) + "\n")
                 print(str(desc.encode('utf-8')) + "\n")
                 result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc})
-                rank += 1
-        
+                rank += 1 
         return result
-
-
-
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
    main()
