@@ -133,40 +133,20 @@ class episode_prepare():
 
     def get_doc_weighted_vec(self, i, doc_corpus, tf_idf, weighted = True): # ith documents. doc_corpus a list of words
         df = self.word_vecs_df
-        vocab = self.vocab
-        related_rows = df.loc[sorted(list(set(doc_corpus).intersection(set(vocab)))), :] 
-        if weighted:
-            weights = []
-            ind = sorted(tf_idf[i,:].nonzero()[1])
-            if sum([self.vectorizer.vocabulary_[related_rows.index[j]] != ind[j] for j in range(len(ind))]) != 0:
-                print("words position don't match")
-                return 
-            for j in ind:
-                weights.append(tf_idf[i,j])
-            weights = np.array(weights)/sum(weights)
-        else:
-            weights = [1/related_rows.shape[0]] * related_rows.shape[0]
-        if related_rows.shape[0] != len(weights):
-            print(i)
-            print(related_rows.shape[0])
-            print(len(weights))
-        result = related_rows.T * weights
-        return result.sum(axis = 1)
+        return tf_idf.dot(df)
+    
     def get_episode_weighted_vec(self):
         episode_vec_weighted = []
-        total = len(self.descriptions)
-        for i in range(total):
-            doc_corpus = self.episode_desc_title_corpus[i]
-            episode_vec_weighted.append(self.get_doc_weighted_vec(i,doc_corpus, self.X))
+        episode_weighted_vec = self.X.dot(self.word_vecs_df)
+        print("episode_weighted_vec shape is ",episode_weighted_vec.shape) # should be N * 200 where N is the number of episodes
+
         mdir = os.path.dirname(os.path.abspath(__file__))
         if not os.path.exists(mdir+'/episode_vec/'):
             os.makedirs(mdir+'/episode_vec/')
 
-        episode_vec_weighted_df = pd.DataFrame(episode_vec_weighted)
+        episode_vec_weighted_df = pd.DataFrame(episode_weighted_vec)
         episode_vec_weighted_df.to_csv(mdir+"/episode_vec/episode_vec_weighted.csv")
-    # def run(self):
-    #     ins = episodes_preparation.episode_prepare()
-
+    
 def run(update,size, min_count, window, name):
     if update:
         ins = episode_prepare(size, min_count, window, name)
