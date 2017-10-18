@@ -43,7 +43,6 @@ class episode_prepare():
         self.word_vecs_df = word_vecs_df
 
     def vocab_dic(self):
-
         fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
         mdir = os.path.dirname(os.path.abspath(__file__))
         with open(mdir+fname, 'r') as csv_file:
@@ -130,13 +129,8 @@ class episode_prepare():
             for c in corpus:
                 f.write("%s\n" % c)
         return corpus
-
-    def get_doc_weighted_vec(self, i, doc_corpus, tf_idf, weighted = True): # ith documents. doc_corpus a list of words
-        df = self.word_vecs_df
-        return tf_idf.dot(df)
     
     def get_episode_weighted_vec(self):
-        episode_vec_weighted = []
         episode_weighted_vec = self.X.dot(self.word_vecs_df)
         print("episode_weighted_vec shape is ",episode_weighted_vec.shape) # should be N * 200 where N is the number of episodes
 
