@@ -144,7 +144,8 @@ class Listener_Reminder():
         query = "SELECT * FROM reminder_schedule WHERE scheduled = 0 and reminder_time > NOW() and reminder_time < DATE_ADD(NOW(), INTERVAL 5 MINUTE) "
         r = self.internal.execute(query)
         n= r.rowcount
-        print("The number of new task is ", n)
+        if n > 0:
+            print("The number of new task is ", n)
         for i in range(n):
             reminder_task = r.fetchone()
             reminder_id = reminder_task['task_id']
