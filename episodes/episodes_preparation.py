@@ -26,8 +26,11 @@ class episode_prepare():
         self.name = name    
         self.crawl_episode_info()
         self.get_word_vec()
+        #self.get_word_vec_200_glove()
         print("crawling episodes is done.")
         vocab_dic = self.vocab_dic()
+        #vocab_dic = self.vocab_dic_200_glove()
+        print('size of vocab in vocab_dic is ', len(vocab_dic))
         corpus = self.get_episode_corpus()
         self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = vocab_dic)
         self.X = self.vectorizer.fit_transform(corpus)
@@ -42,6 +45,15 @@ class episode_prepare():
         self.vocab = vocab
         self.word_vecs_df = word_vecs_df
 
+    def get_word_vec_200_glove(self):
+        path = "/Users/XiaofeiZheng/Downloads/word_vec_pickle_glove_200.pickle"
+        with open(path, 'rb') as f:
+            word_vecs_df = pickle.load(f)
+        vocab = word_vecs_df.index
+        print("the size of the vocab is ",len(vocab))
+        self.vocab = vocab
+        self.word_vecs_df = word_vecs_df
+
     def vocab_dic(self):
         fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
         mdir = os.path.dirname(os.path.abspath(__file__))
@@ -51,6 +63,12 @@ class episode_prepare():
         for k, value in vocab_dic.items():
             vocab_dic[k] = int(value)
         return vocab_dic
+    def vocab_dic_200_glove(self):
+        path = "/Users/XiaofeiZheng/Downloads/vocab_dic_glove_200.pickle"
+        with open(path, 'rb') as f:
+            vocab_dic = dict(pickle.load(f))
+        return vocab_dic
+
 
     def crawl_episode_info(self):
         mdir =os.path.dirname(os.path.abspath(__file__))
@@ -103,7 +121,7 @@ class episode_prepare():
                 desc = str(desc).replace('\n', "") 
                 title = title.replace('[MINI]', "")
                 title = title.encode('utf-8').strip()
-                title = "*"+ str(i)+str(title).replace('\n', "") 
+                title = str(title).replace('\n', "") 
                 thefile.write("%s\n" % str(title+", "+desc)) 
         self.descriptions = descriptions
 
