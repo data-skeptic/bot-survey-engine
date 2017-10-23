@@ -37,7 +37,8 @@ class episode_prepare():
     
 
     def get_word_vec(self):
-        fname = '/word_vec/word2vector_model_question_answer_' + self.name + '.csv'
+        #fname = '/word_vec/word2vector_model_question_answer_' + self.name + '.csv'
+        fname = "/word_vec_bigram/all_posts_word_vec.csv"
         mdir = os.path.dirname(os.path.abspath(__file__))
         word_vecs_df = pd.read_csv(mdir+fname,index_col=0)
         vocab = word_vecs_df.index
@@ -45,17 +46,18 @@ class episode_prepare():
         self.vocab = vocab
         self.word_vecs_df = word_vecs_df
 
-    def get_word_vec_200_glove(self):
-        path = "/Users/XiaofeiZheng/Downloads/word_vec_pickle_glove_200.pickle"
-        with open(path, 'rb') as f:
-            word_vecs_df = pickle.load(f)
-        vocab = word_vecs_df.index
-        print("the size of the vocab is ",len(vocab))
-        self.vocab = vocab
-        self.word_vecs_df = word_vecs_df
+    # def get_word_vec_200_glove(self):
+    #     path = "/Users/XiaofeiZheng/Downloads/word_vec_pickle_glove_200.pickle"
+    #     with open(path, 'rb') as f:
+    #         word_vecs_df = pickle.load(f)
+    #     vocab = word_vecs_df.index
+    #     print("the size of the vocab is ",len(vocab))
+    #     self.vocab = vocab
+    #     self.word_vecs_df = word_vecs_df
 
     def vocab_dic(self):
-        fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
+        #fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
+        fname = '/vocab_dict_bigram/vocab_dict_question_answer.csv'
         mdir = os.path.dirname(os.path.abspath(__file__))
         with open(mdir+fname, 'r') as csv_file:
             reader = csv.reader(csv_file)
