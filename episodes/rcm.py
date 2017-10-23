@@ -48,8 +48,10 @@ class episode():
         self.episodes_json_fname = mdir+'/text/episodes_json.txt'  # store all information
         self.episodes_desc = mdir+'/text/episode_descs_titles.txt' # store all descriptions
         self.episodes_corpus = mdir+'/text/episode_corpus.txt' # store corpus: a list of sentences (words in sentences are tokenlized, lowercased and so on)
-        self.word_vec_file = mdir+'/word_vec/word2vector_model_question_answer_' + name + '.csv'
-        self.voc_dic_file = mdir+'/vocab_dict/vocab_dict_question_answer_' + name +'.csv' # store vocab_dictionary
+        # self.word_vec_file = mdir+'/word_vec/word2vector_model_question_answer_' + name + '.csv'
+        # self.voc_dic_file = mdir+'/vocab_dict/vocab_dict_question_answer_' + name +'.csv' # store vocab_dictionary
+        self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
+        self.voc_dic_file = mdir + '/vocab_dict_bigram/vocab_dict_question_answer.csv'
         self.weighted_vecs_file = mdir+'/episode_vec/episode_vec_weighted.csv' # store weighted vectors
 
         # load episode informaiton and save it to variables.
