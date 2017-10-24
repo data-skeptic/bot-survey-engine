@@ -31,6 +31,8 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from nltk.stem import WordNetLemmatizer
+from nltk.stem.lancaster import LancasterStemmer
 
 from gensim.models import Phrases
 
@@ -49,7 +51,7 @@ class episode():
         # self.word_vec_file = mdir+'/word_vec/word2vector_model_question_answer_' + name + '.csv'
         # self.voc_dic_file = mdir+'/vocab_dict/vocab_dict_question_answer_' + name +'.csv' # store vocab_dictionary
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
-        self.voc_dic_file = mdir + '/vocab_dict_bigram/vocab_dict_question_answer.csv'
+        self.voc_dic_file = mdir + '/vocab_dic_bigram/vocab_dict_question_answer.csv'
         self.weighted_vecs_file = mdir+'/episode_vec_bigram/episode_vec_weighted.csv' # store weighted vectors
 
         # load episode informaiton and save it to variables.
@@ -109,12 +111,17 @@ class episode():
     def recommend_episode(self,user_request):
         all_episode = self.episode_vec_weighted_df.values
         user_request_corpus = gensim.utils.simple_preprocess(user_request)
+        # wordnet_lemmatizer = WordNetLemmatizer()
+        # st = LancasterStemmer()
+        # #user_request_corpus = [wordnet_lemmatizer.lemmatize(word) for word in user_request_corpus]
+        # user_request_corpus = [st.stem(word) for word in user_request_corpus]
         temp = self.bigram[user_request_corpus]# temp is a list of words(unigram and bigram)
         result = []
         for element in temp:
             key = element.split("_")
             if len(key) == 1:
-                result.append(element)
+                if element not in stopwords.words('english'):
+                    result.append(element)
             if len(key) > 1 and not any([word in stopwords.words("english") for word in key]):
                 result.append(element)
             for word in key:
@@ -139,7 +146,7 @@ class episode():
             similarity_threshold = 0.10
 
         else:
-            similarity_threshold = 0.65
+            similarity_threshold = 0.70
             df = self.word_vecs_df 
             user_weighted_vec = user_tf_idf.dot(df)[0].reshape(1, -1)
             cos_similarities = cosine_similarity(X=user_weighted_vec, Y=all_episode)[0]
