@@ -52,8 +52,8 @@ path = "/Users/XiaofeiZheng/Desktop/10_23_17/episodes/episode_vec_bigram/episode
 doc_vecs = pd.read_csv(path, index_col = 0)
 
 
-print(doc_vecs.shape)
-print(doc_vecs.head(5))
+# print(doc_vecs.shape)
+# print(doc_vecs.head(5))
 
 #PCA for doc_vecs
 pca = PCA(n_components=30)
@@ -65,20 +65,20 @@ doc_vecs['pca-two'] = pca_result[:,1]
 doc_vecs['pca-three'] = pca_result[:,2]
 doc_vecs['Name'] = descToTitle.values()
 
-print(doc_vecs.head())
+# print(doc_vecs.head())
 print ('Explained variation per principal component: {}'.format(pca.explained_variance_ratio_))
 
 #rndperm = np.random.permutation(df.shape[0])
 
-c12_1 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
-        + geom_point(color = 'red', size = 5) \
-        + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
-        + ggtitle("First and Second Principal Components") \
-        + scale_x_continuous(limits=(-20,5)) \
-        + scale_y_continuous(limits=(-20,20))
+# c12_1 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
+#         + geom_point(color = 'red', size = 5) \
+#         + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
+#         + ggtitle("First and Second Principal Components") \
+#         + scale_x_continuous(limits=(-20,5)) \
+#         + scale_y_continuous(limits=(-20,0))
  
-print("the first figure is ")
-print(c12_1)
+# print("the first figure is ")
+# print(c12_1)
 
 
 # c12_2 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
@@ -90,14 +90,14 @@ print(c12_1)
 
 # print(c12_2)
 
-# c12_3 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
-#         + geom_point(color = 'red', size = 5) \
-#         + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
-#         + ggtitle("First and Second Principal Components") \
-#         + scale_x_continuous(limits=(5,30)) \
-#         + scale_y_continuous(limits=(0,20))
+c12_3 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
+        + geom_point(color = 'red', size = 5) \
+        + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
+        + ggtitle("First and Second Principal Components") \
+        + scale_x_continuous(limits=(5,30)) \
+        + scale_y_continuous(limits=(0,20))
  
-# print(c12_3)
+print(c12_3)
 
 
 
@@ -130,14 +130,14 @@ print(c12_1)
 #         + scale_y_continuous(limits=(-20,0))
 # print(c23_3)
 
-c23_4 = ggplot(doc_vecs, aes(x='pca-one', y='pca-three', label = 'Name') ) \
-        + geom_point(color = 'blue', size = 5) \
-        + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
-        + ggtitle("First and Third Principal Components") \
-        + scale_x_continuous(limits=(-20,0)) \
-        + scale_y_continuous(limits=(0,20))
+# c23_4 = ggplot(doc_vecs, aes(x='pca-one', y='pca-three', label = 'Name') ) \
+#         + geom_point(color = 'blue', size = 5) \
+#         + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
+#         + ggtitle("First and Third Principal Components") \
+#         + scale_x_continuous(limits=(-20,0)) \
+#         + scale_y_continuous(limits=(0,20))
 
-print(c23_4)
+# print(c23_4)
 
 
 
