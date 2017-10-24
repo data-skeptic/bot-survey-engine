@@ -34,7 +34,7 @@ import matplotlib as mpl
 # the goal of this document is to visualize/ cluster all of the 181 episodes in 2 dimensions to see whether the doc vectors are good enough.
 
 
-file_name = "/Users/XiaofeiZheng/Desktop/10_17_2017 copy/bot-survey-engine/episodes/text/episodes_json.txt"
+file_name = "/Users/XiaofeiZheng/Desktop/10_23_17/episodes/text/episodes_json.txt"
 with open(file_name) as data_file:    
 	episode_json = json.load(data_file)
 print('The total number of episodes is ',len(episode_json.keys()))
@@ -48,7 +48,7 @@ for desc  in descriptions:
 	descToNum[desc] = str(episode_json[desc]['num']) 
 
 
-path = "/Users/XiaofeiZheng/Desktop/10_17_2017 copy/bot-survey-engine/episodes/episode_vec/episode_vec_weighted.csv"
+path = "/Users/XiaofeiZheng/Desktop/10_23_17/episodes/episode_vec_bigram/episode_vec_weighted.csv"
 doc_vecs = pd.read_csv(path, index_col = 0)
 
 
@@ -70,15 +70,15 @@ print ('Explained variation per principal component: {}'.format(pca.explained_va
 
 #rndperm = np.random.permutation(df.shape[0])
 
-# c12_1 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
-#         + geom_point(color = 'red', size = 5) \
-#         + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
-#         + ggtitle("First and Second Principal Components") \
-#         + scale_x_continuous(limits=(-20,5)) \
-#         + scale_y_continuous(limits=(-20,20))
+c12_1 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
+        + geom_point(color = 'red', size = 5) \
+        + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
+        + ggtitle("First and Second Principal Components") \
+        + scale_x_continuous(limits=(-20,5)) \
+        + scale_y_continuous(limits=(-20,20))
  
-# print("the first figure is ")
-# print(c12_1)
+print("the first figure is ")
+print(c12_1)
 
 
 # c12_2 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
