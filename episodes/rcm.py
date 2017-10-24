@@ -20,7 +20,6 @@ import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 import episodes_preparation as ep
 
-
 import nltk
 import string
 from nltk.corpus import stopwords
@@ -34,7 +33,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from gensim.models import Phrases
-
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -52,7 +50,7 @@ class episode():
         # self.voc_dic_file = mdir+'/vocab_dict/vocab_dict_question_answer_' + name +'.csv' # store vocab_dictionary
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
         self.voc_dic_file = mdir + '/vocab_dict_bigram/vocab_dict_question_answer.csv'
-        self.weighted_vecs_file = mdir+'/episode_vec/episode_vec_weighted.csv' # store weighted vectors
+        self.weighted_vecs_file = mdir+'/episode_vec_bigram/episode_vec_weighted.csv' # store weighted vectors
 
         # load episode informaiton and save it to variables.
         file_name = self.episodes_json_fname
@@ -72,7 +70,8 @@ class episode():
         self.descToNum = descToNum
         self.descToTitle = descToTitle
         self.descToLink = descToLink
-        print('Retrival of episodes information is done.')
+        print('Retrival of episodes information is done.') 
+        # this is for future print. when we recommend some episodes, we should also be able to print the link, title, descriptions.
 
         # get vocab_dic from SO
         with open(self.voc_dic_file, 'r') as csv_file:
@@ -81,127 +80,78 @@ class episode():
         for k, value in self.vocab_dic.items():
             self.vocab_dic[k] = int(value)
 
-        print("Getting word vectors trained from SO and getting vocab_dictionary are done.")
+        print("Getting vocab_dictionary are done in recommendation python file.")
         self.vocab = list(self.vocab_dic.keys())
-        # get corpus of episodes
-        self.corpus = []
-        fname = self.episodes_corpus
-        with open(fname, 'r') as f:
-            for line in f:
-                self.corpus.append(line)
-
+    
         self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = self.vocab_dic)
+
         self.episode_vec_weighted_df = pd.read_csv(self.weighted_vecs_file, index_col=0)
+        print("Getting weighted vectors for all episodes is done.")
+
         self.word_vecs_df = pd.read_csv(self.word_vec_file, index_col = 0)
-
-        self.bigram, self.episode_corpus,self.vocab_tf_idf,self.vocab_dict_tf_idf = self.bigram_recommendation_prepare()
-
+        print('Getting word vectors trained from SO is done in rcm.py')
+        
+        #self.bigram, self.episode_corpus,self.vocab_tf_idf,self.vocab_dict_tf_idf = self.bigram_recommendation_prepare()
+        mdir = os.path.dirname(os.path.abspath(__file__))
+        fname = '/episodes_preprocess/episodes_sentences_nonstopwords.pickle'
+        with open(mdir+fname, 'rb') as f:
+            self.episodes_sentences_nonstopwords = pickle.load(f)
+        fname = '/episodes_preprocess/episodes_corpus.pickle'
+        with open(mdir+fname, 'rb') as f:
+            self.episodes_corpus = pickle.load(f)
+        fname = '/SO_bigram/SO_bigram.pkl'
+        with open(mdir+fname, 'rb') as f:
+            self.bigram = pickle.load(f)
+            #print("test bigram....", b'random_walk' in self.bigram.vocab.keys())
+            print("size of bigram.vocab is ",len(self.bigram.vocab.keys()))
         print("Initialization is done.")
 
-
-
-    def get_doc_weighted_vec(self, doc_corpus, weighted = True): #  doc_corpus a list of words
-        all_tf_idf = self.vectorizer.fit_transform(self.corpus + [" ".join(doc_corpus)])
-        tf_idf = all_tf_idf[-1,:]
-        df = self.word_vecs_df 
-        return tf_idf.dot(df)[0]
-    
-    def bigram_recommendation_prepare(self):
-        translation = str.maketrans(string.punctuation,' '*len(string.punctuation))
-        def preprocess():
-            lemmatizer = nltk.WordNetLemmatizer()
-            sentences = [] # a list of lists of words
-            bigram = Phrases()
-            episode_corpus = [] # used to save corpus of episodes a list of sentences
-            with open(self.episodes_desc, "r") as f:
-                for line in f:
-                    # remove common punctuations and transform all words to their lower cases.
-                    sentence =  [lemmatizer.lemmatize(word) for word in line.translate(translation).lower().split()]
-                    line = " ".join(sentence)
-                    episode_corpus.append(line)
-                    # sentence = [word
-                    #             for word in nltk.word_tokenize(line)
-                    #             if word not in string.punctuation]
-                    sentences.append(sentence)
-                    bigram.add_vocab([sentence])
-            return bigram, episode_corpus, sentences
-        bigram, episode_corpus, sentences = preprocess()
-
-        def get_ngram(bigram):
-            vocab_dict = Counter()
-            for key,value in bigram.vocab.items():
-                words = key.decode("utf-8").split("_")
-                if len(words) == 1:
-                    if key.decode("utf-8") not in stopwords.words("english"):
-                        vocab_dict[key.decode('utf-8')] = value    
-                else:
-                    if not any([word in stopwords.words('english') for word in words]):
-                        vocab_dict[key.decode('utf-8').replace("_", " ")] = value
-            vocab = list(vocab_dict.keys())
-            return vocab, vocab_dict
-
-
-        vocab, vocab_dict = get_ngram(bigram)
-        
-        # print all bi_words to get an idea of what are included.
-        print("We have the following bi_word: ")
-        # bi_words = []
-        # for word in vocab:
-        #     if len(word.split(" ")) == 2:
-        #         bi_words.append(word)
-        # print(bi_words)
-
-        return bigram, episode_corpus,vocab,vocab_dict
-    
-
-    def get_tf_idf(self,vocab,corpus):
-        vectorizer = CountVectorizer(ngram_range=(1, 2),vocabulary = self.vocab_tf_idf)
-        X = vectorizer.fit_transform(corpus)
-        transformer = TfidfTransformer(smooth_idf=True)
-        tfidf = transformer.fit_transform(X)
-        return tfidf
-
-    def bigram_recommendation(self, user_request):
-        lemmatizer = nltk.WordNetLemmatizer()
-        translation = str.maketrans(string.punctuation,' '*len(string.punctuation))
-        user_request_corpus = " ".join([lemmatizer.lemmatize(word) for word in user_request.translate(translation).lower().split()])
-        #user_request_corpus = [user_request.translate(translation).lower()]
-        corpus = self.episode_corpus + [user_request_corpus]
-        tfidf = self.get_tf_idf(self.vocab_tf_idf, corpus)
-        #print(tfidf.shape) # (N+1) * |V| N is the number of episodes and |V| is the size of the vocab in the bigram dict.
-        #find cos similarities
-        cos_similarities = cosine_similarity(X = tfidf)[-1]
-        most_similar_index = cos_similarities.argsort()[-4:][::-1][1:]# except itself
-        return cos_similarities, most_similar_index
-
-    def doc_vec_recommendation(self,user_request):
+    def recommend_episode(self,user_request):
         all_episode = self.episode_vec_weighted_df.values
         user_request_corpus = gensim.utils.simple_preprocess(user_request)
-
+        temp = self.bigram[user_request_corpus]# temp is a list of words(unigram and bigram)
+        result = []
+        for element in temp:
+            key = element.split("_")
+            if len(key) == 1:
+                result.append(element)
+            if len(key) > 1 and not any([word in stopwords.words("english") for word in key]):
+                result.append(element)
+            for word in key:
+                if word not in stopwords.words("english"):
+                    result.append(word)
+            result = list(set(result))
         # use doc vec to make recommendation
-        user_weighted_vec = self.get_doc_weighted_vec(user_request_corpus).reshape(1, -1)
-        cos_similarities = cosine_similarity(X=user_weighted_vec, Y=all_episode)[0]
-        most_similar_index = cos_similarities.argsort()[-4:][::-1]
-        return cos_similarities, most_similar_index
+        print("after preprocessing, the result of user's request is", result)
+        temp = self.episodes_corpus + [" ".join(result)]
+        all_tf_idf = self.vectorizer.fit_transform(self.episodes_corpus + [" ".join(result)])
+        user_tf_idf = all_tf_idf[-1,:]
+        episodes_tf_idf = all_tf_idf[0:-1,:]
+        # print("user_tf_idf is ", user_tf_idf.nonzero())
+        # for j in range(episodes_tf_idf.shape[0]):
+        #     if sum([episodes_tf_idf[j,k] for k in user_tf_idf.nonzero()[1]]) > 0:
+        #         print(cosine_similarity(X=user_tf_idf,Y =episodes_tf_idf[j,:]))
 
-    def recommend_episode(self,user_request): # add parameter user_request 
-        length_threshold = 5
-        threshold_tf_idf = 0.15
-        threshold_vec= 0.65
-        #most_similar = list(set(most_similar_tf_idf).union(most_similar_tf_idf))
-        if len(user_request.split()) < length_threshold:
-            cos_similarities, most_similar_index = self.bigram_recommendation(user_request)
-            threshold = threshold_tf_idf
+        threshold = 5
+        if len(result) < threshold:
+            print(cosine_similarity(X=episodes_tf_idf, Y=user_tf_idf).shape)
+            cos_similarities = cosine_similarity(X=user_tf_idf,Y=episodes_tf_idf)[0]
+            similarity_threshold = 0.10
+
         else:
-            cos_similarities, most_similar_index = self.doc_vec_recommendation(user_request)
-            threshold = threshold_vec
+            similarity_threshold = 0.65
+            df = self.word_vecs_df 
+            user_weighted_vec = user_tf_idf.dot(df)[0].reshape(1, -1)
+            cos_similarities = cosine_similarity(X=user_weighted_vec, Y=all_episode)[0]
+        
+        most_similar_index = cos_similarities.argsort()[-4:][::-1]
 
         print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& User's request is:  " + user_request + " &&&&&&&&&&&&&&&&&&&&&&&&\n" )
         result = {}
         rank  = 1
         print('most_similary index are ', most_similar_index)
         for i in most_similar_index:
-            if cos_similarities[i] > threshold:
+            if cos_similarities[i] >= similarity_threshold:
                 print("--------------------The episode has cosine similarity "+str(cos_similarities[i])+ "-------------------\n")
                 print( "\n")
                 j = len(self.descriptions) - i  
@@ -212,11 +162,7 @@ class episode():
                 result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc})
                 rank += 1 
         return result
+
 if __name__ == "__main__":
     # stuff only to run when not called via 'import' here
     main()
-   
-    
-   
-
-
