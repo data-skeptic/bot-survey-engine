@@ -20,6 +20,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from gensim.models import Phrases
 from nltk.corpus import stopwords
 import nltk
+from nltk.stem import WordNetLemmatizer
+from nltk.stem.lancaster import LancasterStemmer
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -88,7 +90,7 @@ class episode_prepare():
 
     def vocab_dic(self):
         #fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
-        fname = '/vocab_dict_bigram/vocab_dict_question_answer.csv'
+        fname = '/vocab_dic_bigram/vocab_dict_question_answer.csv'
         mdir = os.path.dirname(os.path.abspath(__file__))
         with open(mdir+fname, 'r') as csv_file:
             reader = csv.reader(csv_file)
@@ -134,11 +136,12 @@ class episode_prepare():
             desc = desc.replace(u'\n', u' ')
             desc = desc.replace(u'\xc2', u' ')
             desc = BeautifulSoup(desc, "lxml").text
-            descriptions.append(desc)
-            descToTitle[desc] = episode['title']
-            descToLink[desc] = episode['link']
-            descToNum[desc] = l
-            l = l - 1
+            if len(desc) >= 5:
+                descriptions.append(desc)
+                descToTitle[desc] = episode['title']
+                descToLink[desc] = episode['link']
+                descToNum[desc] = l
+                l = l - 1
         result = {}
         for desc in descriptions:
             info = {}
@@ -172,6 +175,10 @@ class episode_prepare():
         with smart_open.smart_open(fname, encoding="iso-8859-1") as f:
             for i, line in enumerate(f):
                 sentence = gensim.utils.simple_preprocess(line)
+                #wordnet_lemmatizer = WordNetLemmatizer()
+                # st = LancasterStemmer()
+                # #sentence = [wordnet_lemmatizer.lemmatize(word) for word in sentence]
+                # sentence = [st.stem(word) for word in sentence]
                 sentences.append(sentence)
                 #self.SO_bigram.add_vocab([sentence])
 
@@ -183,7 +190,8 @@ class episode_prepare():
             for element in temp:
                 key = element.split("_")
                 if len(key) == 1:
-                    result.append(element)
+                    if element not in stopwords.words('english'):
+                        result.append(element)
                 if len(key) > 1 and not any([word in stopwords.words("english") for word in key]):
                     result.append(element)
                 for word in key:
