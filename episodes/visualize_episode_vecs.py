@@ -29,12 +29,13 @@ from sklearn.decomposition import PCA
 from ggplot import *
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-
+import os
 
 # the goal of this document is to visualize/ cluster all of the 181 episodes in 2 dimensions to see whether the doc vectors are good enough.
 
-
-file_name = "/Users/XiaofeiZheng/Desktop/10_23_17/episodes/text/episodes_json.txt"
+mdir = os.path.dirname(os.path.abspath(__file__))
+print(mdir)
+file_name = mdir+"/text/episodes_json.txt"
 with open(file_name) as data_file:    
 	episode_json = json.load(data_file)
 print('The total number of episodes is ',len(episode_json.keys()))
@@ -48,7 +49,7 @@ for desc  in descriptions:
 	descToNum[desc] = str(episode_json[desc]['num']) 
 
 
-path = "/Users/XiaofeiZheng/Desktop/10_23_17/episodes/episode_vec_bigram/episode_vec_weighted.csv"
+path = mdir +'/episode_vec_bigram/episode_vec_weighted.csv'
 doc_vecs = pd.read_csv(path, index_col = 0)
 
 
@@ -90,18 +91,23 @@ print ('Explained variation per principal component: {}'.format(pca.explained_va
 
 # print(c12_2)
 
-c12_3 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
+# c12_3 = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
+#         + geom_point(color = 'red', size = 5) \
+#         + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
+#         + ggtitle("First and Second Principal Components") \
+#         + scale_x_continuous(limits=(5,30)) \
+#         + scale_y_continuous(limits=(0,20))
+ 
+# print(c12_3)
+
+
+
+c = ggplot(doc_vecs, aes(x='pca-one', y='pca-two', label = 'Name') ) \
         + geom_point(color = 'red', size = 5) \
         + geom_text(aes(label='Name', size = 4, alpha = 0.8),hjust=0, vjust=0) \
-        + ggtitle("First and Second Principal Components") \
-        + scale_x_continuous(limits=(5,30)) \
-        + scale_y_continuous(limits=(0,20))
+        + ggtitle("First and Second Principal Components") 
  
-print(c12_3)
-
-
-
-
+print(c)
 
 # #________________#
 
