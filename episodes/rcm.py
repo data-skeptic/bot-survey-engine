@@ -139,7 +139,7 @@ class episode():
         #     if sum([episodes_tf_idf[j,k] for k in user_tf_idf.nonzero()[1]]) > 0:
         #         print(cosine_similarity(X=user_tf_idf,Y =episodes_tf_idf[j,:]))
 
-        threshold = 5
+        threshold = 4
         if len(result) < threshold:
             print(cosine_similarity(X=episodes_tf_idf, Y=user_tf_idf).shape)
             cos_similarities = cosine_similarity(X=user_tf_idf,Y=episodes_tf_idf)[0]
