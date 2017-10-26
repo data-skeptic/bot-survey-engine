@@ -28,58 +28,59 @@ with open ("./config/config.json", "r") as myfile:
         window = data['model_paras']['window']
         name = str(size) + "_" + str(window) + "_"+ str(min_count) 
 update_episode = True
-print('name in episode part is ', name)
 episode_instance = episode(update_episode, size, min_count, window, name)
 
-## long request
+
 user_requests = [
 "machine learning",
+"Data science",
+"statistics",
+"A/B testing",
+"something statistics",
 "recommender system",
+"recommendation system",
+"Causal Impact",
 "random walk",
 "random forest",
 "neural network",
-"open source",
 "deep learning",
-"something statistics",
 "mcmc",
 "music",
+"artists and data science",
+"open source",
+"data source,",
+"data lake",
+"finance",
 "AI",
 "artificial intelligence",
-"skeptical thinking",
-"dropout",
-"conference and contest",
 "applications of AI",
-"I am currently in belgrade for one of my clients. We are working on some interesting algorithms. The food here is very heavy and I think i will need a diet when I get back to LA. But at least it is not raining too much.",
+"conference and contest",
+"Computer Vision and Pattern Recognition",
+"I am currently in belgrade for one of my clients. We are working on some interesting algorithms. The food here is very heavy and I think i will need a diet when I get back home. But at least it is not raining too much.",
 "I want to listen to episodes on decision tree and random forest.",
-"I am at my house now and the weather is not good today. So I want to listen to something related to markov chain and Monte Carlo simulation.",
-"Could you recommend some episodes on data science projects for beginners?",
+"Can I trust my machine learning models?",
+"Is there any model describing family and marriage?",
+"How to reduce false positive and false negative?",
+" I want to listen to something related to markov chain and Monte Carlo simulation.",
+"It is raining outside today and I am at home. I want to listen to something related to markov chain and Monte Carlo simulation.",
 "What can artificial intelligence do for human beings? What is the future of artificial intelligence?",
 "The error percentage of regression changes with change in the train and test data which I am deciding randomly. Cross validation can overcome this but how do I apply it for my regression model?",
-"Evaluating the quality of data.",
+"How to evaluate the quality of data and the source of the datasets?", 
 "Is there any episode on Facial Recognition? How does Facial Recognition work?",
-" I am interested in knowing musical stuff.",
-"How to learn machine learning? What books or website do you recommend?",
-" Looking for projects on criminal analysis?",
-"How to take advantage of Internet, computer,  cloud and other  platform in an effective way?",
-"What are the most important knowledge in statistics or probability when doing machine learning?",
-"I would like to learn something about random walk, how random walk works in some algorithmes?"
+"Is there any episode on facial detection? How does facial Recognition work",
+" I am interested in knowing musical stuff",
+"How to learn machine learning? What books or websites do you recommend?",
+" Looking for projects on criminal analysis.",
+"How to take advantage of Internet, computer,  cloud and other platforms in an effective way?",
+"What are the most important knowledge in statistics and probability for data scientists?",
+"I would like to learn something about random walk. How does random walk work in some algorithms?",
+"How can we calculate AUC for classification algorithms?",
+"What's the similarities and differences between these 3 methods: bagging, boosting and stacking? Which is the best one? And why?",
+"Could you introduce the procedures in neural networks?",
+"What are possible problems in training neural network?",
+
 ]
 
-
-## short requests
-# user_requests = [
-# "random walk",
-# "something statistics",
-# "mcmc",
-# "music",
-# "AI",
-# "artificial intelligence",
-# "skeptical thinking",
-# "dropout",
-# "machine learning",
-# "conference and contest",
-# "applications of AI"
-# ]
 for user_request in user_requests:
 	result = episode_instance.recommend_episode(user_request)
 	
