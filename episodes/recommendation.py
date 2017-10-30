@@ -37,8 +37,8 @@ from gensim.models import Phrases
 
 class episode():
     def __init__(self, update_episode):
-        ep.run(update_episode)
-
+        ep.run(update_episode) # episode preparation.
+        # get episodes information
         mdir = os.path.dirname(os.path.abspath(__file__))
         self.episodes_json_fname = mdir+'/text/episodes_json.txt'
         with open(self.episodes_json_fname) as data_file:    
@@ -58,24 +58,24 @@ class episode():
         self.descToNum = descToNum
         self.descToTitle = descToTitle
         self.descToLink = descToLink
-
+        #get word_vectors trained from SO
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
         self.word_vectors = pd.read_csv(self.word_vec_file, index_col=0)
         print('Recommendation: The shape of word_vectors is ',self.word_vectors.shape)
-
+        #get vocabulary dictionary from SO
         voc_dic_file = mdir +"/vocab_dic_bigram/vocab_dict_question_answer.csv"
         with open(voc_dic_file, 'r') as csv_file:
             reader = csv.reader(csv_file)
             self.vocab_dic = dict(reader)
         for k, value in self.vocab_dic.items():
             self.vocab_dic[k] = int(value)
-
+        #get Phrase object SO_bigram trained from SO
         fname = mdir+'/SO_bigram/SO_bigram.pkl'
         with open(fname, 'rb') as f:
             self.bigram = pickle.load(f)
             #print("test bigram....", b'random_walk' in self.bigram.vocab.keys())
             print("size of bigram.vocab is ",len(self.bigram.vocab.keys()))
-
+        # get preprocessed results of episodes
         fname = mdir +'/episodes_preprocess/episodes_corpus.pickle'
         with open(fname, 'rb') as f:
             self.episodes_corpus = pickle.load(f)
@@ -101,7 +101,7 @@ class episode():
             self.episodes_words_filtered_title.append(list(set(e).intersection(set(self.vocab_dic.keys()))))
 
         print("Initialization is done.")
-
+    #preprocess user's request
     def preprocess(self, user_request):
         user_request_corpus = gensim.utils.simple_preprocess(user_request)
         temp = self.bigram[user_request_corpus]# temp is a list of words(unigram and bigram)
@@ -117,7 +117,7 @@ class episode():
                 if word not in stopwords.words("english"):
                     user_corpus.append(word)
             user_words = list(set(user_corpus).intersection(set(self.vocab_dic.keys())))
-        return user_words
+        return user_words # a list of words with bigram, without stopwords and remove words not in vocabulary.
 
     def get_user_tf_idf(self, user_words):
         vectorizer = TfidfVectorizer(min_df=1,vocabulary = self.vocab_dic)
