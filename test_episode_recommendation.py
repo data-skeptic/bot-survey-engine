@@ -12,8 +12,8 @@ import boto3
 from datetime import datetime, timedelta
 
 sys.path.insert(0, './episodes')
-import rcm
-from rcm import episode
+import recommendation
+from recommendation import episode
 
 with open ("./config/config.json", "r") as myfile:
         data = json.load(myfile)
@@ -23,12 +23,9 @@ with open ("./config/config.json", "r") as myfile:
         password = data['mysql']['password']
         databasename = data['mysql']['databasename']
         #gensim model
-        size = data['model_paras']['size']
-        min_count = data['model_paras']['min_count']
-        window = data['model_paras']['window']
-        name = str(size) + "_" + str(window) + "_"+ str(min_count) 
+        
 update_episode = True
-episode_instance = episode(update_episode, size, min_count, window, name)
+episode_instance = episode(update_episode)
 
 
 user_requests = [
@@ -78,8 +75,36 @@ user_requests = [
 "What's the similarities and differences between these 3 methods: bagging, boosting and stacking? Which is the best one? And why?",
 "Could you introduce the procedures in neural networks?",
 "What are possible problems in training neural network?",
-
 ]
+
+
+user_requests = [
+"unsupervised learning",
+"complexity",
+"computational complexity",
+"microsoft",
+"LSTMs",
+"zestimate",
+"RNNs",
+"statistical testing",
+"what two do with two continuous variables",
+"databases",
+"docker",
+"GANs",
+"elections",
+"police and data",
+"bicycling",
+"variance",
+"anova",
+"protocols",
+"LIME",
+"noisy data",
+"Hadley Wickham",
+"game theory",
+"time series analysis",
+"word clouds"]
+
+
 
 for user_request in user_requests:
 	result = episode_instance.recommend_episode(user_request)
