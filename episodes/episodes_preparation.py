@@ -74,9 +74,9 @@ class episode_prepare():
         fname = '/episodes_preprocess/episodes_title_corpus.pickle'
         with open(mdir+fname, 'wb') as f:
             pickle.dump(episodes_corpus_title, f)
-        #step6
-        self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = vocab_dic)
-        self.X = self.vectorizer.fit_transform(episodes_corpus)  
+        # #step6
+        # self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = vocab_dic)
+        # self.X = self.vectorizer.fit_transform(episodes_corpus)  
 
     def get_word_vec(self):
         #fname = '/word_vec/word2vector_model_question_answer_' + self.name + '.csv'
@@ -96,6 +96,7 @@ class episode_prepare():
         for k, value in vocab_dic.items():
             vocab_dic[k] = int(value)
         return vocab_dic
+        
     def bigram(self):
         mdir = os.path.dirname(os.path.abspath(__file__))
         fname = "/SO_bigram/SO_bigram.pkl"
@@ -243,16 +244,16 @@ class episode_prepare():
         return all_sentences_nonstopword, all_sentences_corpus
 
 
-    def get_episode_weighted_vec(self):
-        episode_weighted_vec = self.X.dot(self.word_vecs_df)
-        print("EP:episode_weighted_vec shape is ",episode_weighted_vec.shape) # should be N * 200 where N is the number of episodes
+    # def get_episode_weighted_vec(self):
+    #     episode_weighted_vec = self.X.dot(self.word_vecs_df)
+    #     print("EP:episode_weighted_vec shape is ",episode_weighted_vec.shape) # should be N * 200 where N is the number of episodes
 
-        mdir = os.path.dirname(os.path.abspath(__file__))
-        if not os.path.exists(mdir+'/episode_vec_bigram/'):
-            os.makedirs(mdir+'/episode_vec_bigram/')
+    #     mdir = os.path.dirname(os.path.abspath(__file__))
+    #     if not os.path.exists(mdir+'/episode_vec_bigram/'):
+    #         os.makedirs(mdir+'/episode_vec_bigram/')
 
-        episode_vec_weighted_df = pd.DataFrame(episode_weighted_vec)
-        episode_vec_weighted_df.to_csv(mdir+"/episode_vec_bigram/episode_vec_weighted.csv")
+    #     episode_vec_weighted_df = pd.DataFrame(episode_weighted_vec)
+    #     episode_vec_weighted_df.to_csv(mdir+"/episode_vec_bigram/episode_vec_weighted.csv")
     
 def run(update):
     if update:
