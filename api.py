@@ -28,20 +28,17 @@ import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
 
-
-
 sys.path.insert(0, './survey')
 import survey
 from survey import Survey
 
 sys.path.insert(0, './episodes')
-import rcm
-from rcm import episode
+import recommendation
+from recommendation import episode
 
 sys.path.insert(0, './listener_reminder')
 import listener_reminder
 from listener_reminder import Listener_Reminder
-
 
 logname = sys.argv[0]
 logger = logging.getLogger(logname)
@@ -122,19 +119,7 @@ class SaveAnswer(Resource):
 
 # episode
 update_episode = True
-print('name in episode part is ', name)
-episode_instance = episode(update_episode, size, min_count, window, name)
-
-class random_recommendation(Resource):
-    def get(self):
-        descriptions = episode_instance.descriptions
-        descToNum = episode_instance.descToNum
-        descToTitle = episode_instance.descToTitle
-        descToLink = episode_instance.descToLink
-        total = len(descToLink)
-        rand_ind = random.sample(list(descToNum.values()), 1)[0] - 1
-        desc = descriptions[rand_ind]
-        return {'desc':desc, 'num':descToNum[desc], 'link':descToLink[desc],'title':descToTitle[desc]}
+episode_instance = episode(update_episode)
 
 class give_recommendation(Resource):
     def post(self):
@@ -184,7 +169,6 @@ if __name__ == '__main__':
     api.add_resource(GetQuestion,  '/survey/question/<int:question_id>')
     api.add_resource(SaveAnswer,   '/survey/response/answer/save')
     # episode
-    api.add_resource(random_recommendation,  '/episode/random_recommendation')
     api.add_resource(give_recommendation,   '/episode/recommendation')
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')
