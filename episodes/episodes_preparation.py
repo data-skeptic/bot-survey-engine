@@ -27,8 +27,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 class episode_prepare():
-    def __init__(self,size, min_count, window, name):
-        self.name = name 
+    def __init__(self):
+         
         #step1 
         self.SO_bigram = self.bigram()
         print("EP: the size of the vocab from SO including bigram is ",len(self.SO_bigram.vocab.keys()))   
@@ -66,6 +66,14 @@ class episode_prepare():
             pickle.dump(episodes_corpus, f)
     
         print("EP:Got the corpus (without stopwords in bigram) of all episodes.")
+
+        episodes_sentences_nonstopwords_title, episodes_corpus_title = self.get_episode_title_corpus_bigram()
+        fname = '/episodes_preprocess/episodes_sentences_nonstopwords_title.pickle'
+        with open(mdir+fname, 'wb') as f:
+            pickle.dump(episodes_sentences_nonstopwords_title, f)
+        fname = '/episodes_preprocess/episodes_title_corpus.pickle'
+        with open(mdir+fname, 'wb') as f:
+            pickle.dump(episodes_corpus_title, f)
         #step6
         self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = vocab_dic)
         self.X = self.vectorizer.fit_transform(episodes_corpus)  
@@ -77,16 +85,6 @@ class episode_prepare():
         word_vecs_df = pd.read_csv(mdir+fname,index_col=0)
         vocab = word_vecs_df.index
         return vocab, word_vecs_df
-       
-
-    # def get_word_vec_200_glove(self):
-    #     path = "/Users/XiaofeiZheng/Downloads/word_vec_pickle_glove_200.pickle"
-    #     with open(path, 'rb') as f:
-    #         word_vecs_df = pickle.load(f)
-    #     vocab = word_vecs_df.index
-    #     print("the size of the vocab is ",len(vocab))
-    #     self.vocab = vocab
-    #     self.word_vecs_df = word_vecs_df
 
     def vocab_dic(self):
         #fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
@@ -104,12 +102,6 @@ class episode_prepare():
         with open(mdir+fname,'rb') as f:
             bigram = pickle.load(f)
         return bigram
-
-    # def vocab_dic_200_glove(self):
-    #     path = "/Users/XiaofeiZheng/Downloads/vocab_dic_glove_200.pickle"
-    #     with open(path, 'rb') as f:
-    #         vocab_dic = dict(pickle.load(f))
-    #     return vocab_dic
 
     def crawl_episode_info(self):
         mdir =os.path.dirname(os.path.abspath(__file__))
@@ -155,6 +147,16 @@ class episode_prepare():
             os.makedirs(mdir+'/text/')
         with open(mdir+'/text/episodes_json.txt', 'w') as outfile:  
             json.dump(result, outfile)
+
+        with open(mdir+'/text/episode_titles.txt','w') as thefile:
+            for i in range(len(descriptions)):
+                desc = descriptions[i]
+                title = descToTitle[desc]
+                title = title.replace('[MINI]', "")
+                title = title.encode('utf-8').strip()
+                title = str(title).replace('\n', "") 
+                thefile.write("%s\n" % str(title))
+
         with open(mdir+'/text/episode_descs_titles.txt', 'w') as thefile:  
             for i in range(len(descriptions)):
                 desc = descriptions[i]
@@ -202,6 +204,44 @@ class episode_prepare():
             all_sentences_corpus.append(" ".join(result))
             
         return all_sentences_nonstopword, all_sentences_corpus
+    
+    def get_episode_title_corpus_bigram(self):
+        mdir = os.path.dirname(os.path.abspath(__file__))
+        fname = mdir+'/text/episode_descs_titles.txt'
+        fname = mdir+"/text/episode_titles.txt"
+        sentences = []
+        #bigram = Phrases(min_count=5)
+        with smart_open.smart_open(fname, encoding="iso-8859-1") as f:
+            for i, line in enumerate(f):
+                sentence = gensim.utils.simple_preprocess(line)
+                #wordnet_lemmatizer = WordNetLemmatizer()
+                # st = LancasterStemmer()
+                # #sentence = [wordnet_lemmatizer.lemmatize(word) for word in sentence]
+                # sentence = [st.stem(word) for word in sentence]
+                sentences.append(sentence)
+                #self.SO_bigram.add_vocab([sentence])
+
+        all_sentences_nonstopword = [] # a list of lists of words
+        all_sentences_corpus = [] # a list of strings
+        for i in range(len(sentences)):
+            temp = self.SO_bigram[sentences[i]] # temp is a list of words(unigram and bigram)
+            result = []
+            for element in temp:
+                key = element.split("_")
+                if len(key) == 1:
+                    if element not in stopwords.words('english'):
+                        result.append(element)
+                if len(key) > 1 and not any([word in stopwords.words("english") for word in key]):
+                    result.append(element)
+                for word in key:
+                    if word not in stopwords.words("english"):
+                        result.append(word)
+                result = list(set(result))
+            all_sentences_nonstopword.append(result)
+            all_sentences_corpus.append(" ".join(result))
+            
+        return all_sentences_nonstopword, all_sentences_corpus
+
 
     def get_episode_weighted_vec(self):
         episode_weighted_vec = self.X.dot(self.word_vecs_df)
@@ -214,10 +254,10 @@ class episode_prepare():
         episode_vec_weighted_df = pd.DataFrame(episode_weighted_vec)
         episode_vec_weighted_df.to_csv(mdir+"/episode_vec_bigram/episode_vec_weighted.csv")
     
-def run(update,size, min_count, window, name):
+def run(update):
     if update:
-        ins = episode_prepare(size, min_count, window, name)
-        ins.get_episode_weighted_vec() 
+        ins = episode_prepare()
+        #ins.get_episode_weighted_vec() 
     
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
