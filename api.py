@@ -36,6 +36,10 @@ sys.path.insert(0, './episodes')
 import recommendation
 from recommendation import episode
 
+sys.path.insert(0, './episodes/word_vec_bigram')
+import load_file_from_bucket
+from load_file_from_bucket import load_word_vec
+
 sys.path.insert(0, './listener_reminder')
 import listener_reminder
 from listener_reminder import Listener_Reminder
@@ -118,6 +122,7 @@ class SaveAnswer(Resource):
         return resp
 
 # episode
+load_word_vec_instance = load_word_vec()
 update_episode = True
 episode_instance = episode(update_episode)
 
