@@ -64,6 +64,7 @@ logger.addHandler(stdout)
 version = "0.0.1"
 
 #survey
+print('survey session')
 with open ("./config/config.json", "r") as myfile:
         data = json.load(myfile)
         #mysql
@@ -122,6 +123,8 @@ class SaveAnswer(Resource):
         return resp
 
 # episode
+print("episode session")
+print('Downloading word_vec from AWS S3...')
 load_word_vec_instance = load_word_vec()
 update_episode = True
 episode_instance = episode(update_episode,username, address,password,databasename)
@@ -138,7 +141,7 @@ class give_recommendation(Resource):
             return None
 
 #listener_reminder
-
+print("listener reminder session")
 reminder_ins = Listener_Reminder(user, pw, username, password, address, databasename)
 ## a test.
 # contact_type = 'sms'
