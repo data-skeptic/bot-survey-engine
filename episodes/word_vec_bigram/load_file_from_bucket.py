@@ -2,14 +2,12 @@ import boto3
 import json
 import os
 
-
 class load_word_vec():
   def __init__(self):
     mdir = os.path.dirname(os.path.abspath(__file__))
     local_filename = mdir + '/all_posts_word_vec.csv'
     if not os.path.exists(local_filename):
       config_path = "/".join(local_filename.split("/")[0:-3]) + "/config/config.json"
-      print(config_path)
       with open (config_path, "r") as myfile:
               data = json.load(myfile)
               user = data['aws']['accessKeyId']
