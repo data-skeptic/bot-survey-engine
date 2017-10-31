@@ -22,7 +22,7 @@ from nltk.corpus import stopwords
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.lancaster import LancasterStemmer
-
+import boto3
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -36,6 +36,7 @@ class episode_prepare():
         self.crawl_episode_info()
         print("EP: crawling episodes is done.")
         #step3
+        
         self.vocab, self.word_vecs_df = self.get_word_vec()
         print("EP:Got word vectors trained from SO dataset.")
         print("EP: the size of the word vectors df is ", self.word_vecs_df.shape)
@@ -77,9 +78,9 @@ class episode_prepare():
         # #step6
         # self.vectorizer = TfidfVectorizer(min_df=1,vocabulary = vocab_dic)
         # self.X = self.vectorizer.fit_transform(episodes_corpus)  
+    
 
     def get_word_vec(self):
-        #fname = '/word_vec/word2vector_model_question_answer_' + self.name + '.csv'
         fname = "/word_vec_bigram/all_posts_word_vec.csv"
         mdir = os.path.dirname(os.path.abspath(__file__))
         word_vecs_df = pd.read_csv(mdir+fname,index_col=0)
