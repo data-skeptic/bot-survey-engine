@@ -124,7 +124,7 @@ class SaveAnswer(Resource):
 # episode
 load_word_vec_instance = load_word_vec()
 update_episode = True
-episode_instance = episode(update_episode)
+episode_instance = episode(update_episode,username, address,password,databasename)
 
 class give_recommendation(Resource):
     def post(self):
@@ -163,7 +163,6 @@ class reminder(Resource):
         reminder_ins.save_reminder_task(contact_type, contact_account,reminder_time, 
                                                 episode_title, episode_link)
         return " Reminder will be sent."# + str(alarm_time)
-
 
 if __name__ == '__main__':
     logger.info("Init")

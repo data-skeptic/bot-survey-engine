@@ -15,6 +15,7 @@ import csv
 import seaborn as sns
 import smart_open
 
+import heapq
 import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 import episodes_preparation as ep
@@ -25,6 +26,10 @@ from nltk.corpus import stopwords
 from collections import Counter
 
 import scipy.sparse as sparse
+import sqlalchemy
+import pymysql
+pymysql.install_as_MySQLdb()
+from sqlalchemy.orm import sessionmaker
 
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -36,7 +41,17 @@ from nltk.stem.lancaster import LancasterStemmer
 from gensim.models import Phrases
 
 class episode():
-    def __init__(self, update_episode):
+    def __init__(self, update_episode, username, address,password,databasename):
+        engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, password, address,databasename),pool_size=3, pool_recycle=3600)
+        self.internal = engine_internal
+        #test
+        try:
+            self.internal.execute("SHOW DATABASES;")
+            print('The connection is successful in episode recommenation.')
+        except:
+            print('The connection fails in episode recommendation.')
+            raise
+
         ep.run(update_episode) # episode preparation.
         # get episodes information
         mdir = os.path.dirname(os.path.abspath(__file__))
@@ -75,7 +90,7 @@ class episode():
         with open(fname, 'rb') as f:
             self.bigram = pickle.load(f)
             #print("test bigram....", b'random_walk' in self.bigram.vocab.keys())
-            print("size of bigram.vocab is ",len(self.bigram.vocab.keys()))
+            print("Recommendation: size of bigram.vocab is ",len(self.bigram.vocab.keys()))
         # get preprocessed results of episodes
         fname = mdir +'/episodes_preprocess/episodes_corpus.pickle'
         with open(fname, 'rb') as f:
@@ -101,7 +116,7 @@ class episode():
         for e in self.episodes_sentences_nonstopwords_title:
             self.episodes_words_filtered_title.append(list(set(e).intersection(set(self.vocab_dic.keys()))))
 
-        print("Initialization is done.")
+        print("Recommendation: Initialization is done.")
     #preprocess user's request
 
     def preprocess(self, user_request):
@@ -153,7 +168,7 @@ class episode():
             cos_similarities_df = pd.DataFrame(cos_similarities, index = episode_words, columns = user_words)
             max_cos_similarities = cos_similarities_df.max(axis = 0)
             max_cos_similarities.sort_index(inplace=True)
-            score = max_cos_similarities.values.sum()
+            score = max_cos_similarities.values.mean()
         else:
             score = 0
         return score
@@ -173,31 +188,86 @@ class episode():
             most_similar_indice = np.array(scores).argsort()[-4:][::-1]
         else:
             by_title = True
-            title_scores = [self.get_score_titles(i, user_words) for i in episode_indice]
-            most_similar_indice = [episode_indice[i] for i in np.array(title_scores).argsort()[-4:][::-1]]
+            title_cos_similarities = {}
+            for i in episode_indice:
+                title_cos_similarities[i] = self.get_score_titles(i, user_words)
+            most_similar_indice = heapq.nlargest(4, title_cos_similarities, key=title_cos_similarities.get)
         
         score_threshold_not_by_title  = 0.70
-        score_threshold_by_title  = 0.2
+        score_threshold_by_title  = 0.50
         if by_title:
             score_threshold = score_threshold_by_title
         else:
             score_threshold = score_threshold_not_by_title
-        print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& User's request is:  " + user_request + " &&&&&&&&&&&&&&&&&&&&&&&&\n" )
+        #print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& User's request is:  " + user_request + " &&&&&&&&&&&&&&&&&&&&&&&&\n" )
         result = {}
         rank  = 1
-        print('most_similary index are ', most_similar_indice)
+        #print('most_similary index are ', most_similar_indice)
         for i in most_similar_indice:
             if scores[i] >= score_threshold:
-                print("--------------------The episode has cosine similarity "+str(scores[i])+ "-------------------\n")
-                print( "\n")
+                #print("--------------------The episode has cosine similarity "+str(scores[i])+ "-------------------\n")
+                #print( "\n")
                 j = len(self.descriptions) - i  
                 desc = [key for key, value in self.descToNum.items() if value == j][0]
-                print(str(self.descToTitle[desc]) + "\n")
-                print(str(self.descToLink[desc]) + "\n")
-                print(str(desc.encode('utf-8')) + "\n")
-                result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc})
+                # print(str(self.descToTitle[desc]) + "\n")
+                # print(str(self.descToLink[desc]) + "\n")
+                # print(str(desc.encode('utf-8')) + "\n")
+                if by_title:
+                    result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc, 'body_cos_similarity': scores[i], 'title_cos_similarity':title_cos_similarities[i]})
+                else:
+                    result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc, 'body_cos_similarity': scores[i]})
                 rank += 1 
+        start = time.time()
+        self.save_recommendation_table(user_request, result)
+        #print('time of saving to table is ' + str( time.time() - start))
         return result
+    def save_recommendation_table(self, user_request, result):
+        user_request = user_request.replace("'", "\\'")
+        user_request = user_request.replace(";", "\\;")
+        user_request = user_request.replace("&", "\\&")
+        user_request = user_request.replace("%", "%%")
+        
+        #save request and result to database
+        if len(result) == 0:
+            try: 
+                template = """
+                            INSERT INTO record_recommendation
+                            (user_request) VALUES('{user_request}')
+                            """
+                query = template.format(user_request = user_request)
+                conn = self.internal.connect()
+                conn.execute(query)
+                conn.close()
+                #print("Successful in inserting into record_recommendation table.")                                                   
+            except: 
+                print("Error in inserting into record_recommendation table.")
+                raise
+        else:
+            for key, value in result.items():
+                recommended_episode_title = value["title"]
+                recommended_episode_title = recommended_episode_title.replace("'", "\\'")
+                recommended_episode_title = recommended_episode_title.replace(";", "\\;")
+                recommended_episode_title = recommended_episode_title.replace("&", "\\&")
+                recommended_episode_title = recommended_episode_title.replace("%", "%%")
+
+                top = int(key.split("_")[1])
+                body_cos_similarity = value.get('body_cos_similarity')
+                title_cos_similarity = value.get("title_cos_similarity")
+                #print("title_cos_similarity is ", title_cos_similarity)
+                try: 
+                    template = """
+                                INSERT INTO record_recommendation
+                                (user_request, recommended_episode_title, top, body_cos_similarity, title_cos_similarity) 
+                                VALUES('{user_request}','{recommended_episode_title}','{top}','{body_cos_similarity}','{title_cos_similarity}')
+                                """
+                    query = template.format(user_request = user_request, recommended_episode_title = recommended_episode_title , top = top, body_cos_similarity = body_cos_similarity, title_cos_similarity = title_cos_similarity)
+                    conn = self.internal.connect()
+                    conn.execute(query)
+                    conn.close()
+                    #print("Successful in inserting into record_recommendation table.")                                                   
+                except: 
+                    print("Error in inserting into record_recommendation table.")
+                    raise
 
 if __name__ == "__main__":
     # stuff only to run when not called via 'import' here

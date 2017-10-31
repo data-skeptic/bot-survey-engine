@@ -140,6 +140,27 @@ def create_reminder_table():
     finally:
         internal.close() 
 
+def create_record_recommendation_table():
+  query_create = """
+      CREATE TABLE record_recommendation( 
+      ID int not null auto_increment
+    , user_request varchar(1024) not null
+    , recommended_episode_title varchar(1024) not null
+    , top int 
+    , body_cos_similarity DOUBLE(4, 3)
+    , title_cos_similarity DOUBLE(4, 3)
+    , primary key (ID)
+    );
+    """
+    try:
+        #internal.execute("""DROP TABLE IF EXISTS bot_survey_responses;""")
+        internal.execute(query_create)
+        print( "done")
+    except:
+        print( "failed")
+    finally:
+        internal.close() 
+
 # create_questions_table()
 # create_responses_table()
 # create_response_answers_table()
