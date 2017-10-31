@@ -59,6 +59,7 @@ class episode():
         self.descToTitle = descToTitle
         self.descToLink = descToLink
         #get word_vectors trained from SO
+
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
         self.word_vectors = pd.read_csv(self.word_vec_file, index_col=0)
         print('Recommendation: The shape of word_vectors is ',self.word_vectors.shape)
@@ -102,6 +103,7 @@ class episode():
 
         print("Initialization is done.")
     #preprocess user's request
+
     def preprocess(self, user_request):
         user_request_corpus = gensim.utils.simple_preprocess(user_request)
         temp = self.bigram[user_request_corpus]# temp is a list of words(unigram and bigram)
