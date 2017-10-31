@@ -3,7 +3,8 @@
 	"aws": {
 		"accessKeyId": ,
 		"secretAccessKey": ,
-		"region": "us-east-1"
+		"region": "us-east-1",
+		"bucket_name":"word-vectors-from-so"
 	},
 	"logging": {
 		"sqsQueueUrl": ""
