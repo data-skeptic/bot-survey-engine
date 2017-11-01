@@ -42,6 +42,7 @@ from gensim.models import Phrases
 
 class episode():
     def __init__(self, update_episode, username, address,password,databasename):
+        print('enter episode Initialization function')
         engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, password, address,databasename),pool_size=3, pool_recycle=3600)
         self.internal = engine_internal
         #test
@@ -133,8 +134,9 @@ class episode():
             for word in key:
                 if word not in stopwords.words("english"):
                     user_corpus.append(word)
-            user_words = list(set(user_corpus).intersection(set(self.vocab_dic.keys())))
-        return user_words # a list of words with bigram, without stopwords and remove words not in vocabulary.
+            result = list(set(user_corpus).intersection(set(self.vocab_dic.keys())))
+        #print("after preprocess, the result of user_request is ", result)
+        return result, len(set(user_corpus)) # a list of words with bigram, without stopwords and remove words not in vocabulary.
 
     def get_user_tf_idf(self, user_words):
         vectorizer = TfidfVectorizer(min_df=1,vocabulary = self.vocab_dic)
@@ -156,6 +158,7 @@ class episode():
         max_cos_similarities.sort_index(inplace=True)
         user_tf_idf_df.sort_index(inplace=True)
         score = np.dot(max_cos_similarities.values, user_tf_idf_df.values)[0]
+
         return score, cos_similarities_df
 
     def get_score_titles(self,i,user_words):   
@@ -175,26 +178,27 @@ class episode():
 
     def recommend_episode(self, user_request):
         by_title = True
-        user_words = self.preprocess(user_request)
+        score_threshold_not_by_title  = 0.70
+        score_threshold_by_title  = 0.30
+
+        user_words = self.preprocess(user_request)[0]
+        ratio = len(user_words)/self.preprocess(user_request)[1]
         user_tf_idf_df = self.get_user_tf_idf(user_words)
-        scores = np.array([self.get_score(i, user_words,user_tf_idf_df)[0] for i in range(len(self.episodes_corpus))]) 
+        scores = np.array([self.get_score(i, user_words,user_tf_idf_df)[0]*ratio for i in range(len(self.episodes_corpus))]) 
         max_score = scores.max()
         episode_indice = np.where(scores == max_score)[0]
         #print('episode_indice are', episode_indice)
-        result = {}
         if len(episode_indice) == 1:
             by_title = False
             best_index = episode_indice
             most_similar_indice = np.array(scores).argsort()[-4:][::-1]
-        else:
+        else: # there are more than one episodes with the highest similarity. We need to use title to decide.
             by_title = True
             title_cos_similarities = {}
             for i in episode_indice:
                 title_cos_similarities[i] = self.get_score_titles(i, user_words)
             most_similar_indice = heapq.nlargest(4, title_cos_similarities, key=title_cos_similarities.get)
         
-        score_threshold_not_by_title  = 0.70
-        score_threshold_by_title  = 0.50
         if by_title:
             score_threshold = score_threshold_by_title
         else:
@@ -203,21 +207,22 @@ class episode():
         result = {}
         rank  = 1
         #print('most_similary index are ', most_similar_indice)
-        for i in most_similar_indice:
-            if scores[i] >= score_threshold:
-                #print("--------------------The episode has cosine similarity "+str(scores[i])+ "-------------------\n")
-                #print( "\n")
-                j = len(self.descriptions) - i  
-                desc = [key for key, value in self.descToNum.items() if value == j][0]
-                # print(str(self.descToTitle[desc]) + "\n")
-                # print(str(self.descToLink[desc]) + "\n")
-                # print(str(desc.encode('utf-8')) + "\n")
-                if by_title:
-                    result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc, 'body_cos_similarity': scores[i], 'title_cos_similarity':title_cos_similarities[i]})
-                else:
+        if not by_title:
+            for i in most_similar_indice:
+                if scores[i] >= score_threshold:
+                    j = len(self.descriptions) - i  
+                    desc = [key for key, value in self.descToNum.items() if value == j][0]
                     result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc, 'body_cos_similarity': scores[i]})
-                rank += 1 
-        start = time.time()
+                    rank += 1
+        else:
+            for i in most_similar_indice:
+                if title_cos_similarities[i] >= score_threshold and scores[i] >= 0.5:
+                    j = len(self.descriptions) - i  
+                    desc = [key for key, value in self.descToNum.items() if value == j][0]
+                    result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc, 'body_cos_similarity': scores[i], 'title_cos_similarity': title_cos_similarities[i]})
+                    rank += 1  
+
+        
         self.save_recommendation_table(user_request, result)
         #print('time of saving to table is ' + str( time.time() - start))
         return result
