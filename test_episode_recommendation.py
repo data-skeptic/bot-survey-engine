@@ -24,34 +24,30 @@ with open ("./config/config.json", "r") as myfile:
         databasename = data['mysql']['databasename']
         #gensim model
         
-update_episode = True
+update_episode = False
 episode_instance = episode(update_episode,username, address,password,databasename)
 
-# user_requests = [
-# "machine learning",
-# "Data science",
-# "statistics"]
-# ,
-# "A/B testing",
-# "something statistics",
-# "recommender system",
-# "recommendation system",
-# "Causal Impact",
-# "random walk",
-# "random forest",
-# "neural network",
-# "deep learning",
-# "mcmc",
-# "music",
-# "artists and data science",
-# "open source",
-# "data source,",
-# "data lake",
-# "finance",
-# "AI",
-# "artificial intelligence",
-# "applications of AI",
 user_requests = [
+"machine learning",
+"Data science",
+"statistics",
+"something statistics",
+"recommender system",
+"Causal Impact",
+"random walk",
+"random forest",
+"neural network",
+"deep learning",
+"mcmc",
+"music",
+"artists and data science",
+"open source",
+"data source,",
+"data lake",
+"finance",
+"AI",
+"artificial intelligence",
+"applications of AI",
 "conference and contest",
 "Computer Vision and Pattern Recognition",
 "I am currently in belgrade for one of my clients. We are working on some interesting algorithms. The food here is very heavy and I think i will need a diet when I get back home. But at least it is not raining too much.",
@@ -79,7 +75,19 @@ user_requests = [
 ]
 
 
+
 # user_requests = [
+# "stats",
+# "bonferroni adjustment",
+# "macaroni adjustment",
+# "tesla",
+# "cloud ML models",
+# "google adwords",
+# "depth perception",
+# "computerized depth perception",
+# "deep learning and healthcare",
+# "python",
+# "sklearn",
 # "unsupervised learning",
 # "complexity",
 # "computational complexity",
@@ -94,6 +102,7 @@ user_requests = [
 # "GANs",
 # "elections",
 # "police and data",
+# "finance",
 # "bicycling",
 # "variance",
 # "anova",
@@ -105,9 +114,8 @@ user_requests = [
 # "time series analysis",
 # "word clouds"]
 
-
-
 for user_request in user_requests:
+	#print(user_request)
 	result = episode_instance.recommend_episode(user_request)
 	
 
