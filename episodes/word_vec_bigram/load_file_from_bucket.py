@@ -14,10 +14,11 @@ class load_word_vec():
               pw = data['aws']['secretAccessKey']
               region = data['aws']['region']
               BUCKET_NAME = data['aws']['bucket_name']
+              print(BUCKET_NAME)
       s3= boto3.resource('s3',region_name = region, 
                           aws_access_key_id = user, 
                           aws_secret_access_key = pw)
-      s3_filename = 's3_all_posts_word_vec.csv'
+      s3_filename = 'all_posts_word_vec.csv'
       print(BUCKET_NAME, s3_filename)
       s3.Bucket(BUCKET_NAME).download_file(s3_filename, local_filename)
 
