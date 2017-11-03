@@ -2,15 +2,15 @@
 import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
-from sqlalchemy.orm import sessionmaker
-import datetime
-import time
-from pandas import DataFrame
-import random
+# import datetime
+# import time
+#import random
+#import os
 import pandas as pd
 import json
 import boto3
-import os
+from pandas import DataFrame
+from sqlalchemy.orm import sessionmaker
 
 pd.set_option('display.max_colwidth', -1)
 

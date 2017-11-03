@@ -1,32 +1,16 @@
-#10_19_17 for record
 from flask import Flask
-from flask import Response
 from flask_restful import reqparse, Resource, Api, request
-from flask import Markup
-import numpy as np
-import pandas as pd
 import json
 import os
-import random
 import sys
-import datetime
-import time
 import logging
-
-import time
-import boto3
-import atexit
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers.blocking import BlockingScheduler
-# from apscheduler.triggers.date import DateTrigger
-# from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-from apscheduler.triggers.interval import IntervalTrigger
-
-from datetime import datetime, timedelta
-
 import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 
 sys.path.insert(0, './survey')
 import survey
@@ -37,7 +21,7 @@ import recommendation
 from recommendation import episode
 
 sys.path.insert(0, './episodes/word_vec_bigram')
-import load_file_from_bucket
+# import load_file_from_bucket
 from load_file_from_bucket import load_word_vec
 
 sys.path.insert(0, './listener_reminder')
@@ -126,6 +110,7 @@ class SaveAnswer(Resource):
 print("episode session")
 print('Downloading word_vec from AWS S3...')
 load_word_vec_instance = load_word_vec()
+print("The downloading is done.")
 update_episode = True
 episode_instance = episode(update_episode,username, address,password,databasename)
 

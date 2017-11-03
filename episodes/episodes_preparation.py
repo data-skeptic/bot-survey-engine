@@ -1,25 +1,15 @@
 import lxml
 import pandas as pd
-import numpy as np
-import configparser
-import json
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
-import time
 import pickle
 import json
 import os
 import gensim
 import csv
 import smart_open
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer
-from gensim.models import Phrases
 from nltk.corpus import stopwords
-import nltk
-from nltk.stem import WordNetLemmatizer
-from nltk.stem.lancaster import LancasterStemmer
 import boto3
 import warnings
 warnings.filterwarnings('ignore')
