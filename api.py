@@ -1,4 +1,4 @@
-#9_14_17
+#10_19_17 for record
 from flask import Flask
 from flask import Response
 from flask_restful import reqparse, Resource, Api, request
@@ -28,20 +28,21 @@ import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
 
-
-
 sys.path.insert(0, './survey')
 import survey
 from survey import Survey
 
 sys.path.insert(0, './episodes')
-import rcm
-from rcm import episode
+import recommendation
+from recommendation import episode
+
+sys.path.insert(0, './episodes/word_vec_bigram')
+import load_file_from_bucket
+from load_file_from_bucket import load_word_vec
 
 sys.path.insert(0, './listener_reminder')
 import listener_reminder
 from listener_reminder import Listener_Reminder
-
 
 logname = sys.argv[0]
 logger = logging.getLogger(logname)
@@ -63,6 +64,7 @@ logger.addHandler(stdout)
 version = "0.0.1"
 
 #survey
+print('survey session')
 with open ("./config/config.json", "r") as myfile:
         data = json.load(myfile)
         #mysql
@@ -121,20 +123,11 @@ class SaveAnswer(Resource):
         return resp
 
 # episode
+print("episode session")
+print('Downloading word_vec from AWS S3...')
+load_word_vec_instance = load_word_vec()
 update_episode = True
-print('name in episode part is ', name)
-episode_instance = episode(update_episode, size, min_count, window, name)
-
-class random_recommendation(Resource):
-    def get(self):
-        descriptions = episode_instance.descriptions
-        descToNum = episode_instance.descToNum
-        descToTitle = episode_instance.descToTitle
-        descToLink = episode_instance.descToLink
-        total = len(descToLink)
-        rand_ind = random.sample(list(descToNum.values()), 1)[0] - 1
-        desc = descriptions[rand_ind]
-        return {'desc':desc, 'num':descToNum[desc], 'link':descToLink[desc],'title':descToTitle[desc]}
+episode_instance = episode(update_episode,username, address,password,databasename)
 
 class give_recommendation(Resource):
     def post(self):
@@ -148,7 +141,7 @@ class give_recommendation(Resource):
             return None
 
 #listener_reminder
-
+print("listener reminder session")
 reminder_ins = Listener_Reminder(user, pw, username, password, address, databasename)
 ## a test.
 # contact_type = 'sms'
@@ -174,7 +167,6 @@ class reminder(Resource):
                                                 episode_title, episode_link)
         return " Reminder will be sent."# + str(alarm_time)
 
-
 if __name__ == '__main__':
     logger.info("Init")
     app = Flask(__name__)
@@ -184,7 +176,6 @@ if __name__ == '__main__':
     api.add_resource(GetQuestion,  '/survey/question/<int:question_id>')
     api.add_resource(SaveAnswer,   '/survey/response/answer/save')
     # episode
-    api.add_resource(random_recommendation,  '/episode/random_recommendation')
     api.add_resource(give_recommendation,   '/episode/recommendation')
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')

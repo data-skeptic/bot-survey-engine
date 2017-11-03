@@ -36,6 +36,7 @@ class Listener_Reminder():
         # What special characters may have in episode titles and links?
         
         if episode_links and episode_titles:
+            print("episode_links and titles are not empty and they are ",episode_links,episode_titles)
             for i in range(len(episode_links)):
                 episode_title = episode_titles[i]
                 episode_title = episode_title.replace("'", "\\'")
@@ -67,6 +68,8 @@ class Listener_Reminder():
                     print("Error in saving task into reminder_schedule table.")
                     raise
         else:
+            episode_title = "None"
+            episode_link = "None"
             try:
                 template = """
                             INSERT INTO reminder_schedule (contact_type, contact_account, reminder_time, 
