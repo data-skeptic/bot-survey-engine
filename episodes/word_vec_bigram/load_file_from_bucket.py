@@ -18,13 +18,8 @@ class load_word_vec():
                           aws_access_key_id = user, 
                           aws_secret_access_key = pw)
       s3_filename = 's3_all_posts_word_vec.csv'
-      try:
-          s3.Bucket(BUCKET_NAME).download_file(s3_filename, local_filename)
-      except botocore.exceptions.ClientError as e:
-          if e.response['Error']['Code'] == "404":
-              print("The object does not exist.")
-          else:
-              raise
+      print(BUCKET_NAME, s3_filename)
+      s3.Bucket(BUCKET_NAME).download_file(s3_filename, local_filename)
 
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
