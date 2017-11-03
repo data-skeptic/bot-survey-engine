@@ -14,7 +14,6 @@ class load_word_vec():
               pw = data['aws']['secretAccessKey']
               region = data['aws']['region']
               BUCKET_NAME = data['aws']['bucket_name']
-
       s3= boto3.resource('s3',region_name = region, 
                           aws_access_key_id = user, 
                           aws_secret_access_key = pw)
