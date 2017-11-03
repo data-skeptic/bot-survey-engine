@@ -1,0 +1,26 @@
+{
+	"api": "http://0.0.0.0:3500/",
+	"aws": {
+		"accessKeyId": ,
+		"secretAccessKey": ,
+		"region": "us-east-1"
+	},
+	"logging": {
+		"sqsQueueUrl": ""
+	},
+	"mysql":{
+		"password":,
+		"username": ,
+    	"address": "iupdated.com:3306",
+	    "databasename":"survey"
+	},
+	"botframework": {
+		"microsoft_app_id": ,
+		"microsoft_app_password": 
+	},
+	"model_paras": {
+        "min_count": 2,
+        "size": 200,
+        "window": 6 
+       }
+}

@@ -1,1 +1,0 @@
-Files in the folder word_vec store all word vectors generated from the dataset of Stack Exchange by word2vec models. One has to run the file gensim_models_question_answer python3.ipynb to generate it.
