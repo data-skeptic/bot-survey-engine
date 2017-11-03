@@ -19,8 +19,6 @@ class load_word_vec():
       s3= boto3.resource('s3',region_name = region, 
                           aws_access_key_id = user, 
                           aws_secret_access_key = pw)
-      #s3_filename = 'all_posts_word_vec.csv'
-      s3_filename = 'README.md'
       print(BUCKET_NAME, s3_filename, "downloading...")
       s3.Bucket(BUCKET_NAME).download_file(s3_filename, local_filename)
 
