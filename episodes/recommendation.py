@@ -1,41 +1,39 @@
 import pandas as pd
 import numpy as np
-import configparser
+# import configparser
 import json
-import requests
-import xmltodict
-from bs4 import BeautifulSoup
-import time
+# import requests
+# import xmltodict
+# from bs4 import BeautifulSoup
+# import time
 import pickle
 import os
 import gensim
 import csv
-import smart_open
+# import smart_open
 
 import heapq
-import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 import episodes_preparation as ep
 
-import nltk
-import string
+# import nltk
+# import string
 from nltk.corpus import stopwords
-from collections import Counter
+# from collections import Counter
 
-import scipy.sparse as sparse
+# import scipy.sparse as sparse
 import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
-from sqlalchemy.orm import sessionmaker
+# from sqlalchemy.orm import sessionmaker
 
 from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from nltk.stem import WordNetLemmatizer
-from nltk.stem.lancaster import LancasterStemmer
+# from nltk.stem import WordNetLemmatizer
+# from nltk.stem.lancaster import LancasterStemmer
 
-from gensim.models import Phrases
+# from gensim.models import Phrases
 
 class episode():
     def __init__(self, update_episode, username, address,password,databasename):

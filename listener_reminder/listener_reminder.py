@@ -1,20 +1,18 @@
 import sqlalchemy
 import pymysql
+import re
+import boto3
 pymysql.install_as_MySQLdb()
 from sqlalchemy.orm import sessionmaker
-import datetime
-import time
-from pandas import DataFrame
-import random
-import pandas as pd
+# import datetime
+# import time
+# from pandas import DataFrame
 import json
-import boto3
-import atexit
+# import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.date import DateTrigger
-from datetime import date
-import re
+# from datetime import date
 
 class Listener_Reminder():
     def __init__(self, user, pw, username, password, address, databasename):
@@ -30,11 +28,9 @@ class Listener_Reminder():
             raise
         self.user= user
         self.pw = pw
-        
-           
+
     def save_reminder_task (self, contact_type, contact_account, reminder_time, episode_titles = None, episode_links = None):
         # What special characters may have in episode titles and links?
-        
         if episode_links and episode_titles:
             print("episode_links and titles are not empty and they are ",episode_links,episode_titles)
             for i in range(len(episode_links)):
@@ -51,8 +47,6 @@ class Listener_Reminder():
                 episode_link = episode_link.replace("%", "%%")
                 episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
                 print("episode_link is ", episode_link )
-            
-            
                 try:
                     template = """
                                 INSERT INTO reminder_schedule (contact_type, contact_account, reminder_time, 
@@ -84,14 +78,11 @@ class Listener_Reminder():
             except: 
                 print("Error in saving task into reminder_schedule table.")
                 raise
-
     def send_message(self, contact_type, contact_account,episode_title = None, episode_link = None):
         message = 'It is time to listen to podcasts.'
         html_message = '<p>' + message + '</p>'
-
         if len(episode_link) > 5:
             html_message = html_message + episode_link
-
         if contact_type == 'email':
             client = boto3.client('ses',
                         region_name = 'us-east-1', 
@@ -139,10 +130,6 @@ class Listener_Reminder():
                     Message = sms_message)
             except:
                 print('error in sending message. Check the phone number.')
-          
-
-
-
     def checkForReminders(self):
         query = "SELECT * FROM reminder_schedule WHERE scheduled = 0 and reminder_time > NOW() and reminder_time < DATE_ADD(NOW(), INTERVAL 5 MINUTE) "
         r = self.internal.execute(query)
