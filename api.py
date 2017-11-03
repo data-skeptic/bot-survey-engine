@@ -1,31 +1,16 @@
-#10_19_17 for record
 from flask import Flask
-# from flask import Response
 from flask_restful import reqparse, Resource, Api, request
-# from flask import Markup
-# import numpy as np
-# import pandas as pd
 import json
 import os
-# import random
 import sys
-# import datetime
-# import time
 import logging
-
-# import boto3
 import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
-# from apscheduler.triggers.date import DateTrigger
-# from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.triggers.interval import IntervalTrigger
-
-# from datetime import datetime, timedelta
-
 
 sys.path.insert(0, './survey')
 import survey
