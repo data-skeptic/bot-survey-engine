@@ -24,11 +24,11 @@ class episode_prepare():
         print("EP: crawling episodes is done.")
         #step3
         
-        self.vocab, self.word_vecs_df = self.get_word_vec()
+        self.vocab, self.vocab_dict, self.word_vecs_df = self.get_word_vec()
         print("EP:Got word vectors trained from SO dataset.")
         print("EP: the size of the word vectors df is ", self.word_vecs_df.shape)
         #step4
-        vocab_dic = self.vocab_dic()
+        # vocab_dic = self.vocab_dic()
         print("EP:Got vocab dictionary trained from SO dataset.")
         print('EP:size of vocab in vocab_dic is ', len(vocab_dic))
 
@@ -72,18 +72,19 @@ class episode_prepare():
         mdir = os.path.dirname(os.path.abspath(__file__))
         word_vecs_df = pd.read_csv(mdir+fname,index_col=0)
         vocab = word_vecs_df.index
-        return vocab, word_vecs_df
+        vocab_dict = {vocab[i]:i for i in range(word_vecs_df.shape[0])}
+        return vocab, vocab_dict, word_vecs_df
 
-    def vocab_dic(self):
-        #fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
-        fname = '/vocab_dic_bigram/vocab_dict_question_answer.csv'
-        mdir = os.path.dirname(os.path.abspath(__file__))
-        with open(mdir+fname, 'r') as csv_file:
-            reader = csv.reader(csv_file)
-            vocab_dic = dict(reader)
-        for k, value in vocab_dic.items():
-            vocab_dic[k] = int(value)
-        return vocab_dic
+    # def vocab_dic(self):
+    #     #fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
+    #     fname = '/vocab_dic_bigram/vocab_dict_question_answer.csv'
+    #     mdir = os.path.dirname(os.path.abspath(__file__))
+    #     with open(mdir+fname, 'r') as csv_file:
+    #         reader = csv.reader(csv_file)
+    #         vocab_dic = dict(reader)
+    #     for k, value in vocab_dic.items():
+    #         vocab_dic[k] = int(value)
+    #     return vocab_dic
         
     def bigram(self):
         mdir = os.path.dirname(os.path.abspath(__file__))
