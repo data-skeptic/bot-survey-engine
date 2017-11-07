@@ -56,36 +56,50 @@ class episode():
         vocab = self.word_vectors.index
         self.vocab_dic = {vocab[i]:i for i in range(self.word_vectors.shape[0])}
         #get Phrase object SO_bigram trained from SO
+       
         fname = mdir+'/SO_bigram/SO_bigram.pkl'
         with open(fname, 'rb') as f:
             self.bigram = pickle.load(f)
             #print("test bigram....", b'random_walk' in self.bigram.vocab.keys())
             print("Recommendation: size of bigram.vocab is ",len(self.bigram.vocab.keys()))
         # get preprocessed results of episodes
-        fname = mdir +'/episodes_preprocess/episodes_corpus.pickle'
+        # fname = mdir +'/episodes_preprocess/episodes_corpus.pickle'
+        # with open(fname, 'rb') as f:
+        #     self.episodes_corpus = pickle.load(f)
+
+        # fname = mdir +'/episodes_preprocess/episodes_sentences_nonstopwords.pickle'
+        # with open(fname, 'rb') as f:
+        #     self.episodes_sentences_nonstopwords = pickle.load(f)
+
+        # self.episodes_words_filtered = []
+        # for e in self.episodes_sentences_nonstopwords:
+        #     self.episodes_words_filtered.append(list(set(e).intersection(set(self.vocab_dic.keys()))))
+        fname = mdir + "/episodes_preprocess/episodes_words_filtered.pickle"
         with open(fname, 'rb') as f:
-            self.episodes_corpus = pickle.load(f)
+            self.episodes_words_filtered = pickle.load(f)
+        self.episodes_corpus = []
+        for item in self.episodes_words_filtered:
+            self.episodes_corpus.append(" ".join(item))
 
-        fname = mdir +'/episodes_preprocess/episodes_sentences_nonstopwords.pickle'
+        # title part
+        # fname = mdir +'/episodes_preprocess/episodes_title_corpus.pickle'
+        # with open(fname, 'rb') as f:
+        #     self.episodes_corpus_title = pickle.load(f)
+
+        # fname = mdir +'/episodes_preprocess/episodes_sentences_nonstopwords_title.pickle'
+        # with open(fname, 'rb') as f:
+        #     self.episodes_sentences_nonstopwords_title = pickle.load(f)
+        
+
+        # self.episodes_words_filtered_title = []
+        # for e in self.episodes_sentences_nonstopwords_title:
+        #     self.episodes_words_filtered_title.append(list(set(e).intersection(set(self.vocab_dic.keys()))))
+        fname = mdir + "/episodes_preprocess/episodes_words_filtered_title.pickle"
         with open(fname, 'rb') as f:
-            self.episodes_sentences_nonstopwords = pickle.load(f)
-
-        self.episodes_words_filtered = []
-        for e in self.episodes_sentences_nonstopwords:
-            self.episodes_words_filtered.append(list(set(e).intersection(set(self.vocab_dic.keys()))))
-
-        fname = mdir +'/episodes_preprocess/episodes_title_corpus.pickle'
-        with open(fname, 'rb') as f:
-            self.episodes_corpus_title = pickle.load(f)
-
-        fname = mdir +'/episodes_preprocess/episodes_sentences_nonstopwords_title.pickle'
-        with open(fname, 'rb') as f:
-            self.episodes_sentences_nonstopwords_title = pickle.load(f)
-
-        self.episodes_words_filtered_title = []
-        for e in self.episodes_sentences_nonstopwords_title:
-            self.episodes_words_filtered_title.append(list(set(e).intersection(set(self.vocab_dic.keys()))))
-
+            self.episodes_words_filtered_title = pickle.load(f)
+        self.episodes_corpus_title = []
+        for item in self.episodes_words_filtered_title:
+            self.episodes_corpus_title.append(" ".join(item))
         print("Recommendation: Initialization is done.")
     #preprocess user's request
 
