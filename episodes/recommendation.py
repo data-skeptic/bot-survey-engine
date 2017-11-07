@@ -35,7 +35,6 @@ class episode():
         with open(self.episodes_json_fname) as data_file:    
             episode_json = json.load(data_file)
         print('The total number of episodes is ',len(episode_json.keys()))
-
         descriptions = list(episode_json.keys())
         descToTitle = {}
         descToLink = {}
@@ -50,17 +49,12 @@ class episode():
         self.descToTitle = descToTitle
         self.descToLink = descToLink
         #get word_vectors trained from SO
-
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
         self.word_vectors = pd.read_csv(self.word_vec_file, index_col=0)
         print('Recommendation: The shape of word_vectors is ',self.word_vectors.shape)
         #get vocabulary dictionary from SO
-        voc_dic_file = mdir +"/vocab_dic_bigram/vocab_dict_question_answer.csv"
-        with open(voc_dic_file, 'r') as csv_file:
-            reader = csv.reader(csv_file)
-            self.vocab_dic = dict(reader)
-        for k, value in self.vocab_dic.items():
-            self.vocab_dic[k] = int(value)
+        vocab = self.word_vectors.index
+        self.vocab_dic = {vocab[i]:i for i in range(self.word_vectors.shape[0])}
         #get Phrase object SO_bigram trained from SO
         fname = mdir+'/SO_bigram/SO_bigram.pkl'
         with open(fname, 'rb') as f:

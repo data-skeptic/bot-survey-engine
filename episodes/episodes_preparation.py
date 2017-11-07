@@ -24,21 +24,12 @@ class episode_prepare():
         print("EP: crawling episodes is done.")
         #step3
         
-        self.vocab, self.vocab_dict, self.word_vecs_df = self.get_word_vec()
+        self.vocab, self.vocab_dic, self.word_vecs_df = self.get_word_vec()
         print("EP:Got word vectors trained from SO dataset.")
         print("EP: the size of the word vectors df is ", self.word_vecs_df.shape)
         #step4
-        # vocab_dic = self.vocab_dic()
         print("EP:Got vocab dictionary trained from SO dataset.")
-        print('EP:size of vocab in vocab_dic is ', len(vocab_dic))
-
-        print("EP: check vocab = vocab_dic.keys()...")
-        # for key, value in vocab_dic.items():
-        #     if self.vocab[value] != key:
-        #         print(key)
-        #         print(value)
-        #         print(self.vocab[value])
-
+        print('EP:size of vocab in vocab_dic is ', len(self.vocab_dic))
         #step5
         episodes_sentences_nonstopwords, episodes_corpus = self.get_episode_corpus_bigram()
 
@@ -72,8 +63,8 @@ class episode_prepare():
         mdir = os.path.dirname(os.path.abspath(__file__))
         word_vecs_df = pd.read_csv(mdir+fname,index_col=0)
         vocab = word_vecs_df.index
-        vocab_dict = {vocab[i]:i for i in range(word_vecs_df.shape[0])}
-        return vocab, vocab_dict, word_vecs_df
+        vocab_dic = {vocab[i]:i for i in range(word_vecs_df.shape[0])}
+        return vocab, vocab_dic, word_vecs_df
 
     # def vocab_dic(self):
     #     #fname = '/vocab_dict/vocab_dict_question_answer_'+ self.name +'.csv'
