@@ -112,7 +112,7 @@ start = time.time()
 print("*************episode session*************")
 print('Downloading word_vec from AWS S3...')
 load_word_vec_instance = load_word_vec()
-update_episode = True
+update_episode = False
 episode_instance = episode(update_episode,username, address,password,databasename)
 class give_recommendation(Resource):
     def post(self):
