@@ -28,7 +28,6 @@ class episode():
         except:
             print('The connection fails in episode recommendation.')
             raise
-        import time
         start1 = time.time()
         ep.run(update_episode) # episode preparation.
         end1 = time.time()
@@ -198,21 +197,16 @@ class episode():
                     desc = [key for key, value in self.descToNum.items() if value == j][0]
                     result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc, 'body_cos_similarity': scores[i], 'title_cos_similarity': title_cos_similarities[i]})
                     rank += 1  
-        # start5 = time.time()
-        # self.save_recommendation_table(user_request, result)
-        # end5 = time.time()
-        # print('saving to table takes ', end5 - start5)
-        #print('time of saving to table is ' + str( time.time() - start))
+        
         return result
     def save_recommendation_table(self, user_request, result):
+        start1 = time.time()
         user_request = user_request.replace("'", "\\'").replace(";", "\\;").replace("&", "\\&").replace("%", "%%")
-        # user_request = user_request.replace(";", "\\;")
-        # user_request = user_request.replace("&", "\\&")
-        # user_request = user_request.replace("%", "%%")
-        
+        print('replacing special characters in user requests takes', time.time() - start1)
         #save request and result to database
         if len(result) == 0:
             try: 
+                start2 = time.time()
                 template = """
                             INSERT INTO record_recommendation
                             (user_request) VALUES('{user_request}')
@@ -221,12 +215,14 @@ class episode():
                 conn = self.internal.connect()
                 conn.execute(query)
                 conn.close()
+                print('When there is no recommendation, how long does it take to save the request? ',time.time() - start2)
                 #print("Successful in inserting into record_recommendation table.")                                                   
             except: 
                 print("Error in inserting into record_recommendation table.")
                 raise
         else:
             for key, value in result.items():
+                start3 = time.time()
                 recommended_episode_title = value["title"]
                 recommended_episode_title = recommended_episode_title.replace("'", "\\'").replace(";", "\\;").replace("&", "\\&").replace("%", "%%")
 
@@ -244,7 +240,8 @@ class episode():
                     conn = self.internal.connect()
                     conn.execute(query)
                     conn.close()
-                    #print("Successful in inserting into record_recommendation table.")                                                   
+                    #print("Successful in inserting into record_recommendation table.")  
+                    print("The time it spends on saving one piece of recommendation is ", time.time() - start3)                                                 
                 except: 
                     print("Error in inserting into record_recommendation table.")
                     raise
