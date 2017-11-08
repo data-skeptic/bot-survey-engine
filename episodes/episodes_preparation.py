@@ -15,7 +15,6 @@ warnings.filterwarnings('ignore')
 
 class episode_prepare():
     def __init__(self):
-         
         #step1 
         self.SO_bigram = self.bigram()
         print("EP: the size of the vocab from SO including bigram is ",len(self.SO_bigram.vocab.keys()))   
@@ -23,15 +22,15 @@ class episode_prepare():
         self.crawl_episode_info()
         print("EP: crawling episodes is done.")
         #step3
-        self.vocab, self.vocab_dic, self.word_vecs_df = self.get_word_vec()
-        print("EP:Got word vectors trained from SO dataset.")
-        print("EP: the size of the word vectors df is ", self.word_vecs_df.shape)
-        #step4
-        print("EP:Got vocab dictionary trained from SO dataset.")
-        print('EP:size of vocab in vocab_dic is ', len(self.vocab_dic))
-        #step5
+        #self.vocab_dic, self.word_vecs_df = self.get_word_vec()
+        self.vocab = self.get_word_vec()
+
+        import time
+        start = time.time()
         episodes_words_filtered = self.get_episode_corpus_bigram()
-        
+        end = time.time()
+        print("EP: How long does it take to preprocess episodes ", end - start)
+
         mdir = os.path.dirname(os.path.abspath(__file__))
         if not os.path.exists(mdir+'/episodes_preprocess/'):
             os.makedirs(mdir+'/episodes_preprocess/')
@@ -43,14 +42,15 @@ class episode_prepare():
         fname = '/episodes_preprocess/episodes_words_filtered_title.pickle'
         with open(mdir+fname, 'wb') as f:
             pickle.dump(episdoes_words_filtered_title, f)
-
+        
     def get_word_vec(self):
         fname = "/word_vec_bigram/all_posts_word_vec.csv"
         mdir = os.path.dirname(os.path.abspath(__file__))
         word_vecs_df = pd.read_csv(mdir+fname,index_col=0)
-        vocab = word_vecs_df.index
-        vocab_dic = {vocab[i]:i for i in range(word_vecs_df.shape[0])}
-        return vocab, vocab_dic, word_vecs_df
+        vocab = set(word_vecs_df.index)
+        #vocab_dic = {vocab[i]:i for i in range(word_vecs_df.shape[0])}
+        #return vocab_dic, word_vecs_df
+        return vocab
 
     def bigram(self):
         mdir = os.path.dirname(os.path.abspath(__file__))
@@ -134,9 +134,6 @@ class episode_prepare():
             for i, line in enumerate(f):
                 sentence = gensim.utils.simple_preprocess(line)
                 sentences.append(sentence)
-               
-        # all_sentences_nonstopword = [] # a list of lists of words
-        # all_sentences_corpus = [] # a list of strings
         episodes_words_filtered = []
         for i in range(len(sentences)):
             temp = self.SO_bigram[sentences[i]] # temp is a list of words(unigram and bigram)
@@ -152,16 +149,14 @@ class episode_prepare():
                     if word not in stopwords.words("english"):
                         result.append(word)
                 result = list(set(result))
-            # all_sentences_nonstopword.append(result)
-            episodes_words_filtered.append(list(set(result).intersection(set(self.vocab_dic.keys()))))            
-        return episodes_words_filtered
+            episodes_words_filtered.append(list(set(result).intersection(self.vocab)))            
+        return episodes_words_filtered # a list of lists of words
     
     def get_episode_title_corpus_bigram(self):
         mdir = os.path.dirname(os.path.abspath(__file__))
         fname = mdir+'/text/episode_descs_titles.txt'
         fname = mdir+"/text/episode_titles.txt"
         sentences = []
-        #bigram = Phrases(min_count=5)
         with smart_open.smart_open(fname, encoding="iso-8859-1") as f:
             for i, line in enumerate(f):
                 sentence = gensim.utils.simple_preprocess(line)
@@ -181,13 +176,12 @@ class episode_prepare():
                     if word not in stopwords.words("english"):
                         result.append(word)
                 result = list(set(result))
-            episodes_words_filtered_title.append(list(set(result).intersection(set(self.vocab_dic.keys()))))    
+            episodes_words_filtered_title.append(list(set(result).intersection(self.vocab)))    
         return episodes_words_filtered_title
 
 def run(update):
     if update:
         ins = episode_prepare()
-        #ins.get_episode_weighted_vec() 
     
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
