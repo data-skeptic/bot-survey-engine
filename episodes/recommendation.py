@@ -116,6 +116,7 @@ class episode():
         user_tf_idf_df = pd.DataFrame([user_tf_idf_dict], columns = user_tf_idf_dict.keys()).T
         user_tf_idf_df.columns = ['tf_idf']
         user_tf_idf_df /=user_tf_idf_df.sum(axis = 0)
+        user_tf_idf_df.sort_index(inplace=True)
         return user_tf_idf_df
 
     def get_score(self, i, user_words,user_tf_idf_df): # the ith episode
@@ -126,10 +127,9 @@ class episode():
         cos_similarities_df = pd.DataFrame(cos_similarities, index = episode_words, columns = user_words) 
         max_cos_similarities = cos_similarities_df.max(axis = 0)
         max_cos_similarities.sort_index(inplace=True)
-        user_tf_idf_df.sort_index(inplace=True)
         score = np.dot(max_cos_similarities.values, user_tf_idf_df.values)[0]
-
-        return score, cos_similarities_df
+        # return score, cos_similarities_df
+        return score
 
     def get_score_titles(self,i,user_words):   
         episode_words = self.episodes_words_filtered_title[i]
@@ -160,7 +160,7 @@ class episode():
         end2 = time.time()
         print("to get tf_idf of user request ", end2 - start2)
         start3 = time.time()
-        scores = np.array([self.get_score(i, user_words,user_tf_idf_df)[0]*ratio for i in range(len(self.episodes_corpus))]) 
+        scores = np.array([self.get_score(i, user_words,user_tf_idf_df)*ratio for i in range(len(self.episodes_corpus))]) 
         end3 = time.time()
         print("get all scores ", end3 - start3)
         max_score = scores.max()

@@ -124,7 +124,7 @@ class give_recommendation(Resource):
         print("the time it takes to make a recommendation is ", time.time() - start)
         start = time.time()
         episode_instance.save_recommendation_table(user_request, result)
-        print('the time it taks to save the rcommendation to table is ', time.time() - start)
+        print('the time it takes to save the recommendation to table is ', time.time() - start)
         if len(result) > 0:
             return result
         else:
