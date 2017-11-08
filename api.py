@@ -6,6 +6,7 @@ import sys
 import logging
 import sqlalchemy
 import pymysql
+import time
 pymysql.install_as_MySQLdb()
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -48,7 +49,7 @@ logger.addHandler(stdout)
 version = "0.0.1"
 
 #survey
-print('survey session')
+print('*************survey session*************')
 with open ("./config/config.json", "r") as myfile:
         data = json.load(myfile)
         #mysql
@@ -107,34 +108,27 @@ class SaveAnswer(Resource):
         return resp
 
 # episode
-print("episode session")
+print("*************episode session*************")
 print('Downloading word_vec from AWS S3...')
 load_word_vec_instance = load_word_vec()
-print("The downloading is done.")
 update_episode = True
 episode_instance = episode(update_episode,username, address,password,databasename)
-
 class give_recommendation(Resource):
     def post(self):
         r = request.get_data()
         req = json.loads(r.decode('utf-8'))
         user_request = req['request']
+        start = time.time()
         result = episode_instance.recommend_episode(user_request)
+        print("the time it takes to make a recommendation is ", time.time() - start)
         if len(result) > 0:
             return result
         else:
             return None
 
 #listener_reminder
-print("listener reminder session")
+print("*************listener reminder session*************")
 reminder_ins = Listener_Reminder(user, pw, username, password, address, databasename)
-## a test.
-# contact_type = 'sms'
-# contact_account = '+18144414200'
-# episode_title = "MCMC"
-# episode_link = "https://dataskeptic.com/blog/episodes/2017/data-science-tools-and-other-announcements-from-ignite"
-# episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
-# reminder_ins.send_message(contact_type, contact_account,episode_title , episode_link)
 
 class reminder(Resource):
     def post(self):
