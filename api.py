@@ -122,10 +122,14 @@ class give_recommendation(Resource):
         start = time.time()
         result = episode_instance.recommend_episode(user_request)
         print("the time it takes to make a recommendation is ", time.time() - start)
+        start = time.time()
+        episode_instance.save_recommendation_table(user_request, result)
+        print('the time it taks to save the rcommendation to table is ', time.time() - start)
         if len(result) > 0:
             return result
         else:
             return None
+
 print("How long does it spend in the episode session ", time.time() - start)
 #listener_reminder
 print("*************listener reminder session*************")
@@ -145,6 +149,7 @@ class reminder(Resource):
         # save reminder task into the table.
         reminder_ins.save_reminder_task(contact_type, contact_account,reminder_time, 
                                                 episode_title, episode_link)
+
         return " Reminder will be sent."# + str(alarm_time)
 
 if __name__ == '__main__':

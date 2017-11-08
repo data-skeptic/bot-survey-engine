@@ -5,6 +5,7 @@ import pickle
 import os
 import gensim
 import csv
+import time
 import heapq
 from sklearn.feature_extraction.text import TfidfVectorizer
 import episodes_preparation as ep
@@ -60,7 +61,8 @@ class episode():
         self.word_vectors = pd.read_csv(self.word_vec_file, index_col=0)
         print('Recommendation: The shape of word_vectors is ',self.word_vectors.shape)
         #get vocabulary dictionary from SO
-        vocab = self.word_vectors.index
+        vocab = list(self.word_vectors.index)
+        #self.vocab_dic = dict(zip(vocab, range(len(vocab))))
         self.vocab_dic = {vocab[i]:i for i in range(self.word_vectors.shape[0])}
         #get Phrase object SO_bigram trained from SO
         end3 = time.time()
@@ -149,11 +151,19 @@ class episode():
         by_title = True
         score_threshold_not_by_title  = 0.70
         score_threshold_by_title  = 0.30
-
+        start1 = time.time()
         user_words,total = self.preprocess(user_request)
+        end1 = time.time()
+        print("user request preprocess takes ", end1 - start1)
         ratio = len(user_words)/total
+        start2 = time.time()
         user_tf_idf_df = self.get_user_tf_idf(user_words)
+        end2 = time.time()
+        print("to get tf_idf of user request ", end2 - start2)
+        start3 = time.time()
         scores = np.array([self.get_score(i, user_words,user_tf_idf_df)[0]*ratio for i in range(len(self.episodes_corpus))]) 
+        end3 = time.time()
+        print("get all scores ", end3 - start3)
         max_score = scores.max()
         episode_indice = np.where(scores == max_score)[0]
         #print('episode_indice are', episode_indice)
@@ -162,12 +172,14 @@ class episode():
             best_index = episode_indice
             most_similar_indice = np.array(scores).argsort()[-2:][::-1]
         else: # there are more than one episodes with the highest similarity. We need to use title to decide.
+            start4 = time.time()
             by_title = True
             title_cos_similarities = {}
             for i in episode_indice:
                 title_cos_similarities[i] = self.get_score_titles(i, user_words)
             most_similar_indice = heapq.nlargest(2, title_cos_similarities, key=title_cos_similarities.get)
-        
+            end4 = time.time()
+            print('if multi score ==1, then by titles, it takes ', end4 - start4)
         #print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& User's request is:  " + user_request + " &&&&&&&&&&&&&&&&&&&&&&&&\n" )
         result = {}
         rank  = 1
@@ -186,8 +198,10 @@ class episode():
                     desc = [key for key, value in self.descToNum.items() if value == j][0]
                     result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc, 'body_cos_similarity': scores[i], 'title_cos_similarity': title_cos_similarities[i]})
                     rank += 1  
-
-        self.save_recommendation_table(user_request, result)
+        # start5 = time.time()
+        # self.save_recommendation_table(user_request, result)
+        # end5 = time.time()
+        # print('saving to table takes ', end5 - start5)
         #print('time of saving to table is ' + str( time.time() - start))
         return result
     def save_recommendation_table(self, user_request, result):
@@ -215,9 +229,6 @@ class episode():
             for key, value in result.items():
                 recommended_episode_title = value["title"]
                 recommended_episode_title = recommended_episode_title.replace("'", "\\'").replace(";", "\\;").replace("&", "\\&").replace("%", "%%")
-                # recommended_episode_title = recommended_episode_title.replace(";", "\\;")
-                # recommended_episode_title = recommended_episode_title.replace("&", "\\&")
-                # recommended_episode_title = recommended_episode_title.replace("%", "%%")
 
                 top = int(key.split("_")[1])
                 body_cos_similarity = value.get('body_cos_similarity')
