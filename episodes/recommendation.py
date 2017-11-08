@@ -27,8 +27,12 @@ class episode():
         except:
             print('The connection fails in episode recommendation.')
             raise
-
+        import time
+        start1 = time.time()
         ep.run(update_episode) # episode preparation.
+        end1 = time.time()
+        print("update episode and prepared time is ", end1 - start1)
+        start2 = time.time()
         # get episodes information
         mdir = os.path.dirname(os.path.abspath(__file__))
         self.episodes_json_fname = mdir+'/text/episodes_json.txt'
@@ -48,6 +52,9 @@ class episode():
         self.descToNum = descToNum
         self.descToTitle = descToTitle
         self.descToLink = descToLink
+        end2 = time.time()
+        print('get episodes info time is ', end2 - start2)
+        start3 = time.time()
         #get word_vectors trained from SO
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
         self.word_vectors = pd.read_csv(self.word_vec_file, index_col=0)
@@ -56,50 +63,29 @@ class episode():
         vocab = self.word_vectors.index
         self.vocab_dic = {vocab[i]:i for i in range(self.word_vectors.shape[0])}
         #get Phrase object SO_bigram trained from SO
-       
+        end3 = time.time()
+        print('time of getting word vectors and vocab_dict is', end3 - start3)
         fname = mdir+'/SO_bigram/SO_bigram.pkl'
         with open(fname, 'rb') as f:
             self.bigram = pickle.load(f)
             #print("test bigram....", b'random_walk' in self.bigram.vocab.keys())
             print("Recommendation: size of bigram.vocab is ",len(self.bigram.vocab.keys()))
-        # get preprocessed results of episodes
-        # fname = mdir +'/episodes_preprocess/episodes_corpus.pickle'
-        # with open(fname, 'rb') as f:
-        #     self.episodes_corpus = pickle.load(f)
-
-        # fname = mdir +'/episodes_preprocess/episodes_sentences_nonstopwords.pickle'
-        # with open(fname, 'rb') as f:
-        #     self.episodes_sentences_nonstopwords = pickle.load(f)
-
-        # self.episodes_words_filtered = []
-        # for e in self.episodes_sentences_nonstopwords:
-        #     self.episodes_words_filtered.append(list(set(e).intersection(set(self.vocab_dic.keys()))))
+        
+        start4 = time.time()
         fname = mdir + "/episodes_preprocess/episodes_words_filtered.pickle"
         with open(fname, 'rb') as f:
             self.episodes_words_filtered = pickle.load(f)
         self.episodes_corpus = []
         for item in self.episodes_words_filtered:
             self.episodes_corpus.append(" ".join(item))
-
-        # title part
-        # fname = mdir +'/episodes_preprocess/episodes_title_corpus.pickle'
-        # with open(fname, 'rb') as f:
-        #     self.episodes_corpus_title = pickle.load(f)
-
-        # fname = mdir +'/episodes_preprocess/episodes_sentences_nonstopwords_title.pickle'
-        # with open(fname, 'rb') as f:
-        #     self.episodes_sentences_nonstopwords_title = pickle.load(f)
         
-
-        # self.episodes_words_filtered_title = []
-        # for e in self.episodes_sentences_nonstopwords_title:
-        #     self.episodes_words_filtered_title.append(list(set(e).intersection(set(self.vocab_dic.keys()))))
         fname = mdir + "/episodes_preprocess/episodes_words_filtered_title.pickle"
         with open(fname, 'rb') as f:
             self.episodes_words_filtered_title = pickle.load(f)
         self.episodes_corpus_title = []
         for item in self.episodes_words_filtered_title:
             self.episodes_corpus_title.append(" ".join(item))
+        print("Recommendation: the time it takes to download the episodes pickles is ", time.time() - start4)
         print("Recommendation: Initialization is done.")
     #preprocess user's request
 
@@ -164,8 +150,8 @@ class episode():
         score_threshold_not_by_title  = 0.70
         score_threshold_by_title  = 0.30
 
-        user_words = self.preprocess(user_request)[0]
-        ratio = len(user_words)/self.preprocess(user_request)[1]
+        user_words,total = self.preprocess(user_request)
+        ratio = len(user_words)/total
         user_tf_idf_df = self.get_user_tf_idf(user_words)
         scores = np.array([self.get_score(i, user_words,user_tf_idf_df)[0]*ratio for i in range(len(self.episodes_corpus))]) 
         max_score = scores.max()
@@ -174,46 +160,41 @@ class episode():
         if len(episode_indice) == 1:
             by_title = False
             best_index = episode_indice
-            most_similar_indice = np.array(scores).argsort()[-4:][::-1]
+            most_similar_indice = np.array(scores).argsort()[-2:][::-1]
         else: # there are more than one episodes with the highest similarity. We need to use title to decide.
             by_title = True
             title_cos_similarities = {}
             for i in episode_indice:
                 title_cos_similarities[i] = self.get_score_titles(i, user_words)
-            most_similar_indice = heapq.nlargest(4, title_cos_similarities, key=title_cos_similarities.get)
+            most_similar_indice = heapq.nlargest(2, title_cos_similarities, key=title_cos_similarities.get)
         
-        if by_title:
-            score_threshold = score_threshold_by_title
-        else:
-            score_threshold = score_threshold_not_by_title
         #print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& User's request is:  " + user_request + " &&&&&&&&&&&&&&&&&&&&&&&&\n" )
         result = {}
         rank  = 1
         #print('most_similary index are ', most_similar_indice)
         if not by_title:
             for i in most_similar_indice:
-                if scores[i] >= score_threshold:
+                if scores[i] >= score_threshold_not_by_title:
                     j = len(self.descriptions) - i  
                     desc = [key for key, value in self.descToNum.items() if value == j][0]
                     result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc, 'body_cos_similarity': scores[i]})
                     rank += 1
         else:
             for i in most_similar_indice:
-                if title_cos_similarities[i] >= score_threshold and scores[i] >= 0.5:
+                if title_cos_similarities[i] >= score_threshold_by_title and scores[i] >= 0.5:
                     j = len(self.descriptions) - i  
                     desc = [key for key, value in self.descToNum.items() if value == j][0]
                     result['rank_'+str(rank)] = ({'title':self.descToTitle[desc],'link':self.descToLink[desc],'desc':desc, 'body_cos_similarity': scores[i], 'title_cos_similarity': title_cos_similarities[i]})
                     rank += 1  
 
-        
         self.save_recommendation_table(user_request, result)
         #print('time of saving to table is ' + str( time.time() - start))
         return result
     def save_recommendation_table(self, user_request, result):
-        user_request = user_request.replace("'", "\\'")
-        user_request = user_request.replace(";", "\\;")
-        user_request = user_request.replace("&", "\\&")
-        user_request = user_request.replace("%", "%%")
+        user_request = user_request.replace("'", "\\'").replace(";", "\\;").replace("&", "\\&").replace("%", "%%")
+        # user_request = user_request.replace(";", "\\;")
+        # user_request = user_request.replace("&", "\\&")
+        # user_request = user_request.replace("%", "%%")
         
         #save request and result to database
         if len(result) == 0:
@@ -233,10 +214,10 @@ class episode():
         else:
             for key, value in result.items():
                 recommended_episode_title = value["title"]
-                recommended_episode_title = recommended_episode_title.replace("'", "\\'")
-                recommended_episode_title = recommended_episode_title.replace(";", "\\;")
-                recommended_episode_title = recommended_episode_title.replace("&", "\\&")
-                recommended_episode_title = recommended_episode_title.replace("%", "%%")
+                recommended_episode_title = recommended_episode_title.replace("'", "\\'").replace(";", "\\;").replace("&", "\\&").replace("%", "%%")
+                # recommended_episode_title = recommended_episode_title.replace(";", "\\;")
+                # recommended_episode_title = recommended_episode_title.replace("&", "\\&")
+                # recommended_episode_title = recommended_episode_title.replace("%", "%%")
 
                 top = int(key.split("_")[1])
                 body_cos_similarity = value.get('body_cos_similarity')
