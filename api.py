@@ -108,6 +108,7 @@ class SaveAnswer(Resource):
         return resp
 
 # episode
+start = time.time()
 print("*************episode session*************")
 print('Downloading word_vec from AWS S3...')
 load_word_vec_instance = load_word_vec()
@@ -125,7 +126,7 @@ class give_recommendation(Resource):
             return result
         else:
             return None
-
+print("How long does it spend in the episode session ", time.time() - start)
 #listener_reminder
 print("*************listener reminder session*************")
 reminder_ins = Listener_Reminder(user, pw, username, password, address, databasename)

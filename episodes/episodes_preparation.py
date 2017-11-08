@@ -7,6 +7,7 @@ import json
 import os
 import gensim
 import csv
+import time
 import smart_open
 from nltk.corpus import stopwords
 import boto3
@@ -16,20 +17,25 @@ warnings.filterwarnings('ignore')
 class episode_prepare():
     def __init__(self):
         #step1 
+        start1 = time.time()
         self.SO_bigram = self.bigram()
         print("EP: the size of the vocab from SO including bigram is ",len(self.SO_bigram.vocab.keys()))   
+        end1 = time.time()
+        print("EP downloading SO_bigram time is ", end1-start1)
         #step2
         self.crawl_episode_info()
         print("EP: crawling episodes is done.")
         #step3
         #self.vocab_dic, self.word_vecs_df = self.get_word_vec()
+        start2 = time.time()
         self.vocab = self.get_word_vec()
+        end2 = time.time()
+        print("EP: get word vec time ", end2 -start2)
 
-        import time
-        start = time.time()
+        start3 = time.time()
         episodes_words_filtered = self.get_episode_corpus_bigram()
-        end = time.time()
-        print("EP: How long does it take to preprocess episodes ", end - start)
+        end3 = time.time()
+        print("EP: How long does it take to preprocess episodes ", end3 - start3)
 
         mdir = os.path.dirname(os.path.abspath(__file__))
         if not os.path.exists(mdir+'/episodes_preprocess/'):
@@ -44,12 +50,15 @@ class episode_prepare():
             pickle.dump(episdoes_words_filtered_title, f)
         
     def get_word_vec(self):
-        fname = "/word_vec_bigram/all_posts_word_vec.csv"
-        mdir = os.path.dirname(os.path.abspath(__file__))
-        word_vecs_df = pd.read_csv(mdir+fname,index_col=0)
-        vocab = set(word_vecs_df.index)
+        # fname = "/word_vec_bigram/all_posts_word_vec.csv"
+        # mdir = os.path.dirname(os.path.abspath(__file__))
+        # word_vecs_df = pd.read_csv(mdir+fname,index_col=0)
+        # vocab = set(word_vecs_df.index)
         #vocab_dic = {vocab[i]:i for i in range(word_vecs_df.shape[0])}
         #return vocab_dic, word_vecs_df
+        mdir = os.path.dirname(os.path.abspath(__file__))
+        with open(mdir + '/vocab.plk', 'rb') as f:
+            vocab = pickle.load(f)
         return vocab
 
     def bigram(self):
