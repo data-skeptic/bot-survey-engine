@@ -15,6 +15,8 @@ import pymysql
 pymysql.install_as_MySQLdb()
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+from itertools import repeat
+from multiprocessing import Pool
 
 class episode():
     def __init__(self, update_episode, username, address,password,databasename):
@@ -129,6 +131,8 @@ class episode():
         max_cos_similarities.sort_index(inplace=True)
         score = np.dot(max_cos_similarities.values, user_tf_idf_df.values)[0]
         # return score, cos_similarities_df
+        result = {}
+        result[i] = score
         return score
 
     def get_score_titles(self,i,user_words):   
@@ -147,10 +151,7 @@ class episode():
         # result = {}
         # result[i] = score
         return score
-    def test(self,a,b,c):
-        result  = {}
-        result[a] = b + c
-        return result
+   
     def recommend_episode(self, user_request):
         by_title = True
         score_threshold_not_by_title  = 0.70
@@ -166,6 +167,13 @@ class episode():
         print("to get tf_idf of user request ", end2 - start2)
         start3 = time.time()
         scores = np.array([self.get_score(i, user_words,user_tf_idf_df)*ratio for i in range(len(self.episodes_corpus))]) 
+        
+        # can not be pickled. If the target self.get_score is some function outside of the class, then it is fine.
+        # num = len(self.episodes_corpus)
+        # with Pool() as pool:
+        #     scores_dict = pool.starmap(self.get_score,list(zip(range(num), repeat(user_words), repeat(user_tf_idf_df))))
+        # print(len(scores_dict))
+
         end3 = time.time()
         print("get all scores ", end3 - start3)
         max_score = scores.max()
@@ -250,6 +258,19 @@ class episode():
                 except: 
                     print("Error in inserting into record_recommendation table.")
                     raise
+def my_get_score(i, user_words,user_tf_idf_df): # the ith episode
+    episode_words = self.episodes_words_filtered[i]
+    X = self.word_vectors.loc[episode_words,:]
+    Y = self.word_vectors.loc[user_words,:]
+    cos_similarities = cosine_similarity(X = X.values, Y = Y.values)
+    cos_similarities_df = pd.DataFrame(cos_similarities, index = episode_words, columns = user_words) 
+    max_cos_similarities = cos_similarities_df.max(axis = 0)
+    max_cos_similarities.sort_index(inplace=True)
+    score = np.dot(max_cos_similarities.values, user_tf_idf_df.values)[0]
+    # return score, cos_similarities_df
+    result = {}
+    result[i] = score
+    return result
 
 if __name__ == "__main__":
     # stuff only to run when not called via 'import' here
