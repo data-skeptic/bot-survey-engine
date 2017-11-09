@@ -122,15 +122,27 @@ class give_recommendation(Resource):
         start = time.time()
         result = episode_instance.recommend_episode(user_request)
         print("the time it takes to make a recommendation is ", time.time() - start)
-        start = time.time()
-        episode_instance.save_recommendation_table(user_request, result)
-        print('the time it takes to save the recommendation to table is ', time.time() - start)
+        # start = time.time()
+        # episode_instance.save_recommendation_table(user_request, result)
+        # print('the time it takes to save the recommendation to table is ', time.time() - start)
         if len(result) > 0:
             return result
         else:
             return None
 
 print("How long does it spend in the episode session ", time.time() - start)
+
+class save_recommendation(Resource):
+    def post(self):
+        r = request.get_data()
+        info = json.loads(r.decode('utf-8'))
+        print('info is ', info)
+        user_request = info.get('user_request')
+        recommendation = info.get('recommendation')
+        start = time.time()
+        episode_instance.save_recommendation_table(user_request,recommendation)
+        print('the time it takes to save the recommendation to table is ', time.time() - start)
+
 #listener_reminder
 print("*************listener reminder session*************")
 reminder_ins = Listener_Reminder(user, pw, username, password, address, databasename)
@@ -152,6 +164,7 @@ class reminder(Resource):
 
         return " Reminder will be sent."# + str(alarm_time)
 
+
 if __name__ == '__main__':
     logger.info("Init")
     app = Flask(__name__)
@@ -162,6 +175,7 @@ if __name__ == '__main__':
     api.add_resource(SaveAnswer,   '/survey/response/answer/save')
     # episode
     api.add_resource(give_recommendation,   '/episode/recommendation')
+    api.add_resource(save_recommendation,   '/episode/save_recommendation')
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')
     
