@@ -144,8 +144,13 @@ class episode():
             score = max_cos_similarities.values.mean()
         else:
             score = 0
+        # result = {}
+        # result[i] = score
         return score
-
+    def test(self,a,b,c):
+        result  = {}
+        result[a] = b + c
+        return result
     def recommend_episode(self, user_request):
         by_title = True
         score_threshold_not_by_title  = 0.70
