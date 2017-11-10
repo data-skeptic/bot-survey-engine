@@ -1,0 +1,20 @@
+{
+  "sessions": "session",
+  "visit": "session",
+  "hour yesterday": "dateHour",
+  "average session duration": "avgSessionDuration",
+  "uration per mo": "month",
+  "bounce rates": "bounceRate",
+  "user type": "userType",
+  "percentage of our site's sessions are new sessions": "percentNewSessions",
+  "last 9 days": "last 7 days",
+  "revenue per transaction": "revenuePerTransaction",
+  "transactions per user": "transactionsPerUser",
+  "by hour": "dateHour",
+  "bounce rate": "bounceRate",
+  "by hou": "dateHour",
+  "per day": "day",
+  "per week": "week",
+  "april of 2017": "April of 2017",
+  "ad cost": "adCost"
+}
