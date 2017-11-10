@@ -1,18 +1,22 @@
 import json
 import time
 import os
+import boto3
+import numpy as np
 import sys
 import pandas as pd
 from datetime import datetime
+import matplotlib.pyplot as plt
 #import parsedatetime as pdt # $ pip install parsedatetime
 import dateparser #https://dateparser.readthedocs.io/en/latest/
 from tabulate import tabulate
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
-
 sys.path.insert(0, './gahelper')
 from gahelper import Gahelper
+from gaformatter import format_dataframe
+
 
 # def get_date_range(time_string):
 # 	now = datetime.now()
@@ -91,6 +95,11 @@ print(tabulate(testing_results_df, headers='keys', tablefmt='psql'))
 config = json.load(open("../config/config.json"))
 ga = Gahelper(config)
 
+key = config['aws']['accessKeyId']
+secret = config['aws']['secretAccessKey']
+bucketname = config['aws']['bucket_name']
+s3 = boto3.resource('s3', aws_access_key_id=key, aws_secret_access_key=secret)
+
 # a test
 test = results[3]
 print(test['text'])
@@ -119,18 +128,20 @@ print(metrics, dimensions,start_date,end_date)
 def report_reply(metrics, dimensions, start_date, end_date):
 	report = ga.get_report(metrics, dimensions, start_date, end_date)
 	print(tabulate(report, headers='keys', tablefmt='psql'))
+	f = format_dataframe(s3, bucketname, report, metrics, dimensions, start_date, end_date)
+	print(f)
 
-	noga_dimensions = [dimension[3:] for dimension in dimensions]
-	noga_metrics = [metric[3:] for metric in metrics]
+	# noga_dimensions = [dimension[3:] for dimension in dimensions]
+	# noga_metrics = [metric[3:] for metric in metrics]
 
-	print('noga ', noga_metrics, noga_dimensions)
-	print("From ", start_date, " to ", end_date, "\n")
-	for i in range(report.shape[0]):
-		print("-----------")
-		dims = ",".join([report.loc[i, d] for d in noga_dimensions])
-		mts = ",".join([report.loc[i, m] for m in noga_metrics])
-		print("when ", ",".join(noga_dimensions), ' is/are ', dims, ',')
-		print(",".join(noga_metrics), " is/are ", mts, ".")
+	# print('noga ', noga_metrics, noga_dimensions)
+	# print("From ", start_date, " to ", end_date, "\n")
+	# for i in range(report.shape[0]):
+	# 	print("-----------")
+	# 	dims = ",".join([report.loc[i, d] for d in noga_dimensions])
+	# 	mts = ",".join([report.loc[i, m] for m in noga_metrics])
+	# 	print("when ", ",".join(noga_dimensions), ' is/are ', dims, ',')
+	# 	print(",".join(noga_metrics), " is/are ", mts, ".")
 report_reply(metrics, dimensions,start_date, end_date)
 
 
