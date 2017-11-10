@@ -6,7 +6,8 @@ from datetime import datetime
 #import parsedatetime as pdt # $ pip install parsedatetime
 import dateparser #https://dateparser.readthedocs.io/en/latest/
 from tabulate import tabulate
-
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 # def get_date_range(time_string):
 # 	now = datetime.now()
 # 	cal = pdt.Calendar()
@@ -36,13 +37,44 @@ with open(result_file_path, 'r') as f:
 			GA_items['start'], GA_items['end'] = get_date_range(GA_items['date'])
 		results.append(GA_items)
 
+#find the standard dimension in GA by fuzzywuzzy
+standard_dims = []
+with open(dir_path + "/dimensions.json") as f:
+	data = json.load(f)
+	for key, value in data.items():
+		standard_dims = standard_dims + value
+
+standard_metrics = []
+with open(dir_path + "/metrics.json") as f:
+	data = json.load(f)
+	for key, value in data.items():
+		standard_metrics = standard_metrics + value
+
+for result in results:
+	print('--------------', result.get('text'), '---------------')
+
+	if result.get('dimension'):
+		print('**dimension')
+		non_standard_dim = result.get('dimension')
+		print(non_standard_dim)
+		standard_dim = process.extract(non_standard_dim, standard_dims, limit = 1,scorer=fuzz.token_sort_ratio)[0][0]
+		print(process.extract(non_standard_dim, standard_dims, limit = 2,scorer=fuzz.token_sort_ratio))
+		result['standard_dim'] = standard_dim
+
+	
+	print('**metric')
+	non_standard_metric = result.get('metric')
+	print(non_standard_metric)
+	standard_metric = process.extract(non_standard_metric, standard_metrics, limit = 1,scorer=fuzz.token_sort_ratio)[0][0]
+	print(process.extract(non_standard_metric, standard_metrics, limit = 2,scorer=fuzz.token_sort_ratio))
+	result['standard_metric'] = standard_metric
+
+print(results)
+
 testing_results_df = pd.DataFrame.from_dict(results)
-testing_results_df = testing_results_df[['dimension','metric','date','start','end']]
+testing_results_df = testing_results_df[['dimension','standard_dim','metric', 'standard_metric','start','end']]
 print('\n')
 print(tabulate(testing_results_df, headers='keys', tablefmt='psql'))
-
-
-
 
 
 
