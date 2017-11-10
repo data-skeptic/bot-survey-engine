@@ -5,3 +5,6 @@ episodes/episode_vec
 episodes/text
 episodes/feed.xml
 config/config.json
+config/ga_key.json
+episodes/word_vec_bigram/all_posts_word_vec.csv
+
