@@ -4,7 +4,9 @@ from rasa_nlu.model import Trainer
 import json
 import os 
 
-training_data = load_data('data/training_data.json')
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+training_data =  load_data(dir_path +'/data/training_data.json')
 trainer = Trainer(RasaNLUConfig("sample_configs/config_spacy.json"))
 trainer.train(training_data)
 model_directory = trainer.persist('./projects/')  # Returns the directory the model is stored in
@@ -13,13 +15,12 @@ from rasa_nlu.model import Metadata, Interpreter
 # where `model_directory points to the folder the model is persisted in
 interpreter = Interpreter.load(model_directory, RasaNLUConfig("sample_configs/config_spacy.json"))
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-file_name = "/data/testing_data.txt" 
+file_name = dir_path + "/data/testing_data.txt" 
 result_file_path = dir_path + "/data/testing_results.json"
 result_file = open(result_file_path, 'w')
 result_file.close()
 i = 0
-with open(dir_path + file_name, 'r') as f:
+with open(file_name, 'r') as f:
     result_file = open(result_file_path, 'a')
     for line in f:
         if i != 0:
