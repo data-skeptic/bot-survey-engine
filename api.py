@@ -6,6 +6,7 @@ import sys
 import logging
 import sqlalchemy
 import pymysql
+import time
 pymysql.install_as_MySQLdb()
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -48,7 +49,7 @@ logger.addHandler(stdout)
 version = "0.0.1"
 
 #survey
-print('survey session')
+print('*************survey session*************')
 with open ("./config/config.json", "r") as myfile:
         data = json.load(myfile)
         #mysql
@@ -107,34 +108,44 @@ class SaveAnswer(Resource):
         return resp
 
 # episode
-print("episode session")
+start = time.time()
+print("*************episode session*************")
 print('Downloading word_vec from AWS S3...')
 load_word_vec_instance = load_word_vec()
-print("The downloading is done.")
-update_episode = True
+update_episode = False
 episode_instance = episode(update_episode,username, address,password,databasename)
-
 class give_recommendation(Resource):
     def post(self):
         r = request.get_data()
         req = json.loads(r.decode('utf-8'))
         user_request = req['request']
+        start = time.time()
         result = episode_instance.recommend_episode(user_request)
+        print("the time it takes to make a recommendation is ", time.time() - start)
+        # start = time.time()
+        # episode_instance.save_recommendation_table(user_request, result)
+        # print('the time it takes to save the recommendation to table is ', time.time() - start)
         if len(result) > 0:
             return result
         else:
             return None
 
+print("How long does it spend in the episode session ", time.time() - start)
+
+class save_recommendation(Resource):
+    def post(self):
+        r = request.get_data()
+        info = json.loads(r.decode('utf-8'))
+        print('info is ', info)
+        user_request = info.get('user_request')
+        recommendation = info.get('recommendation')
+        start = time.time()
+        episode_instance.save_recommendation_table(user_request,recommendation)
+        print('the time it takes to save the recommendation to table is ', time.time() - start)
+
 #listener_reminder
-print("listener reminder session")
+print("*************listener reminder session*************")
 reminder_ins = Listener_Reminder(user, pw, username, password, address, databasename)
-## a test.
-# contact_type = 'sms'
-# contact_account = '+18144414200'
-# episode_title = "MCMC"
-# episode_link = "https://dataskeptic.com/blog/episodes/2017/data-science-tools-and-other-announcements-from-ignite"
-# episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
-# reminder_ins.send_message(contact_type, contact_account,episode_title , episode_link)
 
 class reminder(Resource):
     def post(self):
@@ -150,7 +161,9 @@ class reminder(Resource):
         # save reminder task into the table.
         reminder_ins.save_reminder_task(contact_type, contact_account,reminder_time, 
                                                 episode_title, episode_link)
+
         return " Reminder will be sent."# + str(alarm_time)
+
 
 if __name__ == '__main__':
     logger.info("Init")
@@ -162,6 +175,7 @@ if __name__ == '__main__':
     api.add_resource(SaveAnswer,   '/survey/response/answer/save')
     # episode
     api.add_resource(give_recommendation,   '/episode/recommendation')
+    api.add_resource(save_recommendation,   '/episode/save_recommendation')
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')
     
