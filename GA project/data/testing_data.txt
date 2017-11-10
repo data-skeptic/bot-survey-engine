@@ -1,9 +1,0 @@
-What is the average bounce rate over the past 14 days?
-How many sessions are there in the last month?
-What is the percentage of new sessions in the last week?
-How many transactions across user type in the last year?
-How many transactions across user type per month in 2017?
-What is the ad cost per week in January last year?
-What is the ad cost per week in August of 2017?
-How does bounce rates compare across user type?
-How does the cost per transaction compare across user type?
