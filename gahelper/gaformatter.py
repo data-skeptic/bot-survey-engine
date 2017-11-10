@@ -1,4 +1,9 @@
-def format_dataframe(report, metrics, dimensions):
+import numpy as np
+import os
+from datetime import datetime
+import matplotlib.pyplot as plt
+
+def format_dataframe(s3, bucketname, report, metrics, dimensions, start_date, end_date):
     for metric in metrics:
         m = metric[3:]
         report[m] = report[m].astype(int)
