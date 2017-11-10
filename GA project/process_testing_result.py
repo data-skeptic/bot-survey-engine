@@ -130,7 +130,7 @@ def report_reply(metrics, dimensions, start_date, end_date):
 		dims = ",".join([report.loc[i, d] for d in noga_dimensions])
 		mts = ",".join([report.loc[i, m] for m in noga_metrics])
 		print("when ", ",".join(noga_dimensions), ' is/are ', dims, ',')
-		print(",".join(noga_metrics), " are ", mts, ".")
+		print(",".join(noga_metrics), " is/are ", mts, ".")
 report_reply(metrics, dimensions,start_date, end_date)
 
 
