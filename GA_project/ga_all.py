@@ -19,24 +19,26 @@ from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer
 from rasa_nlu.model import Metadata, Interpreter
 
-from gahelper import gahelper
+from gahelper.gahelper import Gahelper
 from gahelper.gaformatter import format_dataframe
 
 class ga():
     def __init__(self,update_model = False):
-        config = json.load(open("../config/config.json"))
+        self.dir_path = os.path.dirname(os.path.realpath(__file__))
+        # print("/".join(self.dir_path.split("/")[0:-1]) + "/config/config.json")
+        config = json.load(open("/".join(self.dir_path.split("/")[0:-1]) + "/config/config.json"))
         self.key = config['aws']['accessKeyId']
         self.secret = config['aws']['secretAccessKey']
         self.bucketname = config['aws']['bucket_name']
         self.s3 = boto3.resource('s3', aws_access_key_id=self.key, aws_secret_access_key=self.secret)
         self.config = config
-        self.dir_path = os.path.dirname(os.path.realpath(__file__))
+        
         if update_model:
             #-----train a new model and save it in mdoel_directory-----------
             #load training data
             training_data =  load_data(self.dir_path +'/data/training_data.json')
             # set config and train
-            trainer = Trainer(RasaNLUConfig("sample_configs/config_spacy.json"))
+            trainer = Trainer(RasaNLUConfig(self.dir_path + "/sample_configs/config_spacy.json"))
             trainer.train(training_data)
             # Returns the directory the model is stored in 
             self.model_directory = trainer.persist('./projects/') 
@@ -44,7 +46,7 @@ class ga():
         else:
             self.model_directory = self.dir_path + "/projects/default/model_20171110-144019"
         # load the model
-        self.interpreter = Interpreter.load(self.model_directory, RasaNLUConfig("sample_configs/config_spacy.json"))
+        self.interpreter = Interpreter.load(self.model_directory, RasaNLUConfig(self.dir_path + "/sample_configs/config_spacy.json"))
 
         self.standard_dims = []
         with open(self.dir_path + "/data/dimensions.json") as f:
