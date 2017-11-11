@@ -19,9 +19,8 @@ from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer
 from rasa_nlu.model import Metadata, Interpreter
 
-sys.path.insert(0, './gahelper')
-from gahelper import Gahelper
-from gaformatter import format_dataframe
+from gahelper import gahelper
+from gahelper.gaformatter import format_dataframe
 
 class ga():
     def __init__(self,update_model = False):

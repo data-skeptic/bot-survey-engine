@@ -12,8 +12,9 @@ import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-from gahelper import gahelper
+from gahelper import Gahelper
 from gahelper import gaformatter
+from GA_project import ga_all
 
 sys.path.insert(0, './survey')
 import survey
@@ -31,9 +32,6 @@ sys.path.insert(0, './listener_reminder')
 import listener_reminder
 from listener_reminder import Listener_Reminder
 
-sys.path.insert(0,'./GA_project')
-import ga_all
-from ga_all import ga
 
 logname = sys.argv[0]
 logger = logging.getLogger(logname)
@@ -172,7 +170,7 @@ class reminder(Resource):
 
 #GA 
 print("********************* Google Analytics ***********************")
-ga_instance = ga(update_model = False)
+ga_instance = ga_all.ga(update_model = False)
 
 class google_analytics(Resource):
     def post(self):
