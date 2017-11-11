@@ -29,6 +29,10 @@ sys.path.insert(0, './listener_reminder')
 import listener_reminder
 from listener_reminder import Listener_Reminder
 
+sys.path.insert(0,'./GA_project')
+import ga_all
+from ga_all import ga
+
 logname = sys.argv[0]
 logger = logging.getLogger(logname)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -164,6 +168,18 @@ class reminder(Resource):
 
         return " Reminder will be sent."# + str(alarm_time)
 
+#GA 
+print("********************* Google Analytics ***********************")
+ga_instance = ga(update_model = False)
+
+class google_analytics(Resource):
+    def post(self):
+        r = request.get_data()
+        user_info = json.loads(r.decode('utf-8'))
+        print('user_info is ', user_info)
+        user_request = user_info.get('user_request')
+        f = ga_instance.run(user_request)
+        return f # f is in json form: for example {'img': 'http://dataskeptic-static.s3.amazonaws.com/bot/ga-images/2017-11-10/transactions_userType_2016-11-10_2017-11-10.png', 'txt': ''}
 
 if __name__ == '__main__':
     logger.info("Init")
@@ -178,6 +194,8 @@ if __name__ == '__main__':
     api.add_resource(save_recommendation,   '/episode/save_recommendation')
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')
+    
+    api.add_resource(google_analytics, '/ga')
     
     @app.before_first_request 
     def add_tasks():
