@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-
+import os
 import argparse
 
 from apiclient.discovery import build
@@ -92,5 +92,7 @@ class Gahelper(object):
         self.scope = ['https://www.googleapis.com/auth/analytics.readonly']
         self.service_account_email = config["service_account_email"]
         self.key_file_location = config['key_file_location']
+        self.dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.key_file_location = "/".join(self.dir_path.split("/")[0:-1]) + self.key_file_location
         self.initialize(self.scope, self.key_file_location, self.service_account_email)
         
