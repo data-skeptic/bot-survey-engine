@@ -12,7 +12,8 @@ import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-from gahelper import Gahelper
+
+from gahelper.gahelper import Gahelper
 from gahelper import gaformatter
 from GA_project import ga_all
 
