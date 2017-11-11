@@ -23,5 +23,7 @@
         "min_count": 2,
         "size": 200,
         "window": 6 
-       }
+       },
+       "key_file_location": "/config/ga_key.json",
+       "service_account_email":
 }
