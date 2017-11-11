@@ -189,22 +189,24 @@ class ga():
         f = format_dataframe(self.s3, self.bucketname, report, metrics, dimensions, start_date, end_date)
         print(f)
         return f
-def run(): # later pass user_request to run() instead of using a default user_request.
-    ga_instance = ga(update_model = False)
-    user_request = "How many transactions across user type in the last year?"
-    parsed_result = ga_instance.parse_data(user_request)
-    GA_items = ga_instance.get_standard_dim_metric(parsed_result)
-    f = ga_instance.get_google_analytics(GA_items)
-run()
+    def run(self,user_request): # later pass user_request to run() instead of using a default user_request
+        #user_request = "How many transactions across user type in the last year?"
+        parsed_result = self.parse_data(user_request)
+        GA_items = self.get_standard_dim_metric(parsed_result)
+        f = self.get_google_analytics(GA_items)
+        return f
+
 
 def run_test_data():
     ga_instance = ga(update_model = False)
     ga_instance.parse_test_data()
     ga_instance.get_standard_dim_metric_test_date()
 
-run_test_data()
+# run_test_data()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    pass
+   
     # stuff only to run when not called via 'import' here
     
 
