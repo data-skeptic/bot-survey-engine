@@ -12,6 +12,8 @@ import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+from gahelper import gahelper
+from gahelper import gaformatter
 
 sys.path.insert(0, './survey')
 import survey
