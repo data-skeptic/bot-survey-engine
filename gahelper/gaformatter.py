@@ -23,7 +23,7 @@ def format_dataframe(s3, bucketname, report, metrics, dimensions, start_date, en
         data = open(fname, 'rb')
         s3.Bucket(bucketname).put_object(Key=s3key, Body=data, ACL='public-read')
         os.remove(fname)
-        img = "http://dataskeptic-static.s3.amazonaws.com/" + s3key
+        img = "http://dataskeptic-bot.s3.amazonaws.com/" + s3key
         txt = ""
         return {"img": img, "txt": txt}
     else:
