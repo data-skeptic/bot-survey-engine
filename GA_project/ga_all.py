@@ -62,27 +62,27 @@ class ga():
     def parse_data(self,user_request):
         parsed_result = self.interpreter.parse(user_request)
         return parsed_result # which is in json form
-    def parse_test_data(self):
-        file_name = self.dir_path + "/data/testing_data.txt" 
-        result_file_path = self.dir_path + "/data/testing_results.json"
-        result_file = open(result_file_path, 'w')
-        result_file.close()
-        i = 0
-        with open(file_name, 'r') as f:
-            result_file = open(result_file_path, 'a')
-            for line in f:
-                if i != 0:
-                    result_file.write(',')
-                else:
-                    result_file.write('{\"test_results\":[ \n')
-                request = line[0:-1]
-                result = self.interpreter.parse(request)
-                json.dump(result,result_file,indent=4, separators=(',', ': '))
-                result_file.write("\n")
-                i += 1
-            result_file.write("]\n}")
-        result_file.close()
-        self.result_file_path = result_file_path
+    # def parse_test_data(self):
+    #     file_name = self.dir_path + "/data/testing_data.txt" 
+    #     result_file_path = self.dir_path + "/data/testing_results.json"
+    #     result_file = open(result_file_path, 'w')
+    #     result_file.close()
+    #     i = 0
+    #     with open(file_name, 'r') as f:
+    #         result_file = open(result_file_path, 'a')
+    #         for line in f:
+    #             if i != 0:
+    #                 result_file.write(',')
+    #             else:
+    #                 result_file.write('{\"test_results\":[ \n')
+    #             request = line[0:-1]
+    #             result = self.interpreter.parse(request)
+    #             json.dump(result,result_file,indent=4, separators=(',', ': '))
+    #             result_file.write("\n")
+    #             i += 1
+    #         result_file.write("]\n}")
+    #     result_file.close()
+    #     self.result_file_path = result_file_path
         
     # further process of the parsed data to get legal dimensions and metrics in GA.
     def get_date_range(self,time_string):
@@ -91,7 +91,7 @@ class ga():
             return dateparser.parse(time_string).date(), datetime.today().date()
         else:
             return None, None 
-    def get_standard_dim_metric(self, parsed_result):
+    def get_standard_dim_metric(self, parsed_result): #return GA_items = {'text':...,'dimension':..., 'metric':...,'date':...,'standard_dim':..., 'standard_metric':..., 'start':..., 'end':...}
         GA_items = {}
         entities = parsed_result['entities']
         GA_items['text'] = parsed_result['text']
@@ -120,64 +120,51 @@ class ga():
         # show results in dataframe form
         return GA_items
 
-    def get_standard_dim_metric_test_date(self):
-        with open(self.result_file_path, 'r') as f:
-            data = json.load(f)['test_results'] # data is a list
-            results = []
-            for i in range(len(data)):
-                GA_items = {}
-                entities = data[i]['entities'] # a list
-                GA_items['text'] = data[i]['text']
-                for e in entities: # e is a dict: {'start': 12, 'end': 31, 'value': 'average bounce rate', 'entity': 'metric', 'extractor': 'ner_crf'}
-                    value = e.get('value')
-                    entity = e.get('entity')
-                    GA_items[entity] = GA_items.get(entity, "") + " " + value
+    # def get_standard_dim_metric_test_date(self):
+    #     with open(self.result_file_path, 'r') as f:
+    #         data = json.load(f)['test_results'] # data is a list
+    #         results = []
+    #         for i in range(len(data)):
+    #             GA_items = {}
+    #             entities = data[i]['entities'] # a list
+    #             GA_items['text'] = data[i]['text']
+    #             for e in entities: # e is a dict: {'start': 12, 'end': 31, 'value': 'average bounce rate', 'entity': 'metric', 'extractor': 'ner_crf'}
+    #                 value = e.get('value')
+    #                 entity = e.get('entity')
+    #                 GA_items[entity] = GA_items.get(entity, "") + " " + value
             
-                if 'date' in GA_items.keys():
-                    if GA_items.get('date').split()[0] == 'past':
-                        GA_items['date'] = " ".join(GA_items.get('date').split()[1:]) + " " + "ago"
-                    GA_items['start'], GA_items['end'] = self.get_date_range(GA_items['date'])
-                results.append(GA_items)
+    #             if 'date' in GA_items.keys():
+    #                 if GA_items.get('date').split()[0] == 'past':
+    #                     GA_items['date'] = " ".join(GA_items.get('date').split()[1:]) + " " + "ago"
+    #                 GA_items['start'], GA_items['end'] = self.get_date_range(GA_items['date'])
+    #             results.append(GA_items)
         
-        for result in results:
-            print('--------------', result.get('text'), '---------------')
-            if result.get('dimension'):
-                print('**dimension')
-                non_standard_dim = result.get('dimension')
-                print(non_standard_dim)
-                standard_dim = process.extract(non_standard_dim, self.standard_dims, limit = 1,scorer=fuzz.token_sort_ratio)[0][0]
-                print(process.extract(non_standard_dim, self.standard_dims, limit = 2,scorer=fuzz.token_sort_ratio))
-                result['standard_dim'] = 'ga:' + standard_dim     
-            print('**metric')
-            non_standard_metric = result.get('metric')
-            print(non_standard_metric)
-            standard_metric = process.extract(non_standard_metric, self.standard_metrics, limit = 1,scorer=fuzz.token_sort_ratio)[0][0]
-            print(process.extract(non_standard_metric, self.standard_metrics, limit = 2,scorer=fuzz.token_sort_ratio))
-            result['standard_metric'] = 'ga:' + standard_metric
-        print(results)
-        # show results in dataframe form
-        testing_results_df = pd.DataFrame.from_dict(results)
-        testing_results_df = testing_results_df[['dimension','standard_dim','metric', 'standard_metric','start','end']]
-        print('\n')
-        print(tabulate(testing_results_df, headers='keys', tablefmt='psql'))
-        return results,testing_results_df
+    #     for result in results:
+    #         print('--------------', result.get('text'), '---------------')
+    #         if result.get('dimension'):
+    #             print('**dimension')
+    #             non_standard_dim = result.get('dimension')
+    #             print(non_standard_dim)
+    #             standard_dim = process.extract(non_standard_dim, self.standard_dims, limit = 1,scorer=fuzz.token_sort_ratio)[0][0]
+    #             print(process.extract(non_standard_dim, self.standard_dims, limit = 2,scorer=fuzz.token_sort_ratio))
+    #             result['standard_dim'] = 'ga:' + standard_dim     
+    #         print('**metric')
+    #         non_standard_metric = result.get('metric')
+    #         print(non_standard_metric)
+    #         standard_metric = process.extract(non_standard_metric, self.standard_metrics, limit = 1,scorer=fuzz.token_sort_ratio)[0][0]
+    #         print(process.extract(non_standard_metric, self.standard_metrics, limit = 2,scorer=fuzz.token_sort_ratio))
+    #         result['standard_metric'] = 'ga:' + standard_metric
+    #     print(results)
+    #     # show results in dataframe form
+    #     testing_results_df = pd.DataFrame.from_dict(results)
+    #     testing_results_df = testing_results_df[['dimension','standard_dim','metric', 'standard_metric','start','end']]
+    #     print('\n')
+    #     print(tabulate(testing_results_df, headers='keys', tablefmt='psql'))
+    #     return results,testing_results_df
 
 # gahelper
     def get_google_analytics(self,GA_items):
         ga = Gahelper(self.config)
-        # a test
-        # test = results[3]
-        # print(test['text'])
-        # metrics = [test.get('standard_metric', "")]
-        # dimensions = [test.get('standard_dim',"")]
-        # start_date = str(test.get('start'))
-        # end_date = str(test.get('end'))
-        # print(metrics, dimensions,start_date,end_date)
-
-        # report = ga.get_report(metrics, dimensions, start_date, end_date)
-        # print(tabulate(report, headers='keys', tablefmt='psql'))
-        # f = format_dataframe(self.s3, self.bucketname, self.report, metrics, dimensions, start_date, end_date)
-        # print(f)
         print(GA_items)
         metrics = [GA_items.get('standard_metric', "")]
         dimensions = [GA_items.get('standard_dim',"")]
