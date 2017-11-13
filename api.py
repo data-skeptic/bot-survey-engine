@@ -196,7 +196,7 @@ if __name__ == '__main__':
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')
     
-    api.add_resource(google_analytics, '/ga')
+    api.add_resource(google_analytics, '/ga') # {'user_request':...} return f see above, f is in json form
     
     @app.before_first_request 
     def add_tasks():
