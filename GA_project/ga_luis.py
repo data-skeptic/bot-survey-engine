@@ -67,14 +67,15 @@ class ga():
         for e in luis_result['entities']:
             print('*************************')
             print(e)
-            if 'builtin.datetimeV2' in e.get('type'):
-                GA_items['date_text'] = GA_items.get('date_text',[]) + [e['entity']]
-                if e.get('resolution', None):    
-                    if 'range' in e['resolution']['values'][0]['type']: # time range
+            if 'builtin.datetimeV2' in e.get('type'): # The entity is about time
+                GA_items['date_text'] = GA_items.get('date_text',[]) + [e['entity']] # text about date
+                if e.get('resolution', None): # resolved by LUIS  
+                    if 'range' in e['resolution']['values'][0]['type']: # date range
                         if e['resolution']['values'][0].get('value', None) != 'not resolved': # time range is given by LUIS
                             GA_items['start'] = GA_items.get('end',[]) + [e['resolution']['values'][0]['start']]
                             GA_items['end'] = GA_items.get('end',[]) + [e['resolution']['values'][0]['end']]
                         else: # it is a time range, but the endpoints are not given by LUIS.
+                            # it may be a season
                             if "SP" in e['resolution']['values'][0]['timex']: # spring
                                 GA_items['start'] = GA_items.get('start',[]) + ["".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-01-01"]
                                 GA_items['end'] = GA_items.get('end',[]) + ["".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-04-01"]
@@ -87,20 +88,23 @@ class ga():
                             if "WI" in e['resolution']['values'][0]['timex']: # spring
                                 GA_items['start'] = GA_items.get('start',[]) + ["".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-10-01"]
                                 GA_items['end'] = GA_items.get('end',[]) + [str(int("".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])) + 1)+"-01-01"]
-                    else: # not time range, one day or a time point
-                        if e['resolution']['values'][0]['value'] != 'not resolved':
-                            print(e['resolution']['values'][0]['value'])
-                            if ":" not in e['resolution']['values'][0]['value']:
+                            # other cases: it is a range, but not given by LUIS.
+                            # ...
+                    else: # not time range, a day or a time point, for example 3 days ago.
+                        if e['resolution']['values'][0].get('value', None) != 'not resolved':
+                            print(e['resolution']['values'][0]['value']) # a day or a time point
+                            if ":" not in e['resolution']['values'][0]['value']: # a day, not time point
                                 GA_items['start'] = GA_items.get('start',[]) + [e['resolution']['values'][0]['value'] ]
-                                year = int(e['resolution']['values'][0]['value'].split('-')[0])
-                                month = int(e['resolution']['values'][0]['value'].split('-')[1])
-                                day = int(e['resolution']['values'][0]['value'].split('-')[2])
-                                GA_items['end'] = GA_items.get('end',[]) + [str(datetime(year, month, day) + timedelta(days=1))[0:10]]
-                            else:
+                                GA_items['end'] = GA_items.get('end',[]) + [str(datetime.now())[0:10]] # current day
+                                # year = int(e['resolution']['values'][0]['value'].split('-')[0])
+                                # month = int(e['resolution']['values'][0]['value'].split('-')[1])
+                                # day = int(e['resolution']['values'][0]['value'].split('-')[2])
+                                #GA_items['end'] = GA_items.get('end',[]) + [str(datetime(year, month, day) + timedelta(days=1))[0:10]]
+                            else: # two hours ago. time is included.
                                 GA_items['start'] = GA_items.get('start',[]) + [e['resolution']['values'][0]['value']]
-                                GA_items['end'] = str(datetime.now())[0:10]
+                                GA_items['end'] = GA_items.get('end',[]) + [str(datetime.now())[0:19]]
 
-            else:
+            else: # ordinary entity, like dimensions, metrics
                 if e['score'] > score_threshold:
                     GA_items[e['type']] = GA_items.get(e['type'], []) + [e['entity']]
         
