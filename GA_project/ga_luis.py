@@ -49,7 +49,7 @@ class ga():
         params ={
             'q': user_request,
             # Optional request parameters, set to default values
-            'timezoneOffset': '0',
+            'timezoneOffset': '-480', # minus 480 mins or 8 hours
             'verbose': 'true',
             'spellCheck': 'false',
             'staging': 'false',
@@ -66,15 +66,35 @@ class ga():
             print('*************************')
             print(e)
             if 'builtin.datetimeV2' in e.get('type'):
-                print('it is datetime issue')
                 GA_items['date_text'] = GA_items.get('date_text',[]) + [e['entity']]
-                if e.get('resolution', None):
-                    if e['resolution']['values'][0]['type'] == 'date':
-                        GA_items['start'] = GA_items.get('start',[]) + [e['resolution']['values'][0]['value']]
-                        GA_items['end'] = GA_items.get('end',[]) + [e['resolution']['values'][0]['value']]
-                    if e['resolution']['values'][0]['type'] == 'daterange':
-                        GA_items['start'] = GA_items.get('end',[]) + [e['resolution']['values'][0]['start']]
-                        GA_items['end'] = GA_items.get('end',[]) + [e['resolution']['values'][0]['end']]
+                if e.get('resolution', None):    
+                    if 'range' in e['resolution']['values'][0]['type']: # time range
+                        if e['resolution']['values'][0]['value'] != 'not resolved': # time range is given by LUIS
+                            GA_items['start'] = GA_items.get('end',[]) + [e['resolution']['values'][0]['start']]
+                            GA_items['end'] = GA_items.get('end',[]) + [e['resolution']['values'][0]['end']]
+                        else: # it is a time range, but the endpoints are not given by LUIS.
+                            if "SP" in e['resolution']['values'][0]['timex']: # spring
+                                GA_items['start'] = "".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-01-01"
+                                GA_items['end'] = "".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-03-31"
+                            if "SU" in e['resolution']['values'][0]['timex']: # spring
+                                GA_items['start'] = "".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-04-01"
+                                GA_items['end'] = "".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-06-31"
+                            if "FA" in e['resolution']['values'][0]['timex']: # spring
+                                GA_items['start'] = "".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-07-01"
+                                GA_items['end'] = "".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-09-30"
+                            if "WI" in e['resolution']['values'][0]['timex']: # spring
+                                GA_items['start'] = "".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-10-01"
+                                GA_items['end'] = "".join(e['resolution']['values'][0]['timex'].split('-')[0:-1])+"-12-31"
+                    else: # not time range, one day or a time point
+                        if e['resolution']['values'][0]['value'] != 'not resolved':
+                            print(e['resolution']['values'][0]['value'])
+                            if ":" not in e['resolution']['values'][0]['value']:
+                                GA_items['start'] = GA_items.get('start',[]) + [e['resolution']['values'][0]['value'] + " 00:00:00"]
+                                GA_items['end'] = GA_items.get('end',[]) + [e['resolution']['values'][0]['value'] + " 23:59:59"]
+                            else:
+                                GA_items['start'] = GA_items.get('start',[]) + [e['resolution']['values'][0]['value']]
+                                GA_items['end'] = str(datetime.now())[0:19]
+
             else:
                 if e['score'] > score_threshold:
                     GA_items[e['type']] = GA_items.get(e['type'], []) + [e['entity']]
