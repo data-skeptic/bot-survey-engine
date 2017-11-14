@@ -15,7 +15,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from gahelper.gahelper import Gahelper
 from gahelper import gaformatter
-from GA_project import ga_all
+from GA_project import ga_luis
 
 sys.path.insert(0, './survey')
 import survey
@@ -171,7 +171,7 @@ class reminder(Resource):
 
 #GA 
 print("********************* Google Analytics ***********************")
-ga_instance = ga_all.ga(update_model = False)
+ga_instance = ga_luis.ga()
 
 class google_analytics(Resource):
     def post(self):
