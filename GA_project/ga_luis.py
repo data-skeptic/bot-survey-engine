@@ -148,7 +148,10 @@ class ga():
         return f
     def run(self,user_request): # 
         GA_items = self.extract_ga_items(user_request)
-        f = self.get_google_analytics(GA_items)
+        if GA_items.get('standard_metrics') and GA_items.get('start') and GA_items.get('end'):
+            f = self.get_google_analytics(GA_items)
+        else:
+            f = {'img': "", 'txt': "Metric, start date and end date are necessary. At least one of them is missing."}
         return f
          
 # def test_run(user_request):

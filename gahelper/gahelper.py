@@ -49,7 +49,7 @@ class Gahelper(object):
         print('Total Sessions: %s' % results.get('rows')[0][0])
       else:
         print('No results found')
-
+  
    
     def initialize(self, scope, key_file_location, service_account_email):
         self.service = self.get_service('analytics', 'v3', scope, key_file_location, service_account_email)
@@ -67,17 +67,27 @@ class Gahelper(object):
         print(profiles.get('items')[0].get('id'))
         self.profile = self.get_first_profile_id(self.service)
         self.print_results(self.get_results(self.service, self.profile))
-
+ 
+ 
     def get_report(self, metrics, dimensions, start_date, end_date):
         metric = ','.join(metrics)
         dimension = ','.join(dimensions)
-        resp = self.service.data().ga().get(
-              ids='ga:' + self.profile,
-              start_date=start_date,
-              end_date=end_date,
-              metrics=metric,
-              dimensions=dimension
-        ).execute()
+        if len(dimension) > 0:
+          resp = self.service.data().ga().get(
+                ids='ga:' + self.profile,
+                start_date=start_date,
+                end_date=end_date,
+                metrics=metric,
+                dimensions=dimension
+          ).execute()
+        else:
+          resp = self.service.data().ga().get(
+                ids='ga:' + self.profile,
+                start_date=start_date,
+                end_date=end_date,
+                metrics=metric
+          ).execute()
+
         df = pd.DataFrame(resp['rows'])
         cols = []
         for d in dimensions:
