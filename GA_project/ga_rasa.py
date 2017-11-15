@@ -62,27 +62,27 @@ class ga():
     def parse_data(self,user_request):
         parsed_result = self.interpreter.parse(user_request)
         return parsed_result # which is in json form
-    def parse_test_data(self):
-        file_name = self.dir_path + "/data/testing_data.txt" 
-        result_file_path = self.dir_path + "/data/testing_results.json"
-        result_file = open(result_file_path, 'w')
-        result_file.close()
-        i = 0
-        with open(file_name, 'r') as f:
-            result_file = open(result_file_path, 'a')
-            for line in f:
-                if i != 0:
-                    result_file.write(',')
-                else:
-                    result_file.write('{\"test_results\":[ \n')
-                request = line[0:-1]
-                result = self.interpreter.parse(request)
-                json.dump(result,result_file,indent=4, separators=(',', ': '))
-                result_file.write("\n")
-                i += 1
-            result_file.write("]\n}")
-        result_file.close()
-        self.result_file_path = result_file_path
+    # def parse_test_data(self):
+    #     file_name = self.dir_path + "/data/testing_data.txt" 
+    #     result_file_path = self.dir_path + "/data/testing_results.json"
+    #     result_file = open(result_file_path, 'w')
+    #     result_file.close()
+    #     i = 0
+    #     with open(file_name, 'r') as f:
+    #         result_file = open(result_file_path, 'a')
+    #         for line in f:
+    #             if i != 0:
+    #                 result_file.write(',')
+    #             else:
+    #                 result_file.write('{\"test_results\":[ \n')
+    #             request = line[0:-1]
+    #             result = self.interpreter.parse(request)
+    #             json.dump(result,result_file,indent=4, separators=(',', ': '))
+    #             result_file.write("\n")
+    #             i += 1
+    #         result_file.write("]\n}")
+    #     result_file.close()
+    #     self.result_file_path = result_file_path
         
     # further process of the parsed data to get legal dimensions and metrics in GA.
     def get_date_range(self,time_string):
