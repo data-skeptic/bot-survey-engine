@@ -81,13 +81,14 @@ class Gahelper(object):
                 dimensions=dimension
           ).execute()
         else:
+          print("There is no dimension.")
           resp = self.service.data().ga().get(
                 ids='ga:' + self.profile,
                 start_date=start_date,
                 end_date=end_date,
                 metrics=metric
           ).execute()
-
+        print("resp is ", resp)
         df = pd.DataFrame(resp['rows'])
         cols = []
         for d in dimensions:
