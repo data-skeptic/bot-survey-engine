@@ -297,6 +297,63 @@
             "entity":"date"
           }
         ]
+      },
+      {
+        "text": "What is the cost per transaction from 2017-03-01 to 2017-11-01?", 
+        "entities": [
+          {
+            "start":12,
+            "end": 32,
+            "value":"cost per transaction",
+            "entity":"metric"
+          },
+          {
+            "start":33,
+            "end": 62,
+            "value":"from 2017-03-01 to 2017-11-01",
+            "entity": "date"
+          }
+        ]
+      },
+      {
+        "text": "What is the cost per transaction from 2017-03-01 to 2017-11-01?", 
+        "entities": [
+          {
+            "start":12,
+            "end": 32,
+            "value":"cost per transaction",
+            "entity":"metric"
+          },
+          {
+            "start":33,
+            "end": 62,
+            "value":"from 2017-03-01 to 2017-11-01",
+            "entity": "date"
+          }
+        ]
+      },
+      {
+        "text": "How does bounce rates compare across user type in the last month?", 
+        "entities": [
+          {
+            "start":9,
+            "end": 21,
+            "value":"bounce rates",
+            "entity":"metric"
+          },
+          {
+            "start":37,
+            "end": 46,
+            "value":"user type",
+            "entity": "dimension"
+          },
+          {
+            "start":54,
+            "end": 64,
+            "value":"last month",
+            "entity": "date"
+          }
+        ]
       }
 
     ]
