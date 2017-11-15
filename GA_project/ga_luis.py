@@ -137,8 +137,14 @@ class ga():
         print(GA_items)
         metrics = GA_items.get('standard_metrics', [])
         dimensions = GA_items.get('standard_dims',[])
-        start_date = str(GA_items.get('start')[0])
-        end_date = str(GA_items.get('end')[0])
+        if len(GA_items.get('start')) == 1:
+            start_date = str(GA_items.get('start')[-1])
+            end_date = str(GA_items.get('end')[-1])
+        else:
+            # if there are more than one pair of start and end, which one is right? Or need to combine all/both pairs?
+            # for the moment, use the last one. It is more likely to be the right one. For example, how many sessions per month in 2017? Then ['month', '2017'] will be returned. use the last one '2017'.
+            start_date = str(GA_items.get('start')[-1])
+            end_date = str(GA_items.get('end')[-1])
         print(metrics, dimensions,start_date,end_date)
 
         report = ga.get_report(metrics, dimensions, start_date, end_date)
