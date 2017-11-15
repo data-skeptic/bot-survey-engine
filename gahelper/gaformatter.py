@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 def format_dataframe(s3, bucketname, report, metrics, dimensions, start_date, end_date):
     for metric in metrics:
         m = metric[3:]
-        report[m] = report[m].astype(int)
+        print("report is ", report)
+        print('m is ', m)
+        print("report[m] is", report[m])
+        # report[m] = report[m].astype(int)
     sortby = list(map(lambda x: x[3:], metrics))
     report.sort_values(sortby, ascending=False, inplace=True)
     report.index = np.arange(report.shape[0])
