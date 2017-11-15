@@ -16,6 +16,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from gahelper.gahelper import Gahelper
 from gahelper import gaformatter
 from GA_project import ga_luis
+from GA_project import ga_rasa
 
 sys.path.insert(0, './survey')
 import survey
@@ -71,6 +72,8 @@ with open ("./config/config.json", "r") as myfile:
         user = data['aws']['accessKeyId']
         pw = data['aws']['secretAccessKey']
         url = "mysql://%s:%s@%s/%s" % (username, password, address,databasename)
+        # choose ga_model
+        ga_model = data['ga_model'] #"luis" or "rasa"
 survey_instance = Survey(username, password, address, databasename)
 
 class GetQuestion(Resource):
@@ -169,18 +172,22 @@ class reminder(Resource):
 
         return " Reminder will be sent."# + str(alarm_time)
 
-#GA 
+# GA 
 print("********************* Google Analytics ***********************")
-ga_instance = ga_luis.ga()
-
+  
 class google_analytics(Resource):
     def post(self):
+        if ga_model == 'luis':  
+            ga_instance = ga_luis.ga()
+        if ga_model == 'rasa':
+            ga_instance = ga_rasa.ga(update_model = True)
         r = request.get_data()
         user_info = json.loads(r.decode('utf-8'))
         print('user_info is ', user_info)
         user_request = user_info.get('user_request')
         f = ga_instance.run(user_request)
         return f # f is in json form: for example {'img': 'http://dataskeptic-static.s3.amazonaws.com/bot/ga-images/2017-11-10/transactions_userType_2016-11-10_2017-11-10.png', 'txt': ''}
+
 
 if __name__ == '__main__':
     logger.info("Init")
