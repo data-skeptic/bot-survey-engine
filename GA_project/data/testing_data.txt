@@ -5,5 +5,5 @@ How many transactions across user type in the last year?
 How many transactions across user type per month in 2017?
 What is the ad cost per week in January last year?
 What is the ad cost per week in August of 2017?
-How does bounce rates compare across user type?
-How does the cost per transaction compare across user type?
+How does bounce rates compare across user type in the last month?
+What is the cost per transaction from 2017-03-01 to 2017-11-01?
