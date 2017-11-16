@@ -13,27 +13,20 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
-from gahelper.gahelper import Gahelper
-from gahelper import gaformatter
 from GA_project import ga_luis
 from GA_project import ga_rasa
 
 sys.path.insert(0, './survey')
-import survey
 from survey import Survey
 
 sys.path.insert(0, './episodes')
-import recommendation
 from recommendation import episode
 
 sys.path.insert(0, './episodes/word_vec_bigram')
-# import load_file_from_bucket
 from load_file_from_bucket import load_word_vec
 
 sys.path.insert(0, './listener_reminder')
-import listener_reminder
 from listener_reminder import Listener_Reminder
-
 
 logname = sys.argv[0]
 logger = logging.getLogger(logname)
@@ -116,40 +109,41 @@ class SaveAnswer(Resource):
         return resp
 
 # episode
-# start = time.time()
-# print("*************episode session*************")
-# print('Downloading word_vec from AWS S3...')
-# load_word_vec_instance = load_word_vec()
-# update_episode = False
-# episode_instance = episode(update_episode,username, address,password,databasename)
-# class give_recommendation(Resource):
-#     def post(self):
-#         r = request.get_data()
-#         req = json.loads(r.decode('utf-8'))
-#         user_request = req['request']
-#         start = time.time()
-#         result = episode_instance.recommend_episode(user_request)
-#         print("the time it takes to make a recommendation is ", time.time() - start)
-#         # start = time.time()
-#         # episode_instance.save_recommendation_table(user_request, result)
-#         # print('the time it takes to save the recommendation to table is ', time.time() - start)
-#         if len(result) > 0:
-#             return result
-#         else:
-#             return None
+start = time.time()
+print("*************episode session*************")
+print('Downloading word_vec from AWS S3...')
+load_word_vec_instance = load_word_vec()
+update_episode = False
+episode_instance = episode(update_episode,username, address,password,databasename)
 
-# print("How long does it spend in the episode session ", time.time() - start)
+class give_recommendation(Resource):
+    def post(self):
+        r = request.get_data()
+        req = json.loads(r.decode('utf-8'))
+        user_request = req['request']
+        start = time.time()
+        result = episode_instance.recommend_episode(user_request)
+        print("the time it takes to make a recommendation is ", time.time() - start)
+        # start = time.time()
+        # episode_instance.save_recommendation_table(user_request, result)
+        # print('the time it takes to save the recommendation to table is ', time.time() - start)
+        if len(result) > 0:
+            return result
+        else:
+            return None
 
-# class save_recommendation(Resource):
-#     def post(self):
-#         r = request.get_data()
-#         info = json.loads(r.decode('utf-8'))
-#         print('info is ', info)
-#         user_request = info.get('user_request')
-#         recommendation = info.get('recommendation')
-#         start = time.time()
-#         episode_instance.save_recommendation_table(user_request,recommendation)
-#         print('the time it takes to save the recommendation to table is ', time.time() - start)
+print("How long does it spend in the episode session ", time.time() - start)
+
+class save_recommendation(Resource):
+    def post(self):
+        r = request.get_data()
+        info = json.loads(r.decode('utf-8'))
+        print('info is ', info)
+        user_request = info.get('user_request')
+        recommendation = info.get('recommendation')
+        start = time.time()
+        episode_instance.save_recommendation_table(user_request,recommendation)
+        print('the time it takes to save the recommendation to table is ', time.time() - start)
 
 #listener_reminder
 print("*************listener reminder session*************")
@@ -177,9 +171,11 @@ print("********************* Google Analytics ***********************")
   
 class google_analytics(Resource):
     def post(self):
-        if ga_model == 'luis':  
+        if ga_model == 'luis': 
+            print('ga model is LUIS.') 
             ga_instance = ga_luis.ga()
         if ga_model == 'rasa':
+            print('ga model is RASA.')
             ga_instance = ga_rasa.ga(update_model = True)
         r = request.get_data()
         user_info = json.loads(r.decode('utf-8'))
