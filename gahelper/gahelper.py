@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-
+import os
 import argparse
 
 from apiclient.discovery import build
@@ -49,7 +49,7 @@ class Gahelper(object):
         print('Total Sessions: %s' % results.get('rows')[0][0])
       else:
         print('No results found')
-
+  
    
     def initialize(self, scope, key_file_location, service_account_email):
         self.service = self.get_service('analytics', 'v3', scope, key_file_location, service_account_email)
@@ -67,17 +67,28 @@ class Gahelper(object):
         print(profiles.get('items')[0].get('id'))
         self.profile = self.get_first_profile_id(self.service)
         self.print_results(self.get_results(self.service, self.profile))
-
+ 
+ 
     def get_report(self, metrics, dimensions, start_date, end_date):
         metric = ','.join(metrics)
         dimension = ','.join(dimensions)
-        resp = self.service.data().ga().get(
-              ids='ga:' + self.profile,
-              start_date=start_date,
-              end_date=end_date,
-              metrics=metric,
-              dimensions=dimension
-        ).execute()
+        if len(dimension) > 0:
+          resp = self.service.data().ga().get(
+                ids='ga:' + self.profile,
+                start_date=start_date,
+                end_date=end_date,
+                metrics=metric,
+                dimensions=dimension
+          ).execute()
+        else:
+          print("There is no dimension.")
+          resp = self.service.data().ga().get(
+                ids='ga:' + self.profile,
+                start_date=start_date,
+                end_date=end_date,
+                metrics=metric
+          ).execute()
+        print("resp is ", resp)
         df = pd.DataFrame(resp['rows'])
         cols = []
         for d in dimensions:
@@ -92,5 +103,7 @@ class Gahelper(object):
         self.scope = ['https://www.googleapis.com/auth/analytics.readonly']
         self.service_account_email = config["service_account_email"]
         self.key_file_location = config['key_file_location']
+        self.dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.key_file_location = "/".join(self.dir_path.split("/")[0:-1]) + self.key_file_location
         self.initialize(self.scope, self.key_file_location, self.service_account_email)
         

@@ -27,4 +27,10 @@
        },
        "key_file_location": "/config/ga_key.json",
        "service_account_email":
+       "luis":{
+		"app_id":"8a6f43c5-206f-46ce-af1b-1f8b305c2935",
+		"subscription_key": "48b13fb543c74598960959df9f20086e"
+	},
+       "ga_model":"luis"
+
 }

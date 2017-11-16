@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 def format_dataframe(s3, bucketname, report, metrics, dimensions, start_date, end_date):
     for metric in metrics:
         m = metric[3:]
-        report[m] = report[m].astype(int)
+        print("report is ", report)
+        print('metric is ', m)
+        print("report[m] is", report[m])
+        # report[m] = report[m].astype(int)
     sortby = list(map(lambda x: x[3:], metrics))
     report.sort_values(sortby, ascending=False, inplace=True)
     report.index = np.arange(report.shape[0])
@@ -23,7 +26,7 @@ def format_dataframe(s3, bucketname, report, metrics, dimensions, start_date, en
         data = open(fname, 'rb')
         s3.Bucket(bucketname).put_object(Key=s3key, Body=data, ACL='public-read')
         os.remove(fname)
-        img = "http://dataskeptic-static.s3.amazonaws.com/" + s3key
+        img = "http://dataskeptic-bot.s3.amazonaws.com/" + s3key
         txt = ""
         return {"img": img, "txt": txt}
     else:

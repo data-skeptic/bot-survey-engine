@@ -13,20 +13,19 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
+from GA_project import ga_luis
+from GA_project import ga_rasa
+
 sys.path.insert(0, './survey')
-import survey
 from survey import Survey
 
 sys.path.insert(0, './episodes')
-import recommendation
 from recommendation import episode
 
 sys.path.insert(0, './episodes/word_vec_bigram')
-# import load_file_from_bucket
 from load_file_from_bucket import load_word_vec
 
 sys.path.insert(0, './listener_reminder')
-import listener_reminder
 from listener_reminder import Listener_Reminder
 
 logname = sys.argv[0]
@@ -66,6 +65,8 @@ with open ("./config/config.json", "r") as myfile:
         user = data['aws']['accessKeyId']
         pw = data['aws']['secretAccessKey']
         url = "mysql://%s:%s@%s/%s" % (username, password, address,databasename)
+        # choose ga_model
+        ga_model = data['ga_model'] #"luis" or "rasa"
 survey_instance = Survey(username, password, address, databasename)
 
 class GetQuestion(Resource):
@@ -114,6 +115,7 @@ print('Downloading word_vec from AWS S3...')
 load_word_vec_instance = load_word_vec()
 update_episode = False
 episode_instance = episode(update_episode,username, address,password,databasename)
+
 class give_recommendation(Resource):
     def post(self):
         r = request.get_data()
@@ -164,6 +166,24 @@ class reminder(Resource):
 
         return " Reminder will be sent."# + str(alarm_time)
 
+# GA 
+print("********************* Google Analytics ***********************")
+  
+class google_analytics(Resource):
+    def post(self):
+        if ga_model == 'luis': 
+            print('ga model is LUIS.') 
+            ga_instance = ga_luis.ga()
+        if ga_model == 'rasa':
+            print('ga model is RASA.')
+            ga_instance = ga_rasa.ga(update_model = True)
+        r = request.get_data()
+        user_info = json.loads(r.decode('utf-8'))
+        print('user_info is ', user_info)
+        user_request = user_info.get('user_request')
+        f = ga_instance.run(user_request)
+        return f # f is in json form: for example {'img': 'http://dataskeptic-static.s3.amazonaws.com/bot/ga-images/2017-11-10/transactions_userType_2016-11-10_2017-11-10.png', 'txt': ''}
+
 
 if __name__ == '__main__':
     logger.info("Init")
@@ -174,10 +194,12 @@ if __name__ == '__main__':
     api.add_resource(GetQuestion,  '/survey/question/<int:question_id>')
     api.add_resource(SaveAnswer,   '/survey/response/answer/save')
     # episode
-    api.add_resource(give_recommendation,   '/episode/recommendation')
-    api.add_resource(save_recommendation,   '/episode/save_recommendation')
+    # api.add_resource(give_recommendation,   '/episode/recommendation')
+    # api.add_resource(save_recommendation,   '/episode/save_recommendation')
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')
+    
+    api.add_resource(google_analytics, '/ga') # {'user_request':...} return f see above, f is in json form
     
     @app.before_first_request 
     def add_tasks():
