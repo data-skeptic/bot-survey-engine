@@ -194,8 +194,8 @@ if __name__ == '__main__':
     api.add_resource(GetQuestion,  '/survey/question/<int:question_id>')
     api.add_resource(SaveAnswer,   '/survey/response/answer/save')
     # episode
-    # api.add_resource(give_recommendation,   '/episode/recommendation')
-    # api.add_resource(save_recommendation,   '/episode/save_recommendation')
+    api.add_resource(give_recommendation,   '/episode/recommendation')
+    api.add_resource(save_recommendation,   '/episode/save_recommendation')
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')
     
