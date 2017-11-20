@@ -4,7 +4,8 @@ RUN apt-get update
 
 # TODO: Install python3
 RUN apt-get install -y python3
-RUN apt-get install python3-tk
+RUN apt-get update
+RUN apt-get install -y python3-tk
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
