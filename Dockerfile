@@ -4,6 +4,7 @@ RUN apt-get update
 
 # TODO: Install python3
 RUN apt-get install -y python3
+RUN apt-get install python3-tk
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -22,6 +23,9 @@ COPY config /usr/src/app/config
 COPY episodes /usr/src/app/episodes
 COPY listener_reminder /usr/src/app/listener_reminder
 COPY survey /usr/src/app/survey
+COPY GA_project /usr/src/app/GA_project
+COPY gahelper /usr/src/app/gahelper
+
 
 
 # TODO: Run the code
