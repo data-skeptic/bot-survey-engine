@@ -10,6 +10,8 @@ import gensim
 import csv
 import time
 import smart_open
+import nltk
+nltk.download("stopwords")
 from nltk.corpus import stopwords
 import boto3
 import warnings

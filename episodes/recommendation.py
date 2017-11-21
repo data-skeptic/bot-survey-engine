@@ -9,6 +9,8 @@ import time
 import heapq
 from sklearn.feature_extraction.text import TfidfVectorizer
 import episodes_preparation as ep
+import nltk
+nltk.download("stopwords")
 from nltk.corpus import stopwords
 import sqlalchemy
 import pymysql
