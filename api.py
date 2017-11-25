@@ -205,7 +205,8 @@ if __name__ == '__main__':
     def add_tasks():
         #scheduler = BlockingScheduler()
         scheduler = BackgroundScheduler()
-        scheduler.add_job(reminder_ins.checkForReminders, 'interval', seconds=30)
+        # scheduler.add_job(reminder_ins.checkForReminders, 'interval', seconds=30)
+        scheduler.add_job(reminder_ins.checkForReminders2, 'interval', seconds=30)
         print('Press Ctrl+{0} to exit scheduler'.format('Break' if os.name == 'nt' else 'C'))
         try:
             scheduler.start()
