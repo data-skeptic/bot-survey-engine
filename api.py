@@ -48,7 +48,7 @@ logger.addHandler(stdout)
 version = "0.0.1"
 
 #survey
-print('*************survey session*************')
+print('*************api.py: survey session*************')
 with open ("./config/config.json", "r") as myfile:
         data = json.load(myfile)
         #mysql
@@ -89,10 +89,10 @@ class SaveAnswer(Resource):
         question_order = req['question_order']
         if 'response_id' in req:
             response_id = req['response_id']
-            print('response_id is ', response_id)
+            #print('response_id is ', response_id)
         else:
             response_id = None
-            print('response_id is none.')
+            #print('response_id is none.')
         
         magic_text = survey_instance.get_magic_reply(answer_text, question_id)
         next_question_id = survey_instance.get_next_question_id(question_id, answer_text)
@@ -101,16 +101,19 @@ class SaveAnswer(Resource):
         resp = { "magic_text": magic_text, "response_id": response_id, "next_question_id": int(next_question_id)}
         if next_question_id == -1:
             content = survey_instance.survey_retrieval(next_question_id, response_id)
-            print(content)
-            if content.empty:
-                print("No data for the current survey.")
-            else:
+            # print(content)
+            # if content.empty:
+            #     print("No data for the current survey.")
+            # else:
+            #     survey_instance.send_email(content, user, pw)
+            if not content.empty:
                 survey_instance.send_email(content, user, pw)
+
         return resp
 
 # episode
 start = time.time()
-print("*************episode session*************")
+print("*************api.py: episode session*************")
 print('Downloading word_vec from AWS S3...')
 load_word_vec_instance = load_word_vec()
 update_episode = False
@@ -123,7 +126,7 @@ class give_recommendation(Resource):
         user_request = req['request']
         start = time.time()
         result = episode_instance.recommend_episode(user_request)
-        print("the time it takes to make a recommendation is ", time.time() - start)
+        #print("the time it takes to make a recommendation is ", time.time() - start)
         # start = time.time()
         # episode_instance.save_recommendation_table(user_request, result)
         # print('the time it takes to save the recommendation to table is ', time.time() - start)
@@ -132,54 +135,54 @@ class give_recommendation(Resource):
         else:
             return None
 
-print("How long does it spend in the episode session ", time.time() - start)
+#print("How long does it spend in the episode session ", time.time() - start)
 
 class save_recommendation(Resource):
     def post(self):
         r = request.get_data()
         info = json.loads(r.decode('utf-8'))
-        print('info is ', info)
+        #print('info is ', info)
         user_request = info.get('user_request')
         recommendation = info.get('recommendation')
         start = time.time()
         episode_instance.save_recommendation_table(user_request,recommendation)
-        print('the time it takes to save the recommendation to table is ', time.time() - start)
+        #print('the time it takes to save the recommendation to table is ', time.time() - start)
 
 #listener_reminder
-print("*************listener reminder session*************")
+print("*************api.py: listener reminder session*************")
 reminder_ins = Listener_Reminder(user, pw, username, password, address, databasename)
 
 class reminder(Resource):
     def post(self):
         r = request.get_data() # request is RAW body in REST Console.
         user_info = json.loads(r.decode('utf-8'))
-        print('user_info is ', user_info)
+        #print('user_info is ', user_info)
         contact_type = user_info.get('contact_type')
         contact_account = user_info.get('contact_account')
         #reminder_time = user_info.get('reminder_time') 
         reminder_time = user_info.get('reminder_time')
-        episode_title = user_info.get('episode_title')
-        episode_link = user_info.get('episode_link')
-        # save reminder task into the table.
+        episode_titles = user_info.get('episode_titles')
+        episode_links = user_info.get('episode_links')
+       
         reminder_ins.save_reminder_task(contact_type, contact_account,reminder_time, 
-                                                episode_title, episode_link)
+                                                episode_titles, episode_links)
 
         return " Reminder will be sent."# + str(alarm_time)
 
 # GA 
-print("********************* Google Analytics ***********************")
+print("*********************api.py: Google Analytics ***********************")
   
 class google_analytics(Resource):
     def post(self):
         if ga_model == 'luis': 
-            print('ga model is LUIS.') 
+            print('api: ga model is LUIS.') 
             ga_instance = ga_luis.ga()
         if ga_model == 'rasa':
-            print('ga model is RASA.')
+            print('api: ga model is RASA.')
             ga_instance = ga_rasa.ga(update_model = True)
         r = request.get_data()
         user_info = json.loads(r.decode('utf-8'))
-        print('user_info is ', user_info)
+        print('api: user_info is ', user_info)
         user_request = user_info.get('user_request')
         f = ga_instance.run(user_request)
         return f # f is in json form: for example {'img': 'http://dataskeptic-static.s3.amazonaws.com/bot/ga-images/2017-11-10/transactions_userType_2016-11-10_2017-11-10.png', 'txt': ''}
@@ -207,7 +210,7 @@ if __name__ == '__main__':
         scheduler = BackgroundScheduler()
         # scheduler.add_job(reminder_ins.checkForReminders, 'interval', seconds=30)
         scheduler.add_job(reminder_ins.checkForReminders2, 'interval', seconds=30)
-        print('Press Ctrl+{0} to exit scheduler'.format('Break' if os.name == 'nt' else 'C'))
+        print('api: Press Ctrl+{0} to exit scheduler'.format('Break' if os.name == 'nt' else 'C'))
         try:
             scheduler.start()
 

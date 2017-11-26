@@ -22,9 +22,9 @@ class Listener_Reminder():
         #test
         try:
             self.internal.execute("SHOW DATABASES;")
-            print('The connection is successful.')
+            # print('The connection is successful.')
         except:
-            print('The connection fails.')
+            #print('The connection fails.')
             raise
         self.user= user
         self.pw = pw
@@ -32,21 +32,21 @@ class Listener_Reminder():
     def save_reminder_task (self, contact_type, contact_account, reminder_time, episode_titles = None, episode_links = None):
         # What special characters may have in episode titles and links?
         if episode_links and episode_titles:
-            print("episode_links and titles are not empty and they are ",episode_links,episode_titles)
+            print("listener_reminder: episode_links and titles are not empty and they are ",episode_links,episode_titles)
             for i in range(len(episode_links)):
                 episode_title = episode_titles[i]
                 episode_title = episode_title.replace("'", "\\'")
                 episode_title = episode_title.replace(";", "\\;")
                 episode_title = episode_title.replace("&", "\\&")
                 episode_title = episode_title.replace("%", "%%")
-                print("episode_title is ", episode_title )
+                #print("episode_title is ", episode_title )
                 episode_link = episode_links[i]
                 episode_link = episode_link.replace("'", "\\'")
                 episode_link = episode_link.replace(";", "\\;")
                 episode_link = episode_link.replace("&", "\\&")
                 episode_link = episode_link.replace("%", "%%")
                 episode_link = '<a href="' + episode_link + '">' + episode_title + '</a> '
-                print("episode_link is ", episode_link )
+                #print("episode_link is ", episode_link )
                 try:
                     template = """
                                 INSERT INTO reminder_schedule (contact_type, contact_account, reminder_time, 
@@ -59,7 +59,7 @@ class Listener_Reminder():
                     conn.execute(query)
                     conn.close()
                 except: 
-                    print("Error in saving task into reminder_schedule table.")
+                    print("listener_reminder: Error in saving task into reminder_schedule table.")
                     raise
         else:
             episode_title = "None"
@@ -76,7 +76,7 @@ class Listener_Reminder():
                 conn.execute(query)
                 conn.close()
             except: 
-                print("Error in saving task into reminder_schedule table.")
+                print("listen_reminder: Error in saving task into reminder_schedule table.")
                 raise
     def send_message(self, contact_type, contact_account,episode_title = None, episode_link = None):
         message = 'It is time to listen to podcasts.'
@@ -109,7 +109,7 @@ class Listener_Reminder():
                             ReplyToAddresses=[reply_to_email]
                         )
             except:
-                print('error in sending email. Check the email address.')
+                print('listener_reminder: error in sending email. Check the email address.')
             #return response if 'ErrorResponse' in response else 'successful. Check email box.' 
     def send_message2(self, contact_type, contact_account,episode_titles = [], episode_links = []):
         message = 'It is time to listen to podcasts.'
@@ -142,7 +142,7 @@ class Listener_Reminder():
                             ReplyToAddresses=[reply_to_email]
                         )
             except:
-                print('error in sending email. Check the email address.')
+                print('listener_reminder: error in sending email. Check the email address.')
             #return response if 'ErrorResponse' in response else 'successful. Check email box.'  
         if contact_type == 'sms':
             sms_message = message
@@ -151,7 +151,7 @@ class Listener_Reminder():
                 episode_title = episode_titles[i]
                 if len(episode_link) > 5:
                     episode_link = re.findall(r'"([^"]*)"', episode_link)[0]
-                    sms_message = sms_message + "\n" + episode_title+ "\n" + episode_link + " "
+                    sms_message = sms_message + " " + episode_title+ " " + episode_link + " "
             
             client = boto3.client(
                 "sns",
@@ -164,14 +164,14 @@ class Listener_Reminder():
                     PhoneNumber = contact_account,  
                     Message = sms_message)
             except:
-                print('error in sending message. Check the phone number.')
+                print('listener_reminder: error in sending message. Check the phone number.')
 
     def checkForReminders(self):
         query = "SELECT * FROM reminder_schedule WHERE scheduled = 0 and reminder_time > NOW() and reminder_time < DATE_ADD(NOW(), INTERVAL 5 MINUTE) "
         r = self.internal.execute(query)
         n= r.rowcount
         if n > 0:
-            print("The number of new task is ", n)
+            print("listener_reminder: The number of new task is ", n)
         for i in range(n):
             reminder_task = r.fetchone()
             reminder_id = reminder_task['task_id']
@@ -180,7 +180,7 @@ class Listener_Reminder():
             contact_account = reminder_task['contact_account']
             episode_title = reminder_task['episode_title']
             episode_link = reminder_task['episode_link']
-            print("reminder task is ", reminder_time, contact_type, contact_account, episode_title, episode_link)
+            print("listener_reminder: reminder task is ", reminder_time, contact_type, contact_account, episode_title, episode_link)
             self.send_message(contact_type, contact_account,episode_title, episode_link)
             template = "UPDATE reminder_schedule SET scheduled=1 WHERE task_id = '{reminder_id}' "
             query =  template.format(reminder_id = reminder_id)
@@ -191,7 +191,7 @@ class Listener_Reminder():
         r = self.internal.execute(query)
         n= r.rowcount
         if n > 0:
-            print("The number of new task is ", n)
+            print("listener_reminder: The number of new task is ", n)
         tasks_dict = {}
         for i in range(n):
             reminder_task = r.fetchone()
@@ -201,7 +201,7 @@ class Listener_Reminder():
             contact_account = reminder_task['contact_account']
             episode_title = reminder_task['episode_title']
             episode_link = reminder_task['episode_link']
-            print("reminder task is ", reminder_time, contact_type, contact_account, episode_title, episode_link)
+            print("listener_reminder: reminder task is ", reminder_time, contact_type, contact_account, episode_title, episode_link)
             if contact_account not in tasks_dict.keys():
                 tasks_dict[contact_account] = {"contact_type": contact_type, "episode_titles":[episode_title],'episode_links':[episode_link]}
             else:
@@ -210,7 +210,8 @@ class Listener_Reminder():
             template = "UPDATE reminder_schedule SET scheduled=1 WHERE task_id = '{reminder_id}' "
             query =  template.format(reminder_id = reminder_id)
             self.internal.execute(query)
-        print('tasks_dict is ', tasks_dict)
+        if len(tasks_dict) > 0:
+            print('listener_reminder: tasks_dict is ', tasks_dict)
         for contact_account, value in tasks_dict.items():      
             self.send_message2(value['contact_type'], contact_account,value['episode_titles'], value['episode_links'])
         

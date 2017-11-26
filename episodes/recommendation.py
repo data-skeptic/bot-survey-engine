@@ -22,27 +22,27 @@ from multiprocessing import Pool
 
 class episode():
     def __init__(self, update_episode, username, address,password,databasename):
-        print('enter episode Initialization function')
+        #print('enter episode Initialization function')
         engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, password, address,databasename),pool_size=3, pool_recycle=3600)
         self.internal = engine_internal
         #test
         try:
             self.internal.execute("SHOW DATABASES;")
-            print('The connection is successful in episode recommenation.')
+            #print('The connection is successful in episode recommenation.')
         except:
-            print('The connection fails in episode recommendation.')
+            #print('The connection fails in episode recommendation.')
             raise
         start1 = time.time()
         ep.run(update_episode) # episode preparation.
         end1 = time.time()
-        print("update episode and prepared time is ", end1 - start1)
+        #print("update episode and prepared time is ", end1 - start1)
         start2 = time.time()
         # get episodes information
         mdir = os.path.dirname(os.path.abspath(__file__))
         self.episodes_json_fname = mdir+'/text/episodes_json.txt'
         with open(self.episodes_json_fname) as data_file:    
             episode_json = json.load(data_file)
-        print('The total number of episodes is ',len(episode_json.keys()))
+        #print('The total number of episodes is ',len(episode_json.keys()))
         descriptions = list(episode_json.keys())
         descToTitle = {}
         descToLink = {}
@@ -57,7 +57,7 @@ class episode():
         self.descToTitle = descToTitle
         self.descToLink = descToLink
         end2 = time.time()
-        print('get episodes info time is ', end2 - start2)
+        #print('get episodes info time is ', end2 - start2)
         start3 = time.time()
         #get word_vectors trained from SO
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
@@ -69,7 +69,7 @@ class episode():
         self.vocab_dic = {vocab[i]:i for i in range(self.word_vectors.shape[0])}
         #get Phrase object SO_bigram trained from SO
         end3 = time.time()
-        print('time of getting word vectors and vocab_dict is', end3 - start3)
+        #print('time of getting word vectors and vocab_dict is', end3 - start3)
         fname = mdir+'/SO_bigram/SO_bigram.pkl'
         with open(fname, 'rb') as f:
             self.bigram = pickle.load(f)
@@ -161,12 +161,12 @@ class episode():
         start1 = time.time()
         user_words,total = self.preprocess(user_request)
         end1 = time.time()
-        print("user request preprocess takes ", end1 - start1)
+        #print("user request preprocess takes ", end1 - start1)
         ratio = len(user_words)/total
         start2 = time.time()
         user_tf_idf_df = self.get_user_tf_idf(user_words)
         end2 = time.time()
-        print("to get tf_idf of user request ", end2 - start2)
+        #print("to get tf_idf of user request ", end2 - start2)
         start3 = time.time()
         scores = np.array([self.get_score(i, user_words,user_tf_idf_df)*ratio for i in range(len(self.episodes_corpus))]) 
         
@@ -177,7 +177,7 @@ class episode():
         # print(len(scores_dict))
 
         end3 = time.time()
-        print("get all scores ", end3 - start3)
+        #print("get all scores ", end3 - start3)
         max_score = scores.max()
         episode_indice = np.where(scores == max_score)[0]
         #print('episode_indice are', episode_indice)
@@ -193,7 +193,7 @@ class episode():
                 title_cos_similarities[i] = self.get_score_titles(i, user_words)
             most_similar_indice = heapq.nlargest(2, title_cos_similarities, key=title_cos_similarities.get)
             end4 = time.time()
-            print('if multi score ==1, then by titles, it takes ', end4 - start4)
+            #print('if multi score ==1, then by titles, it takes ', end4 - start4)
         #print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& User's request is:  " + user_request + " &&&&&&&&&&&&&&&&&&&&&&&&\n" )
         result = {}
         rank  = 1
@@ -217,9 +217,9 @@ class episode():
     def save_recommendation_table(self, user_request, result):
         start1 = time.time()
         user_request = user_request.replace("'", "\\'").replace(";", "\\;").replace("&", "\\&").replace("%", "%%")
-        print('replacing special characters in user requests takes', time.time() - start1)
+        #print('replacing special characters in user requests takes', time.time() - start1)
         #save request and result to database
-        if len(result) == 0:
+        if  (not result) or len(result) == 0:
             try: 
                 start2 = time.time()
                 template = """
@@ -230,10 +230,10 @@ class episode():
                 conn = self.internal.connect()
                 conn.execute(query)
                 conn.close()
-                print('When there is no recommendation, how long does it take to save the request? ',time.time() - start2)
+                #print('When there is no recommendation, how long does it take to save the request? ',time.time() - start2)
                 #print("Successful in inserting into record_recommendation table.")                                                   
             except: 
-                print("Error in inserting into record_recommendation table.")
+                print("recommendation: Error in inserting into record_recommendation table.")
                 raise
         else:
             for key, value in result.items():
@@ -256,9 +256,9 @@ class episode():
                     conn.execute(query)
                     conn.close()
                     #print("Successful in inserting into record_recommendation table.")  
-                    print("The time it spends on saving one piece of recommendation is ", time.time() - start3)                                                 
+                    #print("The time it spends on saving one piece of recommendation is ", time.time() - start3)                                                 
                 except: 
-                    print("Error in inserting into record_recommendation table.")
+                    print("recommendation: Error in inserting into record_recommendation table.")
                     raise
 def my_get_score(i, user_words,user_tf_idf_df): # the ith episode
     episode_words = self.episodes_words_filtered[i]
