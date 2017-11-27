@@ -200,11 +200,17 @@ class Listener_Reminder():
             contact_type = reminder_task['contact_type']
             contact_account = reminder_task['contact_account']
             episode_title = reminder_task['episode_title']
+            if episode_title == "None":
+                episode_title = ""
+                
             episode_link = reminder_task['episode_link']
+            if episode_link == "None":
+                episode_link = ""
             print("listener_reminder: reminder task is ", reminder_time, contact_type, contact_account, episode_title, episode_link)
             if contact_account not in tasks_dict.keys():
                 tasks_dict[contact_account] = {"contact_type": contact_type, "episode_titles":[episode_title],'episode_links':[episode_link]}
             else:
+                print('listen_reminder: episode_title and episode_link are ', episode_title, episode_link)
                 tasks_dict[contact_account]['episode_titles'].append(episode_title)
                 tasks_dict[contact_account]['episode_links'].append(episode_link)
             template = "UPDATE reminder_schedule SET scheduled=1 WHERE task_id = '{reminder_id}' "
