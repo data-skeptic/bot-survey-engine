@@ -127,14 +127,17 @@ class episode():
         episode_words = self.episodes_words_filtered[i]
         X = self.word_vectors.loc[episode_words,:]
         Y = self.word_vectors.loc[user_words,:]
-        cos_similarities = cosine_similarity(X = X.values, Y = Y.values)
-        cos_similarities_df = pd.DataFrame(cos_similarities, index = episode_words, columns = user_words) 
-        max_cos_similarities = cos_similarities_df.max(axis = 0)
-        max_cos_similarities.sort_index(inplace=True)
-        score = np.dot(max_cos_similarities.values, user_tf_idf_df.values)[0]
-        # return score, cos_similarities_df
-        result = {}
-        result[i] = score
+        if X.shape[0] > 0 and Y.shape[0] > 0:
+            cos_similarities = cosine_similarity(X = X.values, Y = Y.values)
+            cos_similarities_df = pd.DataFrame(cos_similarities, index = episode_words, columns = user_words) 
+            max_cos_similarities = cos_similarities_df.max(axis = 0)
+            max_cos_similarities.sort_index(inplace=True)
+            score = np.dot(max_cos_similarities.values, user_tf_idf_df.values)[0]
+            # return score, cos_similarities_df
+            result = {}
+            result[i] = score
+        else:
+            score = 0
         return score
 
     def get_score_titles(self,i,user_words):   
