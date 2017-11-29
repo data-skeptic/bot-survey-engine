@@ -87,13 +87,14 @@ class SaveAnswer(Resource):
         answer_text = req['answer_text']
         question_id = req['question_id']
         question_order = req['question_order']
-        if 'response_id' in req:
-            response_id = req['response_id']
-            #print('response_id is ', response_id)
-        else:
-            response_id = None
-            #print('response_id is none.')
-        
+        # if 'response_id' in req:
+        #     response_id = req['response_id']
+        #     #print('response_id is ', response_id)
+        # else:
+        #     response_id = None
+        #     #print('response_id is none.')
+        response_id = req.get('response_id', None)
+        print('response_id is ',response_id)
         magic_text = survey_instance.get_magic_reply(answer_text, question_id)
         next_question_id = survey_instance.get_next_question_id(question_id, answer_text)
         response_id, response_answer_id = survey_instance.save_answer(response_id, question_id, question_order, answer_text)
