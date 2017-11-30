@@ -1,16 +1,11 @@
-#(9_14_17)
 import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
-from sqlalchemy.orm import sessionmaker
-import datetime
-import time
-from pandas import DataFrame
-import random
 import pandas as pd
 import json
 import boto3
-import os
+from pandas import DataFrame
+from sqlalchemy.orm import sessionmaker
 
 pd.set_option('display.max_colwidth', -1)
 
@@ -30,7 +25,7 @@ class Survey():
         # refresh_from_database() returns the database form of the three tables:'magic', 'bot_survey_questions', 'logic_branches'
         # They are saved in the dictionary self._dfs and we only need to query the database once. 
     def refresh_from_database(self):
-        table_names = ['magic', 'bot_survey_questions', 'logic_branches']
+        table_names = ['magic', 'bot_survey_questions', 'logic_branches'] # they are defined in advance.
         result_dfs = {}
         for table_name in table_names:
             try:
@@ -84,7 +79,6 @@ class Survey():
                 conn = self.internal.connect()
                 conn.execute(query)
                 r = conn.execute("SELECT last_insert_id()")
-
                 conn.close()
                 #self.internal.execute(query)
                 print('Successful in inserting into bot_survey_responses table.')
@@ -98,8 +92,7 @@ class Survey():
         # response_id is known for the moment.
         # check whether the survey is over. If yes, then update the end_time and reset response_id = None
         
-          # just for test todo: query from question_table to get a list of ending question_ids.
-        last_question_list = [20]
+        last_question_list = [20] # up be updated if the survey questions are updated.
         if question_id in last_question_list:
             # Then the survey is over
             template = "UPDATE bot_survey_responses SET response_end_time = Now() WHERE response_id = '{response_id}';"
@@ -109,7 +102,7 @@ class Survey():
 
         # update table bot_survey_response_answers   
         try: 
-            #check whether response_id is in the response_table
+            #check whether response_id is in the response_table    
             respns = self.internal.execute('select response_id from bot_survey_responses;')
             response_ids = respns.fetchall() 
             response_ids = [id[0] for id in response_ids]
@@ -119,7 +112,7 @@ class Survey():
                 return 
             # response_answer_id will be automatically added by sql when we insert new rows.
             template = "INSERT INTO bot_survey_response_answers (response_id, question_id, question_order, answer_time, answer_text) VALUES('{response_id}','{question_id}', '{question_order}', NOW(), '{answer_text}')"
-            print('in the survey.py, print the response_id which is to be inserted into the table ', response_id)
+            print('in the survey.py, the response_id which is to be inserted into the table is ', response_id)
             query = template.format(response_id = response_id, question_id=question_id,  question_order=question_order, answer_text=answer_text)
             self.internal.execute(query) 
             # retrivel the response_id if the insertation is sucessful.
@@ -184,7 +177,7 @@ class Survey():
                     aws_access_key_id = user, 
                     aws_secret_access_key = pw)
         source_email = 'kyle@dataskeptic.com'
-        destination_email = [ "fayezheng1010@gmail.com", "kyle@dataskeptic.com"] #add "kyle@dataskeptic.com" later when everything is fixed.
+        destination_email = [ "fayezheng1010@gmail.com", "kyle@dataskeptic.com"] 
         reply_to_email = source_email
         if not result_dfs.empty:
             with pd.option_context('display.max_colwidth', 1000):

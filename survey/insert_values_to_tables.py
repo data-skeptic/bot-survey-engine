@@ -2,13 +2,16 @@ import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
 from sqlalchemy.orm import sessionmaker
-import datetime
-import time
+# import datetime
+# import time
 import json
 
 # need to have the mysql_password.txt to connect to sqlworkbench/J.
-with open ("mysql_password.txt", "r") as myfile:
-    password=myfile.readlines()[0].strip()
+# with open ("mysql_password.txt", "r") as myfile:
+#     password=myfile.readlines()[0].strip()
+with open ("../config/config.json", "r") as myfile:
+	data = json.load(myfile)
+	password = data['mysql']['password']
 #connect to sqlworkbench/J
 engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % ("xiaofei", password, "iupdated.com:3306","survey"),pool_size=3, pool_recycle=3600)
 internal = engine_internal

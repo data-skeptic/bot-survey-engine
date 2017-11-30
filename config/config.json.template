@@ -4,7 +4,8 @@
 		"accessKeyId": ,
 		"secretAccessKey": ,
 		"region": "us-east-1",
-		"bucket_name":"word-vectors-from-so"
+		"bucket_name":"dataskeptic-bot",
+		"file_name":"all_posts_word_vec.csv"
 	},
 	"logging": {
 		"sqsQueueUrl": ""
@@ -20,10 +21,15 @@
 		"microsoft_app_password": 
 	},
 	"model_paras": {
-        "min_count": 2,
+        "min_count": 1,
         "size": 200,
         "window": 6 
        },
        "key_file_location": "/config/ga_key.json",
        "service_account_email":
+       "luis":{
+		"app_id":"8a6fffff-ffff-ffff-ffff-ffffffffffff",
+		"subscription_key": "48b11111111111111111111111111111"
+	},
+       "ga_model":"luis"
 }

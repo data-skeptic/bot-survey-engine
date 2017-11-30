@@ -2,11 +2,7 @@ import sqlalchemy
 import pymysql
 pymysql.install_as_MySQLdb()
 from sqlalchemy.orm import sessionmaker
-import datetime
-import time
 import json
-
-# need to have the mysql_password.txt to connect to sqlworkbench/J.
 
 with open ("../config/config.json", "r") as myfile:
             data = json.load(myfile)
