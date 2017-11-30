@@ -73,23 +73,31 @@ class Gahelper(object):
         metric = ','.join(metrics)
         dimension = ','.join(dimensions)
         if len(dimension) > 0:
-          resp = self.service.data().ga().get(
-                ids='ga:' + self.profile,
-                start_date=start_date,
-                end_date=end_date,
-                metrics=metric,
-                dimensions=dimension
-          ).execute()
+          try:
+            resp = self.service.data().ga().get(
+                  ids='ga:' + self.profile,
+                  start_date=start_date,
+                  end_date=end_date,
+                  metrics=metric,
+                  dimensions=dimension
+            ).execute()
+          except:
+            print('error in get_report')
+            return pd.DataFrame([])
         else:
           print("There is no dimension.")
-          resp = self.service.data().ga().get(
-                ids='ga:' + self.profile,
-                start_date=start_date,
-                end_date=end_date,
-                metrics=metric
-          ).execute()
+          try:
+            resp = self.service.data().ga().get(
+                  ids='ga:' + self.profile,
+                  start_date=start_date,
+                  end_date=end_date,
+                  metrics=metric
+            ).execute()
+          except:
+            print('error in get_report')
+            return pd.DataFrame([])
         print("resp is ", resp)
-        df = pd.DataFrame(resp['rows'])
+        df = pd.DataFrame(resp.get('rows'))
         cols = []
         for d in dimensions:
             cols.append(d.replace('ga:', ''))

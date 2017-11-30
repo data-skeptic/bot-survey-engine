@@ -131,55 +131,7 @@ class ga_items():
             GA_items['standard_metrics'] = ['ga:' + standard_metric  for standard_metric in standard_metrics]
         print("GA_items finally is ", GA_items)
         return GA_items
-    # gahelper
-    # def get_google_analytics(self,GA_items):
-    #     ga = Gahelper(self.config)
-    #     print(GA_items)
-    #     metrics = GA_items.get('standard_metrics', [])
-    #     dimensions = GA_items.get('standard_dims',[])
-    #     if len(GA_items.get('start')) == 1:
-    #         start_date = str(GA_items.get('start')[-1])
-    #         end_date = str(GA_items.get('end')[-1])
-    #     else:
-    #         # if there are more than one pair of start and end, which one is right? Or need to combine all/both pairs?
-    #         # for the moment, use the last one. It is more likely to be the right one. For example, how many sessions per month in 2017? Then ['month', '2017'] will be returned. use the last one '2017'.
-    #         start_date = str(GA_items.get('start')[-1])
-    #         end_date = str(GA_items.get('end')[-1])
-    #     print(metrics, dimensions,start_date,end_date)
-
-    #     report = ga.get_report(metrics, dimensions, start_date, end_date)
-    #     print(tabulate(report, headers='keys', tablefmt='psql'))
-    #     f = format_dataframe(self.s3, self.bucketname, report, metrics, dimensions, start_date, end_date)
-    #     print(f)
-    #     return f
-    # def run(self,user_request): # 
-    #     GA_items = self.extract_ga_items(user_request)
-    #     # if GA_items.get('standard_metrics') and GA_items.get('start') and GA_items.get('end'):
-    #     #     f = self.get_google_analytics(GA_items)
-    #     # else:
-    #     #     f = {'img': "", 'txt': "Metric, start date and end date are necessary. At least one of them is missing."}
-    #     # return f
-    #     if GA_items.get('standard_metrics'):
-    #         if GA_items.get('start'):
-    #             if GA_items.get('end'):
-    #                 f = self.get_google_analytics(GA_items)
-    #             else:
-    #                 f = {'img': "", 'txt': "end missing'"}
-    #         elif GA_items.get('end'):
-    #             f = {'img': "", 'txt': "start missing"}
-    #         else:
-    #             f = {'img': "", 'txt': "date range missing"}
-    #     else:
-    #         f = {'img':"",'txt':""}
-
-    #     return f
     
-# def test_run(user_request):
-#     ga_instance = ga()
-#     ga_instance.run(user_request)
-    
-# user_request = "What is the ad cost per week in January last year?"
-# test_run(user_request)
 
 if __name__ == '__main__':
     pass

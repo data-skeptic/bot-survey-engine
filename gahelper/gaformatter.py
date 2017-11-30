@@ -13,9 +13,11 @@ def format_dataframe(s3, bucketname, report, metrics, dimensions, start_date, en
     sortby = list(map(lambda x: x[3:], metrics))
     report.sort_values(sortby, ascending=False, inplace=True)
     report.index = np.arange(report.shape[0])
+
     if len(metrics) == 1 and len(dimensions) == 1:
         m = metrics[0][3:]
         h = dimensions[0][3:]
+        plt.figure()
         plt.barh(report.index, report[m])
         plt.gca().yaxis.set_ticks(report.index)
         plt.gca().yaxis.set_ticklabels(report[h])
