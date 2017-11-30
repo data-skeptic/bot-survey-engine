@@ -32,6 +32,7 @@ class ga():
         self.config = config
 
         self.luis_app_id = config['luis']['app_id']
+        self.luis_url = config['luis']['luis_url']
         self.luis_subscription_key = config['luis']['subscription_key']
 
         self.standard_dims = []
@@ -48,6 +49,7 @@ class ga():
     def extract_ga_items(self,user_request):
         GA_items = {}
         headers = {'Ocp-Apim-Subscription-Key': self.luis_subscription_key}
+        print("h", headers)
         params ={
             'q': user_request,
             # Optional request parameters, set to default values
@@ -57,7 +59,9 @@ class ga():
             'staging': 'false',
         }
         try:
-            r = requests.get('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/' + self.luis_app_id, headers=headers, params=params)
+            r = requests.get(self.luis_url + self.luis_app_id, headers=headers, params=params)
+            print(r)
+            print(r.content)
             luis_result = r.json()
             print(luis_result)
         except Exception as e:
@@ -133,6 +137,7 @@ class ga():
         return GA_items
     # gahelper
     def get_google_analytics(self,GA_items):
+        print("here")
         ga = Gahelper(self.config)
         print(GA_items)
         metrics = GA_items.get('standard_metrics', [])
@@ -155,20 +160,20 @@ class ga():
     def run(self,user_request): # 
         GA_items = self.extract_ga_items(user_request)
         if GA_items.get('standard_metrics') and GA_items.get('start') and GA_items.get('end'):
+            print("GA_items", GA_items)
             f = self.get_google_analytics(GA_items)
         else:
             f = {'img': "", 'txt': "Metric, start date and end date are necessary. At least one of them is missing."}
         return f
          
-# def test_run(user_request):
-#     ga_instance = ga()
-#     ga_instance.run(user_request)
-    
-# user_request = "What is the ad cost per week in January last year?"
-# test_run(user_request)
+def test_run(user_request):
+    ga_instance = ga()
+    ga_instance.run(user_request)
+
 
 if __name__ == '__main__':
-    pass
+    user_request = "What is the ad cost per week in January last year?"
+    test_run(user_request)
    
 
 

@@ -16,7 +16,7 @@ from apscheduler.triggers.date import DateTrigger
 
 class Listener_Reminder():
     def __init__(self, user, pw, username, password, address, databasename):
-        self.message = "It is time to listen to Data Skeptic's podcasts! "
+        self.message = "It is time to listen to Data Skeptic! "
         engine_internal = sqlalchemy.create_engine("mysql://%s:%s@%s/%s" % (username, password, address, databasename),pool_size=3, pool_recycle=3600)
         self.internal = engine_internal
         #test
@@ -79,7 +79,7 @@ class Listener_Reminder():
                 print("listen_reminder: Error in saving task into reminder_schedule table.")
                 raise
     def send_message(self, contact_type, contact_account,episode_title = None, episode_link = None):
-        message = 'It is time to listen to podcasts.'
+        message = 'Listen to Data Skeptic on iTunes, Spotify, Stitcher, or at dataskeptic.com'
         html_message = '<p>' + message + '</p>'
         if len(episode_link) > 5:
             html_message = html_message + episode_link
@@ -112,7 +112,7 @@ class Listener_Reminder():
                 print('listener_reminder: error in sending email. Check the email address.')
             #return response if 'ErrorResponse' in response else 'successful. Check email box.' 
     def send_message2(self, contact_type, contact_account,episode_titles = [], episode_links = []):
-        message = 'It is time to listen to podcasts.'
+        message = 'Listen to Data Skeptic on iTunes, Spotify, Stitcher, or at dataskeptic.com'
         html_message = '<p>' + message + '</p>'
         for link in episode_links:
             html_message = html_message + link + "\n" 
