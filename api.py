@@ -13,8 +13,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
-from GA_project import ga_luis
+# from GA_project import ga_luis
 from GA_project import ga_rasa
+
+from GA_project import ga_luis_items
+from GA_project import ga_luis_report
 
 sys.path.insert(0, './survey')
 from survey import Survey
@@ -172,20 +175,33 @@ class reminder(Resource):
 
 # GA 
 print("*********************api.py: Google Analytics ***********************")
-  
-class google_analytics(Resource):
+class ga_extracted_items(Resource):
     def post(self):
         if ga_model == 'luis': 
-            print('api: ga model is LUIS.') 
-            ga_instance = ga_luis.ga()
+            print('api: ga model in extracting ga items is LUIS.') 
+            ga_instance_item = ga_luis_items.ga_items()
         if ga_model == 'rasa':
-            print('api: ga model is RASA.')
+            print('api: ga model in extracting ga items is RASA.')
             ga_instance = ga_rasa.ga(update_model = True)
         r = request.get_data()
         user_info = json.loads(r.decode('utf-8'))
         print('api: user_info is ', user_info)
         user_request = user_info.get('user_request')
-        f = ga_instance.run(user_request)
+        ga_items = ga_instance_item.extract_ga_items(user_request) # using luis model.
+        return ga_items
+
+class google_analytics(Resource):
+    def post(self):
+        if ga_model == 'luis': 
+            print('api: ga model is LUIS.') 
+            ga_instance_report = ga_luis_report.ga_report()
+        if ga_model == 'rasa':
+            print('api: ga model is RASA.')
+            ga_instance = ga_rasa.ga(update_model = True)
+        r = request.get_data()
+        ga_items = json.loads(r.decode('utf-8'))
+        print('in google_analytics, input is ', ga_items)
+        f = ga_instance_report.run(ga_items)
         return f # f is in json form: for example {'img': 'http://dataskeptic-static.s3.amazonaws.com/bot/ga-images/2017-11-10/transactions_userType_2016-11-10_2017-11-10.png', 'txt': ''}
 
 
@@ -203,7 +219,8 @@ if __name__ == '__main__':
     # listener_reminder
     api.add_resource(reminder,  '/listener_reminder')
     
-    api.add_resource(google_analytics, '/ga') # {'user_request':...} return f see above, f is in json form
+    api.add_resource(ga_extracted_items,  '/ga_items')
+    api.add_resource(google_analytics, '/ga_report') # {'user_request':...} return f see above, f is in json form
     
     @app.before_first_request 
     def add_tasks():
