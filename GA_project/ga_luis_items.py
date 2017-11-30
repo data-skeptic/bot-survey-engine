@@ -20,7 +20,7 @@ from gahelper.gaformatter import format_dataframe
 from datetime import datetime  
 from datetime import timedelta
 
-class ga():
+class ga_items():
     def __init__(self):
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
         # print("/".join(self.dir_path.split("/")[0:-1]) + "/config/config.json")
@@ -135,6 +135,7 @@ class ga():
             GA_items['standard_metrics'] = ['ga:' + standard_metric  for standard_metric in standard_metrics]
         print("GA_items finally is ", GA_items)
         return GA_items
+
     # gahelper
     def get_google_analytics(self,GA_items):
         print("here")
@@ -169,7 +170,6 @@ class ga():
 def test_run(user_request):
     ga_instance = ga()
     ga_instance.run(user_request)
-
 
 if __name__ == '__main__':
     user_request = "What is the ad cost per week in January last year?"
