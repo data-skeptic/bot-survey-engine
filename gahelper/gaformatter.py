@@ -17,8 +17,11 @@ def format_dataframe(s3, bucketname, report, metrics, dimensions, start_date, en
     if len(metrics) == 1 and len(dimensions) == 1:
         m = metrics[0][3:]
         h = dimensions[0][3:]
+        print(report)
+        
+        print('metric is ', m)
         plt.figure()
-        plt.barh(report.index, report[m])
+        plt.barh(report.index, report[m].astype(float))
         plt.gca().yaxis.set_ticks(report.index)
         plt.gca().yaxis.set_ticklabels(report[h])
         fname = m + '_' + h + '_' + start_date + '_' + end_date + '.png'

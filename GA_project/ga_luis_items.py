@@ -32,6 +32,7 @@ class ga_items():
         self.config = config
 
         self.luis_app_id = config['luis']['app_id']
+        self.luis_url = config['luis']['luis_url']
         self.luis_subscription_key = config['luis']['subscription_key']
 
         self.standard_dims = []
@@ -48,6 +49,7 @@ class ga_items():
     def extract_ga_items(self,user_request):
         GA_items = {}
         headers = {'Ocp-Apim-Subscription-Key': self.luis_subscription_key}
+        print("h", headers)
         params ={
             'q': user_request,
             # Optional request parameters, set to default values
@@ -57,7 +59,9 @@ class ga_items():
             'staging': 'false',
         }
         try:
-            r = requests.get('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/' + self.luis_app_id, headers=headers, params=params)
+            r = requests.get(self.luis_url + self.luis_app_id, headers=headers, params=params)
+            print(r)
+            print(r.content)
             luis_result = r.json()
             print(luis_result)
         except Exception as e:
@@ -131,10 +135,44 @@ class ga_items():
             GA_items['standard_metrics'] = ['ga:' + standard_metric  for standard_metric in standard_metrics]
         print("GA_items finally is ", GA_items)
         return GA_items
-    
+    # gahelper
+    def get_google_analytics(self,GA_items):
+        print("here")
+        ga = Gahelper(self.config)
+        print(GA_items)
+        metrics = GA_items.get('standard_metrics', [])
+        dimensions = GA_items.get('standard_dims',[])
+        if len(GA_items.get('start')) == 1:
+            start_date = str(GA_items.get('start')[-1])
+            end_date = str(GA_items.get('end')[-1])
+        else:
+            # if there are more than one pair of start and end, which one is right? Or need to combine all/both pairs?
+            # for the moment, use the last one. It is more likely to be the right one. For example, how many sessions per month in 2017? Then ['month', '2017'] will be returned. use the last one '2017'.
+            start_date = str(GA_items.get('start')[-1])
+            end_date = str(GA_items.get('end')[-1])
+        print(metrics, dimensions,start_date,end_date)
+
+        report = ga.get_report(metrics, dimensions, start_date, end_date)
+        print(tabulate(report, headers='keys', tablefmt='psql'))
+        f = format_dataframe(self.s3, self.bucketname, report, metrics, dimensions, start_date, end_date)
+        print(f)
+        return f
+    def run(self,user_request): # 
+        GA_items = self.extract_ga_items(user_request)
+        if GA_items.get('standard_metrics') and GA_items.get('start') and GA_items.get('end'):
+            print("GA_items", GA_items)
+            f = self.get_google_analytics(GA_items)
+        else:
+            f = {'img': "", 'txt': "Metric, start date and end date are necessary. At least one of them is missing."}
+        return f
+         
+def test_run(user_request):
+    ga_instance = ga()
+    ga_instance.run(user_request)
 
 if __name__ == '__main__':
-    pass
+    user_request = "What is the ad cost per week in January last year?"
+    test_run(user_request)
    
 
 
