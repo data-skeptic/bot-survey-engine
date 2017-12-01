@@ -144,7 +144,7 @@ class episode():
         vectorizer = TfidfVectorizer(min_df=1,vocabulary = self.vocab_dic)
         print("----------------------------------------------------")
         logger.debug('*** user_words in get_user_tf_idf(self, user_words) is ', user_words)
-    
+        print("nan of NaN is in self.episode_corpus? ", ('nan' in self.episodes_corpus) or ('Nan' in self.episodes_corpus))
         all_tf_idf = vectorizer.fit_transform(self.episodes_corpus + [" ".join(user_words)])
         print("----------------------------------------------------")
         logger.debug("*** after fit transform, shape of all_tf_idf is ", all_tf_idf.shape)
