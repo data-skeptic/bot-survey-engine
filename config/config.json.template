@@ -29,7 +29,8 @@
        "service_account_email":
        "luis":{
 		"app_id":"8a6fffff-ffff-ffff-ffff-ffffffffffff",
-		"subscription_key": "48b11111111111111111111111111111"
+		"subscription_key": "48b11111111111111111111111111111",
+		"luis_url": "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
 	},
        "ga_model":"luis"
 }
