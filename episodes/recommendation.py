@@ -93,11 +93,7 @@ class episode():
         #self.vocab_dic = dict(zip(vocab, range(len(vocab))))
         self.vocab_dic = {vocab[i]:i for i in range(self.word_vectors.shape[0])}
 
-        print("--------------------------------------------------------------------------------------------------------")
-        logger.debug('*** the word with index 122692 is: ' )
-        for word, index in self.vocab_dic.items():
-            if index == 122692:
-                print(word)
+        
 
         #get Phrase object SO_bigram trained from SO
         end3 = time.time()
@@ -150,9 +146,18 @@ class episode():
 
     def get_user_tf_idf(self, user_words):
         vectorizer = TfidfVectorizer(min_df=1,vocabulary = self.vocab_dic)
+        print("vectorizer is ", vectorizer)
+        print("--------------------------------------------------------------------------------------------------------")
+        logger.debug('*** the word with index 122692 is: ' )
+        for word, index in self.vocab_dic.items():
+            if index == 122692:
+                print(word)       
         print('len of self.vocab_dic is ', len(self.vocab_dic))
         print("------------------------------------------------------------------------------")
-        logger.debug("self.episodes_corpus + [" ".join(user_words)] is ${0}".format(self.episodes_corpus + [" ".join(user_words)]))
+        logger.debug("self.episodes_corpus + [" ".join(user_words)] is ")
+        test_corpus = self.episodes_corpus + [" ".join(user_words)]
+        for i in range(len(test_corpus)):
+            print(i, ":" ,test_corpus[i][0:3])
         
         all_tf_idf = vectorizer.fit_transform(self.episodes_corpus + [" ".join(user_words)])
         vocab_test = vectorizer.vocabulary_
