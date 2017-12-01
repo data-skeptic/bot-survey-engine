@@ -83,7 +83,7 @@ class Gahelper(object):
             ).execute()
           except:
             print('error in get_report')
-            return pd.DataFrame([])
+            pass
         else:
           print("There is no dimension.")
           try:
@@ -95,7 +95,7 @@ class Gahelper(object):
             ).execute()
           except:
             print('error in get_report')
-            return pd.DataFrame([])
+            pass
         print("resp is ", resp)
         df = pd.DataFrame(resp.get('rows'))
         cols = []

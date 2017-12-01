@@ -48,6 +48,7 @@ class ga_items():
         return
     def extract_ga_items(self,user_request):
         GA_items = {}
+
         headers = {'Ocp-Apim-Subscription-Key': self.luis_subscription_key}
         print("h", headers)
         params ={
@@ -63,7 +64,7 @@ class ga_items():
             print(r)
             print(r.content)
             luis_result = r.json()
-            print(luis_result)
+            print("luis_result is ", luis_result)
         except Exception as e:
             print("[Errno {0}] {1}".format(e.errno, e.strerror))
         score_threshold = 0 # adjust later
@@ -133,6 +134,11 @@ class ga_items():
                 print(process.extract(non_standard_metric, self.standard_metrics, limit = 2,scorer=fuzz.token_sort_ratio))
                 standard_metrics.append(standard_metric)
             GA_items['standard_metrics'] = ['ga:' + standard_metric  for standard_metric in standard_metrics]
+        # LUIS can not inteperate 'all time', so here "start" and "end" are set manually.
+        if ("all time" in user_request and (not GA_items.get('start')) and (not GA_items.get('end'))):
+            GA_items['start'] = ['2010-01-01']
+            GA_items['end'] = [str(datetime.now())[0:10]]
+
         print("GA_items finally is ", GA_items)
         return GA_items
     # gahelper
