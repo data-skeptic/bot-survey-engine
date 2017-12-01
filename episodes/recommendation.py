@@ -77,9 +77,9 @@ class episode():
         #get word_vectors trained from SO
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
         self.word_vectors = pd.read_csv(self.word_vec_file, index_col=0)
-        print("----------------------------------------------------")
+        print("------------------------------------------------------------------------------")
         logger.debug("*** self_word_vectors shape is ", self.word_vectors.shape)
-        print("----------------------------------------------------")
+        print("------------------------------------------------------------------------------")
         logger.debug("*** the 122692 row of self_word_vectors is ", self.word_vectors.iloc[122692, 0:10])
         #get vocabulary dictionary from SO
         vocab = list(self.word_vectors.index)
@@ -87,7 +87,7 @@ class episode():
         logger.debug("*** the word with index  122692 in the vocab is: ", vocab[122692])
         #self.vocab_dic = dict(zip(vocab, range(len(vocab))))
         self.vocab_dic = {vocab[i]:i for i in range(self.word_vectors.shape[0])}
-        print("----------------------------------------------------")
+        print("--------------------------------------------------------------------------------------------------------")
         logger.debug('*** the word with index 122692 is: ' )
         for word, index in self.vocab_dic.items():
             if index == 122692:
@@ -136,17 +136,17 @@ class episode():
                     user_corpus.append(word)
             result = list(set(user_corpus).intersection(set(self.vocab_dic.keys())))
         #print("after preprocess, the result of user_request is ", result)
-        print("----------------------------------------------------")
+        print("------------------------------------------------------------------------------")
         logger.debug('*** after preprocessing, user_request becomes  ', result)
         return result, len(set(user_corpus)) # a list of words with bigram, without stopwords and remove words not in vocabulary.
 
     def get_user_tf_idf(self, user_words):
         vectorizer = TfidfVectorizer(min_df=1,vocabulary = self.vocab_dic)
-        print("----------------------------------------------------")
+        print("------------------------------------------------------------------------------")
         logger.debug('*** user_words in get_user_tf_idf(self, user_words) is ', user_words)
         print("nan of NaN is in self.episode_corpus? ", ('nan' in self.episodes_corpus) or ('Nan' in self.episodes_corpus))
         all_tf_idf = vectorizer.fit_transform(self.episodes_corpus + [" ".join(user_words)])
-        print("----------------------------------------------------")
+        print("------------------------------------------------------------------------------")
         logger.debug("*** after fit transform, shape of all_tf_idf is ", all_tf_idf.shape)
         user_tf_idf = all_tf_idf[-1,:]
         user_tf_idf_dict = {word:user_tf_idf[0,self.vocab_dic[word]] for word in user_words}
@@ -201,7 +201,7 @@ class episode():
         ratio = len(user_words)/total
         start2 = time.time()
         user_tf_idf_df = self.get_user_tf_idf(user_words)
-        print("----------------------------------------------------")
+        print("------------------------------------------------------------------------------")
         logger.debug("user_tf_idf_df is obtained.")
         end2 = time.time()
         #print("to get tf_idf of user request ", end2 - start2)
