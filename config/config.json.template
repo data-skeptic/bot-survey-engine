@@ -28,9 +28,9 @@
        "key_file_location": "/config/ga_key.json",
        "service_account_email":
        "luis":{
-		"app_id":"8a6f43c5-206f-46ce-af1b-1f8b305c2935",
-		"subscription_key": "48b13fb543c74598960959df9f20086e"
+		"app_id":"8a6fffff-ffff-ffff-ffff-ffffffffffff",
+		"subscription_key": "48b11111111111111111111111111111",
+		"luis_url": "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/"
 	},
        "ga_model":"luis"
-
 }
