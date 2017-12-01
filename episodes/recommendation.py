@@ -77,12 +77,14 @@ class episode():
         #get word_vectors trained from SO
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
         self.word_vectors = pd.read_csv(self.word_vec_file, index_col=0)
+        self.word_vectors = self.word_vectors.drop(self.word_vectors.index[122692])
         print("------------------------------------------------------------------------------")
         logger.debug("*** self_word_vectors shape is ")
         print(self.word_vectors.shape)
         print("------------------------------------------------------------------------------")
         logger.debug("*** the 122692 row of self_word_vectors is ")
         print(self.word_vectors.iloc[122692, 0:10])
+
         #get vocabulary dictionary from SO
         vocab = list(self.word_vectors.index)
         print("----------------------------------------------------")
@@ -90,6 +92,7 @@ class episode():
         print(vocab[122692])
         #self.vocab_dic = dict(zip(vocab, range(len(vocab))))
         self.vocab_dic = {vocab[i]:i for i in range(self.word_vectors.shape[0])}
+
         print("--------------------------------------------------------------------------------------------------------")
         logger.debug('*** the word with index 122692 is: ' )
         for word, index in self.vocab_dic.items():
@@ -138,6 +141,7 @@ class episode():
                 if word not in stopwords.words("english"):
                     user_corpus.append(word)
             result = list(set(user_corpus).intersection(set(self.vocab_dic.keys())))
+
         #print("after preprocess, the result of user_request is ", result)
         print("------------------------------------------------------------------------------")
         logger.debug('*** after preprocessing, user_request becomes ${0}'.format(result))
@@ -146,18 +150,18 @@ class episode():
 
     def get_user_tf_idf(self, user_words):
         vectorizer = TfidfVectorizer(min_df=1,vocabulary = self.vocab_dic)
+        print('len of self.vocab_dic is ', len(self.vocab_dic))
         print("------------------------------------------------------------------------------")
-        # logger.debug('*** user_words in get_user_tf_idf(self, user_words) is ', user_words)
-        print("nan or NaN is in self.episode_corpus? ")
-        stat = False
-        for item in self.episodes_corpus:
-            if ('nan' in item) or ('NaN' in item):
-                stat = True
-        print(stat)
-
+        logger.debug("self.episodes_corpus + [" ".join(user_words)] is ${0}".format(self.episodes_corpus + [" ".join(user_words)]))
+        
         all_tf_idf = vectorizer.fit_transform(self.episodes_corpus + [" ".join(user_words)])
+        vocab_test = vectorizer.vocabulary_
+        
+        print('vocab_test length is ', len(vocab_test))
+        print('after fitting transform, the index of the word nan is  ', vocab_test.get('aa_'), vocab_test.get('NaN'), vocab_test.get('nan'))
+        print('after fitting transformation, the 122692 word is  ', list(vocab_test.keys())[122692])
         print("------------------------------------------------------------------------------")
-        logger.debug("*** after fit transform, shape of all_tf_idf is ")
+        logger.debug("*** after fitting transform, shape of all_tf_idf is ")
         print( all_tf_idf.shape)
         user_tf_idf = all_tf_idf[-1,:]
         user_tf_idf_dict = {word:user_tf_idf[0,self.vocab_dic[word]] for word in user_words}
