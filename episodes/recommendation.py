@@ -77,10 +77,15 @@ class episode():
         #get word_vectors trained from SO
         self.word_vec_file = mdir + "/word_vec_bigram/all_posts_word_vec.csv"
         self.word_vectors = pd.read_csv(self.word_vec_file, index_col=0)
-        self.word_vectors = self.word_vectors.drop(self.word_vectors.index[122692])
+        print(self.word_vectors.head())
+        print(self.word_vectors.shape)
+
+        print(list(self.word_vectors.index)[122692])
+        self.word_vectors = pd.concat([self.word_vectors.iloc[0:122692,:], self.word_vectors.iloc[122693:,:]])
         print("------------------------------------------------------------------------------")
         logger.debug("*** self_word_vectors shape is ")
         print(self.word_vectors.shape)
+        print(list(self.word_vectors.index)[122692])
         print("------------------------------------------------------------------------------")
         logger.debug("*** the 122692 row of self_word_vectors is ")
         print(self.word_vectors.iloc[122692, 0:10])
