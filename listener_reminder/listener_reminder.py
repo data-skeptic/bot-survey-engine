@@ -112,12 +112,12 @@ class Listener_Reminder():
     #             print('listener_reminder: error in sending email. Check the email address.')
     #         #return response if 'ErrorResponse' in response else 'successful. Check email box.' 
     def send_message2(self, contact_type, contact_account,episode_titles = [], episode_links = []):
-        print('Message is to be sent.')
+        print('** Message is to be sent.')
         message = 'Listen to Data Skeptic on iTunes, Spotify, Stitcher, or at dataskeptic.com'
         html_message = '<p>' + message + '</p>'
         for link in episode_links:
             html_message = html_message + link + "\n" 
-        if contact_type == 'email':
+        if contact_type == 'Email':
             client = boto3.client('ses',
                         region_name = 'us-east-1', 
                         aws_access_key_id = self.user, 
@@ -144,8 +144,9 @@ class Listener_Reminder():
                         )
             except:
                 print('listener_reminder: error in sending email. Check the email address.')
+
             #return response if 'ErrorResponse' in response else 'successful. Check email box.'  
-        if contact_type == 'sms':
+        if contact_type == 'SMS':
             sms_message = message
             for i in range(len(episode_links)):
                 episode_link = episode_links[i]
@@ -166,7 +167,7 @@ class Listener_Reminder():
                     Message = sms_message)
             except:
                 print('listener_reminder: error in sending message. Check the phone number.')
-
+        print('** sending message is done.')
     # def checkForReminders(self):
     #     query = "SELECT * FROM reminder_schedule WHERE scheduled = 0 and reminder_time > NOW() and reminder_time < DATE_ADD(NOW(), INTERVAL 5 MINUTE) "
     #     r = self.internal.execute(query)
